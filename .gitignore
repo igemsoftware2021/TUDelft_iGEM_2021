@@ -147,3 +147,4 @@ dmypy.json
 .pyre/
 
 # Loulotte's stuff
+.DS_Store
