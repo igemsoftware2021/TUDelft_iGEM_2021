@@ -148,3 +148,6 @@ dmypy.json
 
 # Loulotte's stuff
 .DS_Store
+
+# Boyd's stuff
+/sequence_analysis_pipeline/data/
