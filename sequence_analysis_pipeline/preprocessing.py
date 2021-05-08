@@ -80,3 +80,5 @@ subprocess.call(
     'chmod +x ' + bashfile_directory, shell=True)
 subprocess.call(bashfile_directory, shell=True)
 print('check2')
+
+# Maybe considering NGmerge instead of PEAR, since NGmerge is open-source software?
