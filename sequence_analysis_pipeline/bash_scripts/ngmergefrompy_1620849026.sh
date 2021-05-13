@@ -1,0 +1,1 @@
+/home/boydpeters/NGmerge-master/NGmerge -1 sequence_analysis_pipeline/data/NGS/N41-I14_S14_R1_001.fastq.gz -2 sequence_analysis_pipeline/data/NGS/N41-I14_S14_R2_001.fastq.gz -o N41-I14_S14_I14 > N41-I14_S14_I14_ngmerge.log
