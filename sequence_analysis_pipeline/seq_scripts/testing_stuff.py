@@ -7,10 +7,6 @@ import matplotlib.pyplot as plt
 
 print(matplotlib.get_backend())
 
-
-NGS_REFERENCE = {''}
-
-
 # inputfilename = snakemake.input[0]
 inputfilename = "sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_ngmerge_read_count.txt"
 
