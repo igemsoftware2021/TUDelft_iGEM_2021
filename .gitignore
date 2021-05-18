@@ -150,4 +150,4 @@ dmypy.json
 .DS_Store
 
 # Boyd's stuff
-/sequence_analysis_pipeline/data
+/sequence_analysis_pipeline/data/
