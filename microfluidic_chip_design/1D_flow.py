@@ -8,24 +8,24 @@ import math
 
 tau     = 0.63           # []
 R       = 12*10**-6      # [m]
-rho     = 1025           # [kg/m3]
-K       = 5.92*10**-9    # [m3/m2/s]
-µ       = 1.1*10**-3     # [kg/s^2/m]
+K       = 6.39*10**-13   # [m^2]
+µ       = 1.10*10**-3    # [kg/s^2/m]
 theta   = math.pi/6      # [radians]
-sigma   = 5.25*10**-2    # [kg/s^2]
+sigma   = 52.456*10**-3  # [N/m]
+k       = 6.39*10**-13   # [m^2]
 
 
 # for loop for lenght L and length of tortuous hollow fiber lp
 
-L = np.linspace(0, 10*10**-2, 101)    # from 0 to 10 cm, with steps of 1 mm [m] 
+L = np.linspace(0, 20*10**-2, 101)    # from 0 to 10 cm, with steps of 1 mm [cm] 
 
 for x in L:
-    lp  = tau * L                                                                     # [m]
-    u   = ( 2 * L * sigma * math.cos(theta) * rho * K ) / ( lp * R * µ * (rho+L) )    # [m/s]
+    lp  = (tau * L)                                                       # [cm]
+    u   = (((2*sigma*math.cos(theta)*K)/(R*µ))*(k/((lp/L)*k+L*K)))*10**6  # [µm/s]
 
 # Plotting of results
 
 plt.plot(L, u)
-plt.xlabel("Lenght L [m]")
-plt.ylabel("Velocity u [m/s]")
+plt.xlabel("Lenght L [mm]")
+plt.ylabel("Velocity u [µm/s]")
 plt.show()
