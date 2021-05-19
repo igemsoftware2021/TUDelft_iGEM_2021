@@ -2,21 +2,42 @@
 import sqlite3
 import re
 import numpy as np
-import matplotlib
 import matplotlib.pyplot as plt
+import csv
 
-print(matplotlib.get_backend())
+
+def read_ngs_references(path):
+    ngs_references = {}
+    with open(path, newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            ngs_references[row["sequence"]] = row["name"]
+    return ngs_references
 
 
-NGS_REFERENCE = {''}
+# def is_reference(sequence, references):
+#     patterns = []
+#     for key in references:
+#         patterns.append(re.compile(key))
 
+#     for pat in patterns:
+#         match = pat.search(sequence)
+#         if bool(match):
+#             return (True, sequence, match)
+#     return (False,)
+
+
+ngs_references = read_ngs_references(
+    "sequence_analysis_pipeline/ngs_references.csv")
+
+# print(ngs_references)
 
 # inputfilename = snakemake.input[0]
-inputfilename = "sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_ngmerge_read_count.txt"
+inputfilename = "sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_read_count.txt"
 
-clvd_prefix_pattern = re.compile("CTTTTCCGTATATCTCGCCAG")
+clvd_prefix_pattern = re.compile("CTTTTCCGTATATCTCGCCAG")  # A
 clvd_suffix_pattern = re.compile("AAAAAGAAACAGTC")
-unclvd_prefix_pattern = re.compile("GGGAAACAAACAAA")
+unclvd_prefix_pattern = re.compile("GGGAAACAAACAAA")  # W
 unclvd_suffix_pattern = re.compile("AAAAAGAAACAGTC")
 
 wrong_array = np.zeros(shape=(913709), dtype=np.int32)
@@ -29,6 +50,9 @@ with open(inputfilename) as rf:
     for line in lines:
         count += 1
         sequence = line.strip()
+        # result = is_reference(sequence, ngs_references)
+        # if result[0]:
+        #     print(result[1], result[2])
         prefix_match = clvd_prefix_pattern.search(sequence)
         # print(int(bool(prefix_match)))
         if bool(prefix_match):
@@ -41,8 +65,10 @@ with open(inputfilename) as rf:
                 # clvd_prefix = 2
                 # print("NOOOO CLVD OR UNCLVD PREFIX")
                 # print(sequence)
+                with open("sequence_analysis_pipeline/data/NGS/processed/bad_N41-I14_S14_read_count.txt", 'a+') as wf:
+                    wf.write(sequence + '\n')
                 wrong += 1
-        # if count == 20000:
+        # if count == 50000:
         #     break
         wrong_array[count] = wrong
         # print(clvd_prefix)
