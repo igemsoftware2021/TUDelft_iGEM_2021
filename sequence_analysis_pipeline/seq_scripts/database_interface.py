@@ -1,7 +1,8 @@
 import sqlite3
 
 
-class Database:
+class DatabaseInterface:
+    """Class to allow for easy interface with a database."""
 
     def __init__(self, path=None):
         self.conn = None
@@ -10,8 +11,8 @@ class Database:
         if path is not None:
             self.open(path)
 
-    def open(self, path):
-        """Function tries to connect to a database"""
+    def open(self, path: str):
+        """Function tries to connect to a database."""
         try:
             self.conn = sqlite3.connect(path)
             self.cursor = self.conn.cursor()
@@ -19,7 +20,7 @@ class Database:
             print("Error connecting to the database")
 
     def close(self):
-        """Function closes the database connection if there is one"""
+        """Function closes the database connection if there is one."""
         if self.conn is not None:
             self.conn.commit()
             self.cursor.close()
@@ -32,17 +33,17 @@ class Database:
         return self.close()
 
     def is_open(self):
-        """Function checks whether there is a database connection"""
+        """Function checks whether there is a database connection."""
         return self.conn is not None
 
-    def table_exists(self, table):
+    def table_exists(self, table: str) -> bool:
         """
-        Function checks whether the table with 'table_name' exists in the sqlite database.
-        args:
-        table_name (str)
-
-        return:
-        boolean
+        Function checks whether the table with 'table_name' exists in the sqlite database.\n
+        args:\n
+        table_name: (str) name of the table you want to check for existence.\n
+        \n
+        return values:\n
+        boolean: tells whether the table exists
         """
 
         if not self.is_open():
@@ -56,7 +57,7 @@ class Database:
         # else
         return False
 
-    def get(self, table, columns, limit=None):
+    def get(self, table: str, columns: list, limit: int = None) -> list:
 
         if not self.is_open():
             raise Exception("There is no database connection")
@@ -73,8 +74,8 @@ class Database:
             raise TypeError(
                 "The input variable 'columns' needs to be a list of column names as strings")
 
-    def query(self, sql):
-        """Function to query any other SQL statement"""
+    def query(self, sql: str):
+        """Function to query any other SQL statement."""
 
         if not self.is_open():
             raise Exception("There is no database connection")

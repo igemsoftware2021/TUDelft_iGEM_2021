@@ -6,15 +6,17 @@ import matplotlib.pyplot as plt
 import csv
 from database import Database
 
+# Filename is given by snakemake
+filename = 'fjasafakl'
 
-# def read_ngs_references(path):
-#     ngs_references = {}
-#     with open(path, newline='') as csvfile:
-#         reader = csv.DictReader(csvfile)
-#         for row in reader:
-#             ngs_references[row["sequence"]] = row["name"]
-#     return ngs_references
+# Should be set through a config file
+driver_round_pattern = "_R"
+selection_pattern = "S_"
+ligand_pattern = "L_"
 
+driver_round = int(re.match(driver_round_pattern, filename))
+selection = re.match(selection_pattern, filename)
+ligand_present = int(re.match(ligand_pattern, filename))
 
 # # def is_reference(sequence, references):
 # #     patterns = []
