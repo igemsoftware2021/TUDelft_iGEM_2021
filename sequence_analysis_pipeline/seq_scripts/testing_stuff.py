@@ -8,15 +8,15 @@ import matplotlib.pyplot as plt
 print(matplotlib.get_backend())
 
 # inputfilename = snakemake.input[0]
-inputfilename = "sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_ngmerge_read_count.txt"
+inputfilename = "/home/minke/iGEM_2021/TUDelft_iGEM_2021/sequence_analysis_pipeline/data/test_prefix/N38-I1_S1.txt"
 
-clvd_prefix_pattern = re.compile("CTTTTCCGTATATCTCGCCAG")
-clvd_suffix_pattern = re.compile("AAAAAGAAACAGTC")
-unclvd_prefix_pattern = re.compile("GGGAAACAAACAAA")
-unclvd_suffix_pattern = re.compile("AAAAAGAAACAGTC")
+clvd_prefix_pattern = re.compile("AGATCTTTTCCGTATATCTCGCCAG")
+clvd_suffix_pattern = re.compile("AAAAAGAAA")
+unclvd_prefix_pattern = re.compile("AGATGGGAAACAAACAAA")
+unclvd_suffix_pattern = re.compile("AAAAAGAAA")
 
-wrong_array = np.zeros(shape=(913709), dtype=np.int32)
-count_array = np.arange(0, 913709, step=1)
+wrong_array = np.zeros(shape=(3277315), dtype=np.int32)
+count_array = np.arange(0, 3277315, step=1)
 
 with open(inputfilename) as rf:
     count = 0
@@ -35,8 +35,8 @@ with open(inputfilename) as rf:
                 clvd_prefix = 0
             else:
                 # clvd_prefix = 2
-                # print("NOOOO CLVD OR UNCLVD PREFIX")
-                # print(sequence)
+                #print("NOOOO CLVD OR UNCLVD PREFIX")
+                print(sequence)
                 wrong += 1
         # if count == 20000:
         #     break
