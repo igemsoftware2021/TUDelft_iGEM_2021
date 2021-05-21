@@ -20,15 +20,18 @@ def create_ngs_references_patterns(ngs_references_dict: dict) -> dict:
     return patterns_dict
 
 
-def is_reference_seq(sequence: str, ngs_references_dict: dict) -> bool:
+def reference_seq(sequence: str, ngs_references_dict: dict):
+    """Function returns the name of the reference sequence or the string 'NULL'"""
     for seq_pattern in ngs_references_dict:
         match = seq_pattern.search(sequence)
         if match:
-            return (True, ngs_references_dict[seq_pattern])
-    return (False, None)
+            # True
+            return ngs_references_dict[seq_pattern]
+    # False
+    return "NULL"
 
 
-def prefix_match(sequence: str, clvd_prefix: dict = {"seq": "ACAAAACAAAAC", "name": "Z"}, unclvd_prefix: dict = {"seq": "AAACAAACAAA", "name": "W"}, additional_prefix=None) -> tuple:
+def determine_prefix(sequence: str, clvd_prefix: dict = {"seq": "ACAAAACAAAAC", "name": "Z"}, unclvd_prefix: dict = {"seq": "AAACAAACAAA", "name": "W"}, additional_prefix=None) -> tuple:
     """
     Function returns whether a sequence matches with a cleaved or uncleaved prefix sequences and returns
     the name of the prefix.\n
@@ -55,3 +58,14 @@ def prefix_match(sequence: str, clvd_prefix: dict = {"seq": "ACAAAACAAAAC", "nam
         else:
             clvd_prefix = 2  # TODO decide whether to implement additional sequence argument
     return (clvd_prefix, prefix_name)
+
+
+def retrieve_barcode(sequence: str, prefix: str) -> str:
+    prefix_match = re.search(prefix, sequence)
+    return sequence[:prefix_match.start()]
+
+
+def cleanup_sequence(sequence: str, prefix: str, suffix: str) -> str:
+    prefix_match = re.search(prefix, sequence)
+    suffix_match = re.search(suffix, sequence)
+    return sequence[prefix_match.end():suffix_match.start()]

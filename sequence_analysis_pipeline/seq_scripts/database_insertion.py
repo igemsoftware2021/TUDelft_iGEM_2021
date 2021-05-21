@@ -4,129 +4,114 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
-from database import Database
+from database_interface import DatabaseInterface
+import seq_helper
 
 # Filename is given by snakemake
-filename = 'fjasafakl'
+inputfilename = 'fjasafakl'
+#inputfiles = [snakemake.input[0], snakemake.input[1]]
+
+# Set through config file
+clvd_prefix_seq = "CTTTTCCGTATATCTCGCCAG"
+clvd_prefix_name = "A"
+clvd_suffix_seq = "AAAAAGAAA"
+unclvd_prefix_seq = "GGGAAACAAACAAA"
+unclvd_prefix_name = "W"
+unclvd_suffix_seq = "AAAAAGAAA"
 
 # Should be set through a config file
 driver_round_pattern = "_R"
 selection_pattern = "S_"
 ligand_pattern = "L_"
 
-driver_round = int(re.match(driver_round_pattern, filename))
-selection = re.match(selection_pattern, filename)
-ligand_present = int(re.match(ligand_pattern, filename))
+driver_round = int(re.match(driver_round_pattern, inputfilename))
+selection = re.match(selection_pattern, inputfilename)
+ligand_present = int(re.match(ligand_pattern, inputfilename))
 
-# # def is_reference(sequence, references):
-# #     patterns = []
-# #     for key in references:
-# #         patterns.append(re.compile(key))
+database_path = ":memory:"
 
-# #     for pat in patterns:
-# #         match = pat.search(sequence)
-# #         if bool(match):
-# #             return (True, sequence, match)
-# #     return (False,)
+ngs_references = seq_helper.read_ngs_references(
+    "sequence_analysis_pipeline/ngs_references.csv")
+ngs_references_pattern_dict = seq_helper.create_ngs_references_patterns(
+    ngs_references)
 
+# Create the database
 
-# ngs_references = read_ngs_references(
-#     "sequence_analysis_pipeline/ngs_references.csv")
+with DatabaseInterface(database_path) as db:
 
-# # print(ngs_references)
+    if not db.table_exists("sequences"):
+        db.query("""CREATE TABLE sequences (
+                    reads INTEGER,
+                    original_sequence TEXT,
+                    cleaned_sequence TEXT,
+                    barcode TEXT,
+                    prefix_name TEXT,
+                    cleaved_prefix INTEGER,
+                    reference_name TEXT,
+                    selection TEXT,
+                    round INTEGER,
+                    ligand_present INTEGER,
+                    cleavage_fraction REAL,
+                    fold_change REAL,
+                    sensor INTEGER
+                    )""")
+    else:
+        print("Table already exists, check if files are already processed.")
+        while True:
+            user_input = input(
+                "Do you want to continue filling the database? (Y/n)\t")
+            if user_input.lower().startswith('y'):
+                print("Database filling up...")
+            elif user_input.lower().startswith('n'):
+                exit()
 
-# # inputfilename = snakemake.input[0]
-# inputfilename = "sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_read_count.txt"
+with DatabaseInterface(database_path) as db:
 
-# clvd_prefix_pattern = re.compile("CTTTTCCGTATATCTCGCCAG")  # A
-# clvd_suffix_pattern = re.compile("AAAAAGAAACAGTC")
-# unclvd_prefix_pattern = re.compile("GGGAAACAAACAAA")  # W
-# unclvd_suffix_pattern = re.compile("AAAAAGAAACAGTC")
+    for inputfile in inputfiles:
 
-# wrong_array = np.zeros(shape=(913709), dtype=np.int32)
-# count_array = np.arange(0, 913709, step=1)
+        driver_round = int(re.match(driver_round_pattern, inputfilename))
+        selection = re.match(selection_pattern, inputfilename)
+        ligand_present = int(re.match(ligand_pattern, inputfilename))
 
-# with open(inputfilename) as rf:
-#     count = 0
-#     wrong = 0
-#     lines = rf.readlines()
-#     for line in lines:
-#         count += 1
-#         sequence = line.strip()
-#         # result = is_reference(sequence, ngs_references)
-#         # if result[0]:
-#         #     print(result[1], result[2])
-#         prefix_match = clvd_prefix_pattern.search(sequence)
-#         # print(int(bool(prefix_match)))
-#         if bool(prefix_match):
-#             clvd_prefix = 1
-#         else:
-#             prefix_match = unclvd_prefix_pattern.search(sequence)
-#             if bool(prefix_match):
-#                 clvd_prefix = 0
-#             else:
-#                 # clvd_prefix = 2
-#                 # print("NOOOO CLVD OR UNCLVD PREFIX")
-#                 # print(sequence)
-#                 with open("sequence_analysis_pipeline/data/NGS/processed/bad_N41-I14_S14_read_count.txt", 'a+') as wf:
-#                     wf.write(sequence + '\n')
-#                 wrong += 1
-#         # if count == 50000:
-#         #     break
-#         wrong_array[count] = wrong
-#         # print(clvd_prefix)
-#     print(wrong)
+        with open(inputfile) as rf:
+            lines = rf.readlines()
+            for line in lines:
+                sequence = line.strip()
 
+                # First check whether sequence is a reference sequence
+                reference_name = seq_helper.is_reference_seq(
+                    sequence, ngs_references_pattern_dict)
 
-# conn = sqlite3.connect(':memory:')
+                # conn = sqlite3.connect(':memory:')
 
-# c = conn.cursor()
+                # c = conn.cursor()
 
-# # A database is created with the following columns:
-# # reads: the number of reads, original_sequence: orignal sequence (TEXT)
-# # cleaned_sequence: DNA sequence with barcode prefix and suffix removed (TEXT),
-# # barcode: barcode of the sequence (TEXT), cleaved_prefix: yes(1)/no(0) (INTEGER),
-# # cleaved_suffix: yes(1)/no(0) (INTEGER), reference: indicates whether sequence is a
-# # reference sequence yes(1)/no(0) (INTEGER), round: round when the sequence was
-# # sequenced(INTEGER), ligand: ligand present yes(1)/no(0) (INTEGER),
-# # sensor: indicates whether sequence is a possible biosensor yes(1)/no(0) (INTEGER)
+                # # A database is created with the following columns:
+                # # reads: the number of reads, original_sequence: orignal sequence (TEXT)
+                # # cleaned_sequence: DNA sequence with barcode prefix and suffix removed (TEXT),
+                # # barcode: barcode of the sequence (TEXT), cleaved_prefix: yes(1)/no(0) (INTEGER),
+                # # cleaved_suffix: yes(1)/no(0) (INTEGER), reference: indicates whether sequence is a
+                # # reference sequence yes(1)/no(0) (INTEGER), round: round when the sequence was
+                # # sequenced(INTEGER), ligand: ligand present yes(1)/no(0) (INTEGER),
+                # # sensor: indicates whether sequence is a possible biosensor yes(1)/no(0) (INTEGER)
 
-# c.execute("""CREATE TABLE sequences (
-#             reads INTEGER,
-#             original_sequence TEXT,
-#             cleaned_sequence TEXT,
-#             barcode TEXT,
-#             cleaved_prefix INTEGER,
-#             cleaved_suffix INTEGER,
-#             reference INTEGER,
-#             selection TEXT,
-#             round INTEGER,
-#             ligand_present INTEGER,
-#             cleavage_fraction REAL,
-#             fold_change REAL,
-#             sensor INTEGER
-#             )""")
+                # c.execute("""CREATE TABLE sequences (
+                #             reads INTEGER,
+                #             original_sequence TEXT,
+                #             cleaned_sequence TEXT,
+                #             barcode TEXT,
+                #             cleaved_prefix INTEGER,
+                #             cleaved_suffix INTEGER,
+                #             reference INTEGER,
+                #             selection TEXT,
+                #             round INTEGER,
+                #             ligand_present INTEGER,
+                #             cleavage_fraction REAL,
+                #             fold_change REAL,
+                #             sensor INTEGER
+                #             )""")
 
-# fig, ax = plt.subplots()
-# ax.plot(wrong_array)
-# plt.show()
-# plt.savefig('test')
-
-
-with Database(":memory:") as db:
-    db.query("""CREATE TABLE sequences (
-            reads INTEGER,
-            original_sequence TEXT,
-            cleaned_sequence TEXT,
-            barcode TEXT,
-            cleaved_prefix INTEGER,
-            cleaved_suffix INTEGER,
-            reference INTEGER,
-            selection TEXT,
-            round INTEGER,
-            ligand_present INTEGER,
-            cleavage_fraction REAL,
-            fold_change REAL,
-            sensor INTEGER
-            )""")
-    print(db.is_open())
+                # fig, ax = plt.subplots()
+                # ax.plot(wrong_array)
+                # plt.show()
+                # plt.savefig('test')
