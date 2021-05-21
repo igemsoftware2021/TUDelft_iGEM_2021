@@ -31,41 +31,52 @@ def reference_seq(sequence: str, ngs_references_dict: dict):
     return "NULL"
 
 
-def determine_prefix(sequence: str, clvd_prefix: dict = {"seq": "ACAAAACAAAAC", "name": "Z"}, unclvd_prefix: dict = {"seq": "AAACAAACAAA", "name": "W"}, additional_prefix=None) -> tuple:
+def determine_clvd_prefix(sequence: str, clvd_prefix_info: dict = {"seq": "ACAAAACAAAAC", "name": "Z"}, unclvd_prefix_info: dict = {"seq": "AAACAAACAAA", "name": "W"}, additional_prefix=None) -> tuple:
     """
     Function returns whether a sequence matches with a cleaved or uncleaved prefix sequences and returns
     the name of the prefix.\n
     args:\n
     sequence: (str) sequence you want to check.\n
-    clvd_prefix: (dict) dictionary containing the sequence and name of the cleaved prefix.\n
-    unclvd_prefix: (dict) dictionary containing the sequence and name of the uncleaved prefix.\n
+    clvd_prefix_info: (dict) dictionary containing the sequence and name of the cleaved prefix.\n
+    unclvd_prefix_info: (dict) dictionary containing the sequence and name of the uncleaved prefix.\n
     additional_prefix: (dict) dictionary containing the sequence and name of an optional additional prefix.\n
     \n
     return values:\n
-    clvd_prefix: (int) value that tells you whether it is the cleaved prefix. 1 = Yes, 0 = No, 2 = Neither clvd or unclvd prefix.\n
+    clvd_prefix_info: (int) value that tells you whether it is the cleaved prefix. 1 = Yes, 0 = No, 2 = Neither clvd or unclvd prefix.\n
     prefix_name: (str) name of the found prefix.
     """
 
-    prefix_match = re.search(clvd_prefix["seq"], sequence)
+    prefix_match = re.search(clvd_prefix_info["seq"], sequence)
     if bool(prefix_match):
-        prefix_name = clvd_prefix["name"]
-        clvd_prefix = 1
+        prefix = clvd_prefix_info["seq"]
+        prefix_name = clvd_prefix_info["name"]
+        clvd_prefix_info = 1
     else:
-        prefix_match = re.search(unclvd_prefix["seq"], sequence)
+        prefix_match = re.search(unclvd_prefix_info["seq"], sequence)
         if bool(prefix_match):
-            prefix_name = unclvd_prefix["name"]
-            clvd_prefix = 0
+            prefix = unclvd_prefix_info["seq"]
+            prefix_name = unclvd_prefix_info["name"]
+            clvd_prefix_info = 0
         else:
-            clvd_prefix = 2  # TODO decide whether to implement additional sequence argument
-    return (clvd_prefix, prefix_name)
+            prefix = None
+            prefix_name = "NULL"
+            clvd_prefix_info = 2  # TODO decide whether to implement additional sequence argument
+    return (clvd_prefix_info, prefix_name, prefix)
 
 
 def retrieve_barcode(sequence: str, prefix: str) -> str:
-    prefix_match = re.search(prefix, sequence)
-    return sequence[:prefix_match.start()]
+    if prefix is not None:
+        prefix_match = re.search(prefix, sequence)
+        return sequence[:prefix_match.start()]
+    else:
+        return "NULL"
 
 
 def cleanup_sequence(sequence: str, prefix: str, suffix: str) -> str:
-    prefix_match = re.search(prefix, sequence)
-    suffix_match = re.search(suffix, sequence)
-    return sequence[prefix_match.end():suffix_match.start()]
+    if prefix is not None and suffix is not None:
+        prefix_match = re.search(prefix, sequence)
+        suffix_match = re.search(suffix, sequence)
+        if not bool(suffix_match):
+            return "NULL"
+        return sequence[prefix_match.end():suffix_match.start()]
+    return "NULL"

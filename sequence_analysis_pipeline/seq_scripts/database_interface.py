@@ -5,6 +5,7 @@ class DatabaseInterface:
     """Class to allow for easy interface with a database."""
 
     def __init__(self, path=None):
+        self.path = path
         self.conn = None
         self.cursor = None
 
@@ -17,7 +18,7 @@ class DatabaseInterface:
             self.conn = sqlite3.connect(path)
             self.cursor = self.conn.cursor()
         except sqlite3.Error:
-            print("Error connecting to the database")
+            raise Exception("Error connecting to the database")
 
     def close(self):
         """Function closes the database connection if there is one."""
@@ -74,10 +75,13 @@ class DatabaseInterface:
             raise TypeError(
                 "The input variable 'columns' needs to be a list of column names as strings")
 
-    def query(self, sql: str):
+    def query(self, sql: str, parameters=None):
         """Function to query any other SQL statement."""
 
         if not self.is_open():
             raise Exception("There is no database connection")
 
-        self.cursor.execute(sql)
+        if parameters is None:
+            self.cursor.execute(sql)
+        else:
+            self.cursor.execute(sql, parameters)
