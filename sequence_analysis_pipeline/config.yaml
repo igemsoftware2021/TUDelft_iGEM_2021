@@ -1,0 +1,24 @@
+samples:
+    A: filename1
+    B: filename2
+
+prefix:
+    cleaved:
+        name: A
+        sequence: CTTTTCCGTATATCTCGCCAG
+    uncleaved:
+        name: W
+        sequence: GGGAAACAAACAAA
+
+suffix:
+    cleaved:
+        name: X
+        sequence: AAAAAGAAA
+    uncleaved:
+        name: X
+        sequence: AAAAAGAAA
+
+info_patterns:
+    driver_round: "(?<=D)([0-9]+)"
+    selection: "(S[0-9]+)"
+    ligand_present: "(?<=L)([0-1]+)"

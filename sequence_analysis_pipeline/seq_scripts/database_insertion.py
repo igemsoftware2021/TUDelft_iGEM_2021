@@ -2,35 +2,54 @@ import sqlite3
 import re
 import numpy as np
 import matplotlib.pyplot as plt
-import csv
+import yaml
 from database_interface import DatabaseInterface
 import seq_helper
 
+
+with open("sequence_analysis_pipeline/config.yaml", "r") as rf:
+    try:
+        yaml_info = yaml.safe_load(rf)
+        clvd_prefix_seq = yaml_info["prefix"]["cleaved"]["sequence"]
+        clvd_prefix_name = yaml_info["prefix"]["cleaved"]["name"]
+        clvd_suffix_seq = yaml_info["suffix"]["cleaved"]["sequence"]
+
+        unclvd_prefix_seq = yaml_info["prefix"]["uncleaved"]["sequence"]
+        unclvd_prefix_name = yaml_info["prefix"]["uncleaved"]["name"]
+        unclvd_suffix_seq = yaml_info["suffix"]["uncleaved"]["sequence"]
+
+        driver_round_pattern = yaml_info["info_patterns"]["driver_round"]
+        selection_pattern = yaml_info["info_patterns"]["selection"]
+        ligand_present_pattern = yaml_info["info_patterns"]["ligand_present"]
+
+    except yaml.YAMLError as exc:
+        print(exc)
+
 # Filename is given by snakemake
 inputfiles = [
-    'sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_read_count.txt']
+    'sequence_analysis_pipeline/data/NGS/processed/S1_D80_L0_read_count.txt']
 #inputfiles = [snakemake.input[0], snakemake.input[1]]
 
 # Set through config file
-clvd_prefix_seq = "CTTTTCCGTATATCTCGCCAG"
-clvd_prefix_name = "A"
-clvd_suffix_seq = "AAAAAGAAA"
+# clvd_prefix_seq = "CTTTTCCGTATATCTCGCCAG"
+# clvd_prefix_name = "A"
+# clvd_suffix_seq = "AAAAAGAAA"
 
-unclvd_prefix_seq = "GGGAAACAAACAAA"
-unclvd_prefix_name = "W"
-unclvd_suffix_seq = "AAAAAGAAA"
+# unclvd_prefix_seq = "GGGAAACAAACAAA"
+# unclvd_prefix_name = "W"
+# unclvd_suffix_seq = "AAAAAGAAA"
 
 clvd_prefix_info = {"seq": clvd_prefix_seq, "name": clvd_prefix_name}
 unclvd_prefix_info = {"seq": unclvd_prefix_seq, "name": unclvd_prefix_name}
 
 
 # Should be set through a config file
-driver_round_pattern = "_R"
-selection_pattern = "S_"
-ligand_pattern = "L_"
+# driver_round_pattern = "_R"
+# selection_pattern = "S_"
+# ligand_pattern = "L_"
 
 # database_path = ":memory:"
-database_path = "sequence_analysis_pipeline/data/NGS/processed/N41-I14_S14_database.db"
+database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
 
 ngs_references = seq_helper.read_ngs_references(
     "sequence_analysis_pipeline/ngs_references.csv")
@@ -63,19 +82,21 @@ with DatabaseInterface(path=database_path) as db:
                 "Do you want to continue filling the database? (Y/n)\t")
             if user_input.lower().startswith('y'):
                 print("Database filling up...")
+                break
             elif user_input.lower().startswith('n'):
                 exit()
 
 with DatabaseInterface(path=database_path) as db:
     for inputfile in inputfiles:
 
-        # driver_round = int(re.match(driver_round_pattern, inputfilename))
-        # selection = re.match(selection_pattern, inputfilename)
-        # ligand_present = int(re.match(ligand_pattern, inputfilename))
+        driver_round = int(re.search(driver_round_pattern, inputfile).group())
+        selection = re.search(selection_pattern, inputfile).group()
+        ligand_present = int(
+            re.search(ligand_present_pattern, inputfile).group())
 
-        driver_round = 80
-        selection = "S4"
-        ligand_present = 0
+        # driver_round = 80
+        # selection = "S4"
+        # ligand_present = 0
 
         with open(inputfile) as rf:
             lines = rf.readlines()
@@ -100,6 +121,7 @@ with DatabaseInterface(path=database_path) as db:
 
                 sequence_info["barcode"] = seq_helper.retrieve_barcode(
                     sequence, prefix)
+
                 sequence_info["cleaned_sequence"] = seq_helper.cleanup_sequence(
                     sequence, prefix, clvd_suffix_seq)
 
