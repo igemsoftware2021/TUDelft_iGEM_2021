@@ -1,12 +1,11 @@
-import sqlite3
-import re
-import numpy as np
-import matplotlib.pyplot as plt
 import yaml
+import re
+from tqdm import tqdm
 from database_interface import DatabaseInterface
 import seq_helper
 
 
+# Read out all the information needed from the 'config.yaml' file
 with open("sequence_analysis_pipeline/config.yaml", "r") as rf:
     try:
         yaml_info = yaml.safe_load(rf)
@@ -17,6 +16,11 @@ with open("sequence_analysis_pipeline/config.yaml", "r") as rf:
         unclvd_prefix_seq = yaml_info["prefix"]["uncleaved"]["sequence"]
         unclvd_prefix_name = yaml_info["prefix"]["uncleaved"]["name"]
         unclvd_suffix_seq = yaml_info["suffix"]["uncleaved"]["sequence"]
+
+        # Store the clvd and unclvd prefix info in a dictionary for easy reference
+        clvd_prefix_info = {"seq": clvd_prefix_seq, "name": clvd_prefix_name}
+        unclvd_prefix_info = {
+            "seq": unclvd_prefix_seq, "name": unclvd_prefix_name}
 
         driver_round_pattern = yaml_info["info_patterns"]["driver_round"]
         selection_pattern = yaml_info["info_patterns"]["selection"]
@@ -30,26 +34,8 @@ inputfiles = [
     'sequence_analysis_pipeline/data/NGS/processed/S1_D80_L0_read_count.txt']
 #inputfiles = [snakemake.input[0], snakemake.input[1]]
 
-# Set through config file
-# clvd_prefix_seq = "CTTTTCCGTATATCTCGCCAG"
-# clvd_prefix_name = "A"
-# clvd_suffix_seq = "AAAAAGAAA"
-
-# unclvd_prefix_seq = "GGGAAACAAACAAA"
-# unclvd_prefix_name = "W"
-# unclvd_suffix_seq = "AAAAAGAAA"
-
-clvd_prefix_info = {"seq": clvd_prefix_seq, "name": clvd_prefix_name}
-unclvd_prefix_info = {"seq": unclvd_prefix_seq, "name": unclvd_prefix_name}
-
-
-# Should be set through a config file
-# driver_round_pattern = "_R"
-# selection_pattern = "S_"
-# ligand_pattern = "L_"
-
 # database_path = ":memory:"
-database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
+database_path = snakemake.output[0]
 
 ngs_references = seq_helper.read_ngs_references(
     "sequence_analysis_pipeline/ngs_references.csv")
@@ -87,20 +73,20 @@ with DatabaseInterface(path=database_path) as db:
                 exit()
 
 with DatabaseInterface(path=database_path) as db:
+    print("Insertion of the sequences in the database...")
     for inputfile in inputfiles:
+        print(f"Now inserting the sequences from {inputfile}")
 
+        # Retrieve the round of DRIVER, which selection it is and whether the ligand
+        # is present from the file
         driver_round = int(re.search(driver_round_pattern, inputfile).group())
         selection = re.search(selection_pattern, inputfile).group()
         ligand_present = int(
             re.search(ligand_present_pattern, inputfile).group())
 
-        # driver_round = 80
-        # selection = "S4"
-        # ligand_present = 0
-
         with open(inputfile) as rf:
             lines = rf.readlines()
-            for line in lines:
+            for line in tqdm(lines):
                 # Create a dictionary and store all general information for an unique sequence
                 sequence_info = {"driver_round": driver_round, "selection": selection, "ligand_present": ligand_present,
                                  "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0}
@@ -127,7 +113,7 @@ with DatabaseInterface(path=database_path) as db:
 
                 db.query("""INSERT INTO sequences VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
-                            :barcode, :cleaved_prefix, :prefix_name,:reference_name,
+                            :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor)""", parameters=sequence_info)
 
