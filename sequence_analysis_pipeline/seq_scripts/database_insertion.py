@@ -43,7 +43,7 @@ ngs_references = seq_helper.read_ngs_references(
 
 # Complement, reverse and cleanup the ngs reference sequences. Cleaning up
 # means removing the prefix and suffix from the sequence.
-ready_ngs_references = seq_helper.cleanup_reference_sequences_dict(
+ready_ngs_references = seq_helper.clean_ngs_reference_sequences(
     ngs_references)
 
 # Create a dictionary with the sequences as compiled regex objects. This is
@@ -91,21 +91,23 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                 sequence_info["read_count"] = read_count
                 sequence_info["original_sequence"] = sequence
 
-                clvd_prefix, prefix_name, prefix = seq_helper.determine_clvd_prefix(
-                    sequence, clvd_prefix_info=clvd_prefix_info, unclvd_prefix_info=unclvd_prefix_info)
+                prefix_seq, prefix_name = seq_helper.determine_prefix(sequence)
+
+                clvd_prefix = seq_helper.determine_clvd_prefix(
+                    prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
 
                 sequence_info["cleaved_prefix"] = clvd_prefix
                 sequence_info["prefix_name"] = prefix_name
 
                 sequence_info["barcode"] = seq_helper.retrieve_barcode(
-                    sequence, prefix)
+                    sequence, prefix_seq)
 
-                sequence_info["cleaned_sequence"] = seq_helper.cleanup_sequence(
-                    sequence, prefix, clvd_suffix_seq)
+                sequence_info["cleaned_sequence"] = seq_helper.clean_sequence(
+                    sequence, prefix_seq, clvd_suffix_seq)
 
                 # Determine whether the cleaned sequence is a cleaned reference sequence
                 sequence_info["reference_name"] = seq_helper.reference_seq(
-                    sequence, ready_ngs_references)
+                    sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
 
                 db.insert_sequence_info("sequences", sequence_info)
 
