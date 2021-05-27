@@ -44,7 +44,10 @@ with DatabaseInterfaceSequences(path=database_path) as db:
         #calculate the cleavage fraction in +ligand round
         clvg_frac = (r_clv / r_clv_ref)  /  ( (r_unclv / r_unclv_ref) + (r_clv / r_clv_ref) )
         
-        #put it in database with ID's !!!!
+        #put in database
+        db.update_cleavage_fraction(table=sequences, rowid=one_ID, cleavage_fraction=clvg_frac)
+        db.update_cleavage_fraction(table=sequences, rowid=unclv_ID, cleavage_fraction=clvg_frac)
+
 
 
         #-ligand round
@@ -62,3 +65,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
         #calculate the cleavage fraction in -ligand round
         clvg_frac_neg = (r_clv_neg / r_clv_ref_neg)  /  ((r_unclv_neg / r_unclv_ref_neg) + (r_clv_neg / r_clv_ref_neg))
+
+        #put in database
+        db.update_cleavage_fraction(table=sequences, rowid=clv_ID_neg, cleavage_fraction=clvg_frac_neg)
+        db.update_cleavage_fraction(table=sequences, rowid=unclv_ID_neg, cleavage_fraction=clvg_frac_neg)
