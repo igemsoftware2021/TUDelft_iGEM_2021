@@ -206,7 +206,7 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         fold_change: (float) value to insert in the fold_change column\n
         """
         self.query(
-            f"UPDATE {table} SET cleavage_fraction={fold_change} WHERE id={rowid}")
+            f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
 
     def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
