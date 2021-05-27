@@ -102,6 +102,26 @@ class DatabaseInterfaceSequences(DatabaseInterface):
 
     def __init__(self, path=None):
         super().__init__(path)
+        self.table = None
+
+    def create_table(self, table: str):
+        self.table = table
+        self.query(f"""CREATE TABLE {table} (
+                    id INTEGER PRIMARY KEY,
+                    read_count INTEGER,
+                    original_sequence TEXT,
+                    cleaned_sequence TEXT,
+                    barcode TEXT,
+                    cleaved_prefix INTEGER,
+                    prefix_name TEXT,
+                    reference_name TEXT,
+                    selection TEXT,
+                    driver_round INTEGER,
+                    ligand_present INTEGER,
+                    cleavage_fraction REAL,
+                    fold_change REAL,
+                    possible_sensor INTEGER
+                    )""")
 
     def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
