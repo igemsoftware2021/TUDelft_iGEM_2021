@@ -1,5 +1,6 @@
-import sqlite3 
+import sqlite3
 
-#1 - Select the cleaved sequences in the +ligand round
+# 1 - Select the cleaved sequences in the +ligand round
 with DatabaseInterfaceSequences(path=database_path) as db:
-    pass
+    test_var = 2
+    test_var = 5
