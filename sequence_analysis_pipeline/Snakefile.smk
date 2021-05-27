@@ -4,7 +4,7 @@ configfile: "config.yaml"
 # inputfiles:
 # "S1_D80_l0_read_counts.txt"
 # "S1_D80_l1_read_counts.txt"
-# Then dataset = S1_D80 and sample = L0/L11
+# Then dataset = S1_D80 and sample = L0/L1
 
 rule all:
     pass
@@ -18,8 +18,9 @@ rule all:
 
 rule insert_counts_into_database:
     input:
-        expand("/data/processed/{dataset}_{sample}_read_counts.txt", dataset=config["dataset"], sample=config["sample"])
+        "/data/processed/{dataset}_L0_read_counts.txt"
+        "/data/processed/{dataset}_L1_read_counts.txt"
     output:
-        expand("/data/processed/{dataset}_database.db", dataset=config["dataset"])
+        "/data/processed/{dataset}_database.db"
     script:
         "/seq_scripts/database_insertion.py"

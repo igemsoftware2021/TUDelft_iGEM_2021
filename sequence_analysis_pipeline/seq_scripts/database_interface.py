@@ -58,7 +58,18 @@ class DatabaseInterface:
         # else
         return False
 
-    def get(self, table: str, columns: list, limit: int = None) -> list:
+    def get(self, table: str, columns: list, limit: int = None, offset: int = 0) -> list:
+        """
+        Function to query data from a database.\n
+        args:\n
+        table: (str) name of the table you want to query.\n
+        columns: (list) list of strings of the column names.\n
+        limit: (int) optional keyword argument where you can limit the number of rows retrieved. The default value returns all rows.\n
+        offset: (int) optional keyword argument that allows you to offset your search query. This is only used if a non-default limit is set.\n
+        \n
+        return values:\n
+        list of tuples containing all information from the queried rows.
+        """
 
         if not self.is_open():
             raise Exception("There is no database connection")
@@ -66,10 +77,10 @@ class DatabaseInterface:
         if isinstance(columns, list):
             columns = ",".join(columns)
             if limit is None:
-                self.cursor.execute(f"SELECT {columns} FROM {table}")
+                self.cursor.execute(f"SELECT {columns} FROM {table} ")
             else:
                 self.cursor.execute(
-                    f"SELECT {columns} FROM {table} LIMIT {limit}")
+                    f"SELECT {columns} FROM {table} LIMIT {limit} OFFSET {offset}")
             return self.cursor.fetchall()
         else:
             raise TypeError(
@@ -85,3 +96,18 @@ class DatabaseInterface:
             self.cursor.execute(sql)
         else:
             self.cursor.execute(sql, parameters)
+
+
+class DatabaseInterfaceSequences(DatabaseInterface):
+
+    def __init__(self, path=None):
+        super().__init__(path)
+
+    def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
+        """
+        1 = yes
+        0 = no
+        """
+        self.cursor.execute(
+            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
+        return self.cursor.fetchall()

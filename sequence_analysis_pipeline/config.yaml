@@ -1,6 +1,4 @@
-samples:
-    A: filename1
-    B: filename2
+dataset: S1_D80
 
 prefix:
     cleaved:

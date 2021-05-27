@@ -1,7 +1,7 @@
 import yaml
 import re
 from tqdm import tqdm
-from database_interface import DatabaseInterface
+from database_interface import DatabaseInterfaceSequences
 import seq_helper
 
 
@@ -35,7 +35,8 @@ inputfiles = [
 #inputfiles = [snakemake.input[0], snakemake.input[1]]
 
 # database_path = ":memory:"
-database_path = snakemake.output[0]
+database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
+# database_path = snakemake.output[0]
 
 ngs_references = seq_helper.read_ngs_references(
     "sequence_analysis_pipeline/ngs_references.csv")
@@ -43,10 +44,11 @@ ngs_references_pattern_dict = seq_helper.create_ngs_references_patterns(
     ngs_references)
 
 # Create the database
-with DatabaseInterface(path=database_path) as db:
+with DatabaseInterfaceSequences(path=database_path) as db:
 
     if not db.table_exists("sequences"):
         db.query("""CREATE TABLE sequences (
+                    id INTEGER PRIMARY KEY,
                     read_count INTEGER,
                     original_sequence TEXT,
                     cleaned_sequence TEXT,
@@ -72,7 +74,7 @@ with DatabaseInterface(path=database_path) as db:
             elif user_input.lower().startswith('n'):
                 exit()
 
-with DatabaseInterface(path=database_path) as db:
+with DatabaseInterfaceSequences(path=database_path) as db:
     print("Insertion of the sequences in the database...")
     for inputfile in inputfiles:
         print(f"Now inserting the sequences from {inputfile}")
@@ -111,7 +113,10 @@ with DatabaseInterface(path=database_path) as db:
                 sequence_info["cleaned_sequence"] = seq_helper.cleanup_sequence(
                     sequence, prefix, clvd_suffix_seq)
 
-                db.query("""INSERT INTO sequences VALUES (
+                db.query("""INSERT INTO sequences(read_count, original_sequence, cleaned_sequence,
+                            barcode, cleaved_prefix, prefix_name, reference_name,
+                            selection, driver_round, ligand_present, cleavage_fraction,
+                            fold_change, possible_sensor) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
@@ -127,7 +132,8 @@ with DatabaseInterface(path=database_path) as db:
                 # # sensor: indicates whether sequence is a possible biosensor yes(1)/no(0) (INTEGER)
 
 
-with DatabaseInterface(path=database_path) as db:
+with DatabaseInterfaceSequences(path=database_path) as db:
     results = db.get(
         "sequences", ["original_sequence", "cleaned_sequence"], limit=10)
-    print(results)
+    # print(results)
+    print(db.get_sequences(ligand_present=0))
