@@ -1,5 +1,7 @@
 dataset: S1_D80
 
+pear_directory: /home/boydpeters/pear-0.9.11-linux-x86_64/bin/pear
+
 prefix:
     cleaved:
         name: A

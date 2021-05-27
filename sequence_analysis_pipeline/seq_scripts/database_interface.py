@@ -86,8 +86,30 @@ class DatabaseInterface:
             raise TypeError(
                 "The input variable 'columns' needs to be a list of column names as strings")
 
+    def get_all(self, table: str, limit: int = None, offset: int = 0) -> list:
+        """
+        Function to query rows and all columns from a database.\n
+        args:\n
+        table: (str) name of the table you want to query.\n
+        limit: (int) optional keyword argument where you can limit the number of rows retrieved. The default value returns all rows.\n
+        offset: (int) optional keyword argument that allows you to offset your search query. This is only used if a non-default limit is set.\n
+        \n
+        return values:\n
+        list of tuples containing all information from the queried rows.
+        """
+
+        if not self.is_open():
+            raise Exception("There is no database connection")
+
+        if limit is None:
+            self.cursor.execute(f"SELECT {columns} FROM {table} ")
+        else:
+            self.cursor.execute(
+                f"SELECT {columns} FROM {table} LIMIT {limit} OFFSET {offset}")
+        return self.cursor.fetchall()
+
     def query(self, sql: str, parameters=None):
-        """Function to query any other SQL statement."""
+        """Function to query any SQL statement."""
 
         if not self.is_open():
             raise Exception("There is no database connection")
@@ -105,8 +127,13 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         self.table = None
 
     def create_table(self, table: str):
+        """
+        Function creates a table in the database with the name given by the variable table.\n
+        args:\n
+        table: (str) name of the table to be created.
+        """
         self.table = table
-        self.query(f"""CREATE TABLE {table} (
+        self.query(f"""CREATE TABLE IF NOT EXISTS {table} (
                     id INTEGER PRIMARY KEY,
                     read_count INTEGER,
                     original_sequence TEXT,
@@ -122,6 +149,22 @@ class DatabaseInterfaceSequences(DatabaseInterface):
                     fold_change REAL,
                     possible_sensor INTEGER
                     )""")
+
+    def insert_sequence_info(self, table: str, sequence_info: dict):
+        """
+        Function inserts sequence info data into the database table 'table'.\n
+        args:\n
+        table: (str) name of the table.\n
+        sequence_info: (dict) dictionary where the keyword is the name of the column in the table and the value is the value you want to insert in that column.
+        """
+        self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
+                            barcode, cleaved_prefix, prefix_name, reference_name,
+                            selection, driver_round, ligand_present, cleavage_fraction,
+                            fold_change, possible_sensor) VALUES (
+                            :read_count, :original_sequence, :cleaned_sequence,
+                            :barcode, :cleaved_prefix, :prefix_name, :reference_name,
+                            :selection, :driver_round, :ligand_present, :cleavage_fraction,
+                            :fold_change, :possible_sensor)""", parameters=sequence_info)
 
     def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
         """

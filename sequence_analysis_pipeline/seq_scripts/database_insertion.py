@@ -47,22 +47,7 @@ ngs_references_pattern_dict = seq_helper.create_ngs_references_patterns(
 with DatabaseInterfaceSequences(path=database_path) as db:
 
     if not db.table_exists("sequences"):
-        db.query("""CREATE TABLE sequences (
-                    id INTEGER PRIMARY KEY,
-                    read_count INTEGER,
-                    original_sequence TEXT,
-                    cleaned_sequence TEXT,
-                    barcode TEXT,
-                    cleaved_prefix INTEGER,
-                    prefix_name TEXT,
-                    reference_name TEXT,
-                    selection TEXT,
-                    driver_round INTEGER,
-                    ligand_present INTEGER,
-                    cleavage_fraction REAL,
-                    fold_change REAL,
-                    possible_sensor INTEGER
-                    )""")
+        db.create_table("sequences")
     else:
         print("Table already exists, check if files are already processed.")
         while True:
@@ -73,6 +58,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                 break
             elif user_input.lower().startswith('n'):
                 exit()
+
 
 with DatabaseInterfaceSequences(path=database_path) as db:
     print("Insertion of the sequences in the database...")
@@ -113,14 +99,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                 sequence_info["cleaned_sequence"] = seq_helper.cleanup_sequence(
                     sequence, prefix, clvd_suffix_seq)
 
-                db.query("""INSERT INTO sequences(read_count, original_sequence, cleaned_sequence,
-                            barcode, cleaved_prefix, prefix_name, reference_name,
-                            selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor) VALUES (
-                            :read_count, :original_sequence, :cleaned_sequence,
-                            :barcode, :cleaved_prefix, :prefix_name, :reference_name,
-                            :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor)""", parameters=sequence_info)
+                db.insert_sequence_info("sequences", sequence_info)
 
                 # # A database is created with the following columns:
                 # # reads: the number of reads, original_sequence: orignal sequence (TEXT)
@@ -135,5 +114,5 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 with DatabaseInterfaceSequences(path=database_path) as db:
     results = db.get(
         "sequences", ["original_sequence", "cleaned_sequence"], limit=10)
-    # print(results)
-    print(db.get_sequences(ligand_present=0))
+    print(results)
+    # print(db.get_sequences(ligand_present=0))
