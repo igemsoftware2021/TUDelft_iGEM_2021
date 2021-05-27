@@ -41,13 +41,15 @@ database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.d
 ngs_references = seq_helper.read_ngs_references(
     "sequence_analysis_pipeline/ngs_references.csv")
 
-adjusted_ngs_references = seq_helper.cleanup_reference_sequences_dict(
+# Complement, reverse and cleanup the ngs reference sequences. Cleaning up
+# means removing the prefix and suffix from the sequence.
+ready_ngs_references = seq_helper.cleanup_reference_sequences_dict(
     ngs_references)
 
-# ngs_references_pattern_dict = seq_helper.create_ngs_references_patterns(
-#     adjusted_ngs_references)
-
-# print(ngs_references_pattern_dict)
+# Create a dictionary with the sequences as compiled regex objects. This is
+# for optimization.
+clean_ngs_reference_patterns = seq_helper.create_ngs_references_patterns(
+    ready_ngs_references)
 
 # Create the database
 with DatabaseInterfaceSequences(path=database_path) as db:
@@ -103,7 +105,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
                 # Determine whether the cleaned sequence is a cleaned reference sequence
                 sequence_info["reference_name"] = seq_helper.reference_seq(
-                    sequence, adjusted_ngs_references)
+                    sequence, ready_ngs_references)
 
                 db.insert_sequence_info("sequences", sequence_info)
 
@@ -111,7 +113,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
     results = db.get(
         "sequences", ["original_sequence", "cleaned_sequence"], limit=10)
 
-    # print(results)
-    testing = db.get_ref_sequences()
-    print(testing)
+    print(results)
+    # testing = db.get_ref_sequences()
+    # print(testing)
     # print(db.get_sequences(ligand_present=0))
