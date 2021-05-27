@@ -225,3 +225,15 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         self.cursor.execute(
             f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND reference_name IS NOT NULL")
         return self.cursor.fetchall()
+    
+    def get_uncleaved_sequence(self, cleaned_sequence: str, cleaved_prefix: int=0):
+        """
+        Function finds the information of the uncleaved variant of a specific sequence
+        cleaned_sequence = target sequence
+        cleaved_prefix
+        """
+        
+        self.cursor.execute(
+            f"SELECT * FROM sequences WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix}")
+        return self.cursor.fetchall()
+
