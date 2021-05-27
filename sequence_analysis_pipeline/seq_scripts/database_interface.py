@@ -216,13 +216,12 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         self.cursor.execute(
             f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
-    
-    def get_ref_sequences(self, cleaved_prefix: int=1, reference_name: str ='NULL'):
+
+    def get_ref_sequences(self, cleaved_prefix: int = 1):
         """
         cleaved_prefix = 1 --> reference sequence with prefix corresponding to cleaved sequences
         cleaved_prefix = 0 --> reference sequence with prefix corresponding to uncleaved sequences
         """
-
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND reference_name!={reference_name}")
+            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND reference_name IS NOT NULL")
         return self.cursor.fetchall()
