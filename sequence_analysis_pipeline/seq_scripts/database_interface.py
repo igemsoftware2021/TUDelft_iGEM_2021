@@ -187,7 +187,8 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
-
+    
+    
 
 class DatabaseInterfaceCleanSequences(DatabaseInterface):
 
@@ -203,9 +204,9 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         The created database has the following columns:\n
         id: (INTEGER PRIMARY KEY) unique integer for every row\n
         read_count: (INTEGER) number of reads\n
-        original_sequence: (TEXT) sequence with barcode, prefix and suffix still attached\n
+        # original_sequence: (TEXT) sequence with barcode, prefix and suffix still attached\n
         cleaned_sequence: (TEXT) sequence with barcode, prefix and suffix removed\n
-        barcode: (TEXT) barcode sequence\n
+        # barcode: (TEXT) barcode sequence\n
         cleaved_prefix: (INTEGER) indicates whether the prefix corresponds to the cleaved prefix. Yes(1)/No(0)/Don't know(2)\n
         prefix_name: (TEXT) name of the prefix\n
         reference_name: (TEXT) is name of the reference sequence, if not a reference sequence value is NULL\n
@@ -259,6 +260,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
 
+    
+
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """
         Function updates the cleavage fraction at the row rowid.\n
@@ -280,6 +283,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         """
         self.query(
             f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
+
 
     def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
