@@ -174,6 +174,9 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         table: (str) name of the table.\n
         sequence_info: (dict) dictionary where the keyword is the name of the column in the table and the value is the value you want to insert in that column.
         """
+        if not self.is_open():
+            raise Exception("There is no database connection")
+
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
@@ -182,6 +185,28 @@ class DatabaseInterfaceSequences(DatabaseInterface):
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor)""", parameters=sequence_info)
+
+    def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
+        """
+        Function updates the cleavage fraction at the row rowid.\n
+        args:\n
+        table: (str) name of the table\n
+        rowid: (int) row to update\n
+        cleavage_fraction: (float) value to insert in the cleavage_fraction column\n
+        """
+        self.query(
+            f"UPDATE {table} SET cleavage_fraction={cleavage_fraction} WHERE id={rowid}")
+
+    def update_fold_change(self, table: str, rowid: int, fold_change: float):
+        """
+        Function updates the cleavage fraction at the row rowid.\n
+        args:\n
+        table: (str) name of the table\n
+        rowid: (int) row to update\n
+        fold_change: (float) value to insert in the fold_change column\n
+        """
+        self.query(
+            f"UPDATE {table} SET cleavage_fraction={fold_change} WHERE id={rowid}")
 
     def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
         """

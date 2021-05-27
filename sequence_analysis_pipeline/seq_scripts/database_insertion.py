@@ -101,16 +101,6 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
                 db.insert_sequence_info("sequences", sequence_info)
 
-                # # A database is created with the following columns:
-                # # reads: the number of reads, original_sequence: orignal sequence (TEXT)
-                # # cleaned_sequence: DNA sequence with barcode prefix and suffix removed (TEXT),
-                # # barcode: barcode of the sequence (TEXT), cleaved_prefix: yes(1)/no(0) (INTEGER),
-                # # cleaved_suffix: yes(1)/no(0) (INTEGER), reference: indicates whether sequence is a
-                # # reference sequence yes(1)/no(0) (INTEGER), round: round when the sequence was
-                # # sequenced(INTEGER), ligand: ligand present yes(1)/no(0) (INTEGER),
-                # # sensor: indicates whether sequence is a possible biosensor yes(1)/no(0) (INTEGER)
-
-
 with DatabaseInterfaceSequences(path=database_path) as db:
     results = db.get(
         "sequences", ["original_sequence", "cleaned_sequence"], limit=10)
