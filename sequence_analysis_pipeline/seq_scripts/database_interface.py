@@ -102,10 +102,10 @@ class DatabaseInterface:
             raise Exception("There is no database connection")
 
         if limit is None:
-            self.cursor.execute(f"SELECT {columns} FROM {table} ")
+            self.cursor.execute(f"SELECT * FROM {table} ")
         else:
             self.cursor.execute(
-                f"SELECT {columns} FROM {table} LIMIT {limit} OFFSET {offset}")
+                f"SELECT * FROM {table} LIMIT {limit} OFFSET {offset}")
         return self.cursor.fetchall()
 
     def query(self, sql: str, parameters=None):
@@ -129,6 +129,21 @@ class DatabaseInterfaceSequences(DatabaseInterface):
     def create_table(self, table: str):
         """
         Function creates a table in the database with the name given by the variable table.\n
+        \n
+        The created database has the following columns:\n
+        id: (INTEGER PRIMARY KEY) unique integer for every row
+        read_count: (INTEGER) number of reads
+        original_sequence: (TEXT) the original sequence with barcode, prefix and suffix still attached
+        cleaned_sequence: (TEXT)
+
+        # # A database is created with the following columns:
+                # # reads: the number of reads, original_sequence: orignal sequence (TEXT)
+                # # cleaned_sequence: DNA sequence with barcode prefix and suffix removed (TEXT),
+                # # barcode: barcode of the sequence (TEXT), cleaved_prefix: yes(1)/no(0) (INTEGER),
+                # # cleaved_suffix: yes(1)/no(0) (INTEGER), reference: indicates whether sequence is a
+                # # reference sequence yes(1)/no(0) (INTEGER), round: round when the sequence was
+                # # sequenced(INTEGER), ligand: ligand present yes(1)/no(0) (INTEGER),
+                # # sensor: indicates whether sequence is a possible biosensor yes(1)/no(0) (INTEGER)
         args:\n
         table: (str) name of the table to be created.
         """
