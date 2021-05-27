@@ -217,23 +217,30 @@ class DatabaseInterfaceSequences(DatabaseInterface):
             f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
-    def get_ref_sequences(self, cleaved_prefix: int = 1):
+    def get_ref_sequences(self, cleaved_prefix: int = 1, ligand_present: int=1):
         """
         cleaved_prefix = 1 --> reference sequence with prefix corresponding to cleaved sequences
         cleaved_prefix = 0 --> reference sequence with prefix corresponding to uncleaved sequences
         """
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND reference_name IS NOT NULL")
+            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present} AND reference_name IS NOT NULL")
         return self.cursor.fetchall()
     
-    def get_uncleaved_sequence(self, cleaned_sequence: str, cleaved_prefix: int=0):
+    def get_uncleaved_sequence(self, cleaned_sequence: str, cleaved_prefix: int=0, ligand_present: int=1):
         """
         Function finds the information of the uncleaved variant of a specific sequence
         cleaned_sequence = target sequence
         cleaved_prefix
         """
-        
+
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix}")
+            f"SELECT * FROM sequences WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
+    def get_sequence_negligand(self, cleaned_seqence: str, cleaved_prefix: int=1, ligand_present: int=0):
+        """
+        Function finds the information of specific sequence in the negative ligand rounds
+        """
+        self.cursor.execute(
+            f"SELECT * FROM sequences WHERE cleaned_sequence={cleaned_sequence} AND ligand_present={ligand_present} AND cleaved_prefix={cleaved_prefix}")
+        return self.cursor.fetchall()
