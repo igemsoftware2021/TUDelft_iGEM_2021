@@ -1,5 +1,5 @@
 import yaml
-import re
+import regex
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceSequences
 import seq_helper
@@ -41,19 +41,21 @@ database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.d
 ngs_references = seq_helper.read_ngs_references(
     "sequence_analysis_pipeline/ngs_references.csv")
 
-adjusted_ngs_references = seq_helper.cleanup_reference_sequences_dict(
+# Complement, reverse and cleanup the ngs reference sequences. Cleaning up
+# means removing the prefix and suffix from the sequence.
+ready_ngs_references = seq_helper.clean_ngs_reference_sequences(
     ngs_references)
 
-# ngs_references_pattern_dict = seq_helper.create_ngs_references_patterns(
-#     adjusted_ngs_references)
-
-# print(ngs_references_pattern_dict)
+# Create a dictionary with the sequences as compiled regex objects. This is
+# for optimization.
+clean_ngs_reference_patterns = seq_helper.create_ngs_references_patterns(
+    ready_ngs_references)
 
 # Create the database
 with DatabaseInterfaceSequences(path=database_path) as db:
 
-    if not db.table_exists("sequences"):
-        db.create_table("sequences")
+    if not db.table_exists("raw_sequences"):
+        db.create_table("raw_sequences")
     else:
         print("Table already exists, check if files are already processed.")
         while True:
@@ -73,45 +75,55 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
         # Retrieve the round of DRIVER, which selection it is and whether the ligand
         # is present from the file
-        driver_round = int(re.search(driver_round_pattern, inputfile).group())
-        selection = re.search(selection_pattern, inputfile).group()
+        driver_round = int(regex.search(
+            driver_round_pattern, inputfile).group())
+        selection = regex.search(selection_pattern, inputfile).group()
         ligand_present = int(
-            re.search(ligand_present_pattern, inputfile).group())
+            regex.search(ligand_present_pattern, inputfile).group())
 
         with open(inputfile) as rf:
             lines = rf.readlines()
             for line in tqdm(lines):
                 # Create a dictionary and store all general information for an unique sequence
                 sequence_info = {"driver_round": driver_round, "selection": selection, "ligand_present": ligand_present,
-                                 "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0}
+                                 "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0, "mutated_prefix": 0}
 
                 read_count, sequence = line.strip().split()
                 sequence_info["read_count"] = read_count
                 sequence_info["original_sequence"] = sequence
 
-                clvd_prefix, prefix_name, prefix = seq_helper.determine_clvd_prefix(
-                    sequence, clvd_prefix_info=clvd_prefix_info, unclvd_prefix_info=unclvd_prefix_info)
+                prefix_seq, prefix_name = seq_helper.determine_prefix(sequence)
+
+                clvd_prefix = seq_helper.determine_clvd_prefix(
+                    prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
 
                 sequence_info["cleaved_prefix"] = clvd_prefix
                 sequence_info["prefix_name"] = prefix_name
 
                 sequence_info["barcode"] = seq_helper.retrieve_barcode(
-                    sequence, prefix)
+                    sequence, prefix_seq)
 
-                sequence_info["cleaned_sequence"] = seq_helper.cleanup_sequence(
-                    sequence, prefix, clvd_suffix_seq)
+                sequence_info["cleaned_sequence"] = seq_helper.clean_sequence(
+                    sequence, prefix_seq, clvd_suffix_seq)
 
                 # Determine whether the cleaned sequence is a cleaned reference sequence
                 sequence_info["reference_name"] = seq_helper.reference_seq(
-                    sequence, adjusted_ngs_references)
+                    sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
 
-                db.insert_sequence_info("sequences", sequence_info)
+                db.insert_sequence_info("raw_sequences", sequence_info)
 
 with DatabaseInterfaceSequences(path=database_path) as db:
     results = db.get(
         "sequences", ["original_sequence", "cleaned_sequence"], limit=10)
 
-    # print(results)
-    testing = db.get_ref_sequences()
-    print(testing)
+    print(results)
+    # testing = db.get_ref_sequences()
+    # print(testing)
     # print(db.get_sequences(ligand_present=0))
+
+
+# Fetchall rows only columns (cleaned_sequence, prefix_name, ligand_present)
+# Put the tuples in a set
+# Go over all the tuples in the set, query the data, add the read counts and put all info
+# in new table.
+# Then do the cleavage fraction and stuff
