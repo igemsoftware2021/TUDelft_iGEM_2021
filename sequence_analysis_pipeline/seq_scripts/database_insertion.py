@@ -1,7 +1,7 @@
 import yaml
 import regex
 from tqdm import tqdm
-from database_interface import DatabaseInterfaceSequences
+from database_interface import DatabaseInterfaceRawSequences
 import seq_helper
 
 
@@ -9,18 +9,22 @@ import seq_helper
 with open("sequence_analysis_pipeline/config.yaml", "r") as rf:
     try:
         yaml_info = yaml.safe_load(rf)
-        clvd_prefix_seq = yaml_info["prefix"]["cleaved"]["sequence"]
-        clvd_prefix_name = yaml_info["prefix"]["cleaved"]["name"]
+        prefixes = yaml_info["prefixes"]
+
+        prefix_patterns = {}
+        for prefix in prefixes:
+            sequence = yaml_info["prefixes"][prefix]["sequence"]
+            prefix_name = yaml_info["prefixes"][prefix]["name"]
+            prefix_patterns[regex.compile(
+                fr"(?e)({sequence}){{e<=1}}")] = prefix_name
+
+        clvd_prefix_seq = yaml_info["prefixes"]["cleaved"]["sequence"]
+        clvd_prefix_name = yaml_info["prefixes"]["cleaved"]["name"]
         clvd_suffix_seq = yaml_info["suffix"]["cleaved"]["sequence"]
 
-        unclvd_prefix_seq = yaml_info["prefix"]["uncleaved"]["sequence"]
-        unclvd_prefix_name = yaml_info["prefix"]["uncleaved"]["name"]
+        unclvd_prefix_seq = yaml_info["prefixes"]["uncleaved"]["sequence"]
+        unclvd_prefix_name = yaml_info["prefixes"]["uncleaved"]["name"]
         unclvd_suffix_seq = yaml_info["suffix"]["uncleaved"]["sequence"]
-
-        # Store the clvd and unclvd prefix info in a dictionary for easy reference
-        clvd_prefix_info = {"seq": clvd_prefix_seq, "name": clvd_prefix_name}
-        unclvd_prefix_info = {
-            "seq": unclvd_prefix_seq, "name": unclvd_prefix_name}
 
         driver_round_pattern = yaml_info["info_patterns"]["driver_round"]
         selection_pattern = yaml_info["info_patterns"]["selection"]
@@ -28,6 +32,8 @@ with open("sequence_analysis_pipeline/config.yaml", "r") as rf:
 
     except yaml.YAMLError as exc:
         print(exc)
+
+print(prefix_patterns)
 
 # Filename is given by snakemake
 inputfiles = [
@@ -51,11 +57,13 @@ ready_ngs_references = seq_helper.clean_ngs_reference_sequences(
 clean_ngs_reference_patterns = seq_helper.create_ngs_references_patterns(
     ready_ngs_references)
 
-# Create the database
-with DatabaseInterfaceSequences(path=database_path) as db:
+table_name = "raw_sequences"
 
-    if not db.table_exists("raw_sequences"):
-        db.create_table("raw_sequences")
+# Create the database
+with DatabaseInterfaceRawSequences(path=database_path) as db:
+
+    if not db.table_exists(table_name):
+        db.create_table(table_name)
     else:
         print("Table already exists, check if files are already processed.")
         while True:
@@ -67,8 +75,9 @@ with DatabaseInterfaceSequences(path=database_path) as db:
             elif user_input.lower().startswith('n'):
                 exit()
 
-
-with DatabaseInterfaceSequences(path=database_path) as db:
+# TODO remove this
+count = 0
+with DatabaseInterfaceRawSequences(path=database_path) as db:
     print("Insertion of the sequences in the database...")
     for inputfile in inputfiles:
         print(f"Now inserting the sequences from {inputfile}")
@@ -89,10 +98,15 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                                  "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0, "mutated_prefix": 0}
 
                 read_count, sequence = line.strip().split()
-                sequence_info["read_count"] = read_count
+                sequence_info["read_count"] = int(read_count)
                 sequence_info["original_sequence"] = sequence
 
-                prefix_seq, prefix_name = seq_helper.determine_prefix(sequence)
+                prefix_seq, prefix_name = seq_helper.determine_prefix(
+                    sequence, prefix_info=prefix_patterns)
+
+                # TODO remove this
+                if prefix_name is None:
+                    count += 1
 
                 clvd_prefix = seq_helper.determine_clvd_prefix(
                     prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
@@ -110,13 +124,15 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                 sequence_info["reference_name"] = seq_helper.reference_seq(
                     sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
 
-                db.insert_sequence_info("raw_sequences", sequence_info)
+                db.insert_sequence_info(table_name, sequence_info)
 
-with DatabaseInterfaceSequences(path=database_path) as db:
+# TODO remove this
+print(count)
+
+with DatabaseInterfaceRawSequences(path=database_path) as db:
     results = db.get(
-        "sequences", ["original_sequence", "cleaned_sequence"], limit=10)
+        table_name, ["original_sequence", "cleaned_sequence"], limit=10)
 
-    print(results)
     # testing = db.get_ref_sequences()
     # print(testing)
     # print(db.get_sequences(ligand_present=0))

@@ -78,12 +78,14 @@ def reference_seq(sequence: str, ngs_references_dict: dict):
     return "NULL"
 
 
-def determine_prefix(sequence: str, prefix_info={"ACAAAACAAAAC": "Z", "AAACAAACAAA": "W", "CTTTTCCGTATATCTCGCCAG": "A"}):
+def determine_prefix(sequence: str, prefix_info={regex.compile(r"(?e)(ACAAAACAAAAC){e<=1}"): "Z", regex.compile(
+        r"(?e)(AAACAAACAAA){e<=1}"): "W", regex.compile(r"(?e)(CTTTTCCGTATATCTCGCCAG){e<=1}"): "A"}):
     """"""
-    for prefix_seq in prefix_info:
-        prefix_match = regex.search(prefix_seq, sequence)
+    for prefix_pattern in prefix_info:
+        prefix_match = prefix_pattern.search(sequence)
         if bool(prefix_match):
-            prefix_name = prefix_info[prefix_seq]
+            prefix_name = prefix_info[prefix_pattern]
+            prefix_seq = prefix_match.group()
             return prefix_seq, prefix_name
     return None, None
 

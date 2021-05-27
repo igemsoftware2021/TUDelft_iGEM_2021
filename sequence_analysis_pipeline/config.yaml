@@ -2,21 +2,24 @@ dataset: S1_D80
 
 pear_directory: /home/boydpeters/pear-0.9.11-linux-x86_64/bin/pear
 
-prefix:
+prefixes:
     cleaved:
-        name: A
         sequence: CTTTTCCGTATATCTCGCCAG
+        name: A
     uncleaved:
-        name: W
         sequence: GGGAAACAAACAAA
+        name: W
+    other:
+        sequence: ACAAAACAAAAC
+        name: Z
 
 suffix:
     cleaved:
-        name: X
         sequence: AAAAAGAAA
+        name: X
     uncleaved:
-        name: X
         sequence: AAAAAGAAA
+        name: X
 
 info_patterns:
     driver_round: "(?<=D)([0-9]+)"
