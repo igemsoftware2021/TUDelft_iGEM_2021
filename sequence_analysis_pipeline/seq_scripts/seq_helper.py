@@ -1,5 +1,5 @@
 import csv
-import re
+import regex
 
 
 def read_ngs_references(path: str) -> dict:
@@ -63,7 +63,7 @@ def create_ngs_references_patterns(ngs_references_dict: dict) -> dict:
     every time we want to check for a reference sequence."""
     patterns_dict = {}
     for seq in ngs_references_dict:
-        patterns_dict[re.compile(seq)] = ngs_references_dict[seq]
+        patterns_dict[regex.compile(seq)] = ngs_references_dict[seq]
     return patterns_dict
 
 
@@ -81,7 +81,7 @@ def reference_seq(sequence: str, ngs_references_dict: dict):
 def determine_prefix(sequence: str, prefix_info={"ACAAAACAAAAC": "Z", "AAACAAACAAA": "W", "CTTTTCCGTATATCTCGCCAG": "A"}):
     """"""
     for prefix_seq in prefix_info:
-        prefix_match = re.search(prefix_seq, sequence)
+        prefix_match = regex.search(prefix_seq, sequence)
         if bool(prefix_match):
             prefix_name = prefix_info[prefix_seq]
             return prefix_seq, prefix_name
@@ -110,7 +110,7 @@ def determine_clvd_prefix(prefix_name, clvd_prefix_name="Z", unclvd_prefix_name=
 
 def retrieve_barcode(sequence: str, prefix: str) -> str:
     if prefix is not None:
-        prefix_match = re.search(prefix, sequence)
+        prefix_match = regex.search(prefix, sequence)
         return sequence[:prefix_match.start()]
     else:
         return "NULL"
@@ -118,8 +118,8 @@ def retrieve_barcode(sequence: str, prefix: str) -> str:
 
 def clean_sequence(sequence: str, prefix: str, suffix: str) -> str:
     if prefix is not None and suffix is not None:
-        prefix_match = re.search(prefix, sequence)
-        suffix_match = re.search(suffix, sequence)
+        prefix_match = regex.search(prefix, sequence)
+        suffix_match = regex.search(suffix, sequence)
         if not bool(suffix_match):
             return "NULL"
         return sequence[prefix_match.end():suffix_match.start()]

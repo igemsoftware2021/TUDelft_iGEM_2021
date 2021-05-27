@@ -120,7 +120,7 @@ class DatabaseInterface:
             self.cursor.execute(sql, parameters)
 
 
-class DatabaseInterfaceSequences(DatabaseInterface):
+class DatabaseInterfaceRawSequences(DatabaseInterface):
 
     def __init__(self, path=None):
         super().__init__(path)
@@ -145,6 +145,7 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         cleavage_fraction: (REAL) value of the cleavage fraction for a sequence\n
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
+        mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
@@ -164,7 +165,8 @@ class DatabaseInterfaceSequences(DatabaseInterface):
                     ligand_present INTEGER,
                     cleavage_fraction REAL,
                     fold_change REAL,
-                    possible_sensor INTEGER
+                    possible_sensor INTEGER,
+                    mutated_prefix INTEGER
                     )""")
 
     def insert_sequence_info(self, table: str, sequence_info: dict):
@@ -180,11 +182,82 @@ class DatabaseInterfaceSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor) VALUES (
+                            fold_change, possible_sensor, mutated_prefix) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor)""", parameters=sequence_info)
+                            :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
+
+
+class DatabaseInterfaceCleanSequences(DatabaseInterface):
+
+    def __init__(self, path=None):
+        super().__init__(path)
+        self.table = None
+
+    # TODO remove unneeded columns
+    def create_table(self, table: str):
+        """
+        Function creates a table in the database with the name given by the variable table.\n
+        \n
+        The created database has the following columns:\n
+        id: (INTEGER PRIMARY KEY) unique integer for every row\n
+        read_count: (INTEGER) number of reads\n
+        original_sequence: (TEXT) sequence with barcode, prefix and suffix still attached\n
+        cleaned_sequence: (TEXT) sequence with barcode, prefix and suffix removed\n
+        barcode: (TEXT) barcode sequence\n
+        cleaved_prefix: (INTEGER) indicates whether the prefix corresponds to the cleaved prefix. Yes(1)/No(0)/Don't know(2)\n
+        prefix_name: (TEXT) name of the prefix\n
+        reference_name: (TEXT) is name of the reference sequence, if not a reference sequence value is NULL\n
+        selection: (TEXT) name of the selection\n
+        driver_round: (INTEGER) round of driver at the moment of sequencing\n
+        ligand_present: (INTEGER) indicates whether the ligand was present before sequencing. Yes(1)/No(0)\n
+        cleavage_fraction: (REAL) value of the cleavage fraction for a sequence\n
+        fold_change: (REAL) value of the fold change for a sequence\n
+        possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
+        mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
+        \n
+        args:\n
+        table: (str) name of the table to be created.
+        """
+        self.table = table
+        self.query(f"""CREATE TABLE IF NOT EXISTS {table} (
+                    id INTEGER PRIMARY KEY,
+                    read_count INTEGER,
+                    original_sequence TEXT,
+                    cleaned_sequence TEXT,
+                    barcode TEXT,
+                    cleaved_prefix INTEGER,
+                    prefix_name TEXT,
+                    reference_name TEXT,
+                    selection TEXT,
+                    driver_round INTEGER,
+                    ligand_present INTEGER,
+                    cleavage_fraction REAL,
+                    fold_change REAL,
+                    possible_sensor INTEGER,
+                    mutated_prefix INTEGER
+                    )""")
+
+    # TODO remove unneeded columns
+    def insert_sequence_info(self, table: str, sequence_info: dict):
+        """
+        Function inserts sequence info data into the database table 'table'.\n
+        args:\n
+        table: (str) name of the table.\n
+        sequence_info: (dict) dictionary where the keyword is the name of the column in the table and the value is the value you want to insert in that column.
+        """
+        if not self.is_open():
+            raise Exception("There is no database connection")
+
+        self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
+                            barcode, cleaved_prefix, prefix_name, reference_name,
+                            selection, driver_round, ligand_present, cleavage_fraction,
+                            fold_change, possible_sensor, mutated_prefix) VALUES (
+                            :read_count, :original_sequence, :cleaned_sequence,
+                            :barcode, :cleaved_prefix, :prefix_name, :reference_name,
+                            :selection, :driver_round, :ligand_present, :cleavage_fraction,
+                            :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
 
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """

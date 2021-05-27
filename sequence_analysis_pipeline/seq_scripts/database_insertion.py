@@ -1,5 +1,5 @@
 import yaml
-import re
+import regex
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceSequences
 import seq_helper
@@ -54,8 +54,8 @@ clean_ngs_reference_patterns = seq_helper.create_ngs_references_patterns(
 # Create the database
 with DatabaseInterfaceSequences(path=database_path) as db:
 
-    if not db.table_exists("sequences"):
-        db.create_table("sequences")
+    if not db.table_exists("raw_sequences"):
+        db.create_table("raw_sequences")
     else:
         print("Table already exists, check if files are already processed.")
         while True:
@@ -75,17 +75,18 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
         # Retrieve the round of DRIVER, which selection it is and whether the ligand
         # is present from the file
-        driver_round = int(re.search(driver_round_pattern, inputfile).group())
-        selection = re.search(selection_pattern, inputfile).group()
+        driver_round = int(regex.search(
+            driver_round_pattern, inputfile).group())
+        selection = regex.search(selection_pattern, inputfile).group()
         ligand_present = int(
-            re.search(ligand_present_pattern, inputfile).group())
+            regex.search(ligand_present_pattern, inputfile).group())
 
         with open(inputfile) as rf:
             lines = rf.readlines()
             for line in tqdm(lines):
                 # Create a dictionary and store all general information for an unique sequence
                 sequence_info = {"driver_round": driver_round, "selection": selection, "ligand_present": ligand_present,
-                                 "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0}
+                                 "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0, "mutated_prefix": 0}
 
                 read_count, sequence = line.strip().split()
                 sequence_info["read_count"] = read_count
@@ -109,7 +110,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                 sequence_info["reference_name"] = seq_helper.reference_seq(
                     sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
 
-                db.insert_sequence_info("sequences", sequence_info)
+                db.insert_sequence_info("raw_sequences", sequence_info)
 
 with DatabaseInterfaceSequences(path=database_path) as db:
     results = db.get(
@@ -119,3 +120,10 @@ with DatabaseInterfaceSequences(path=database_path) as db:
     # testing = db.get_ref_sequences()
     # print(testing)
     # print(db.get_sequences(ligand_present=0))
+
+
+# Fetchall rows only columns (cleaned_sequence, prefix_name, ligand_present)
+# Put the tuples in a set
+# Go over all the tuples in the set, query the data, add the read counts and put all info
+# in new table.
+# Then do the cleavage fraction and stuff
