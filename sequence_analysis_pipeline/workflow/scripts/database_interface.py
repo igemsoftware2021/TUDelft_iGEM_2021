@@ -218,7 +218,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
         mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
-        mutated_prefix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
+        mutated_suffix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
@@ -261,7 +261,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
     
-    def get_all_unique_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int)
+    def get_all_unique_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int):
         """
         Function gets all info of one unique sequence to insert in the clean_sequences table
         """
