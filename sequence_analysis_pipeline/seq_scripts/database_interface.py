@@ -227,9 +227,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.query(f"""CREATE TABLE IF NOT EXISTS {table} (
                     id INTEGER PRIMARY KEY,
                     read_count INTEGER,
-                    original_sequence TEXT,
                     cleaned_sequence TEXT,
-                    barcode TEXT,
                     cleaved_prefix INTEGER,
                     prefix_name TEXT,
                     reference_name TEXT,
@@ -254,14 +252,22 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         if not self.is_open():
             raise Exception("There is no database connection")
 
-        self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
-                            barcode, cleaved_prefix, prefix_name, reference_name,
+        self.query(f"""INSERT INTO {table}(read_count, cleaned_sequence,
+                            cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
                             fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
-                            :read_count, :original_sequence, :cleaned_sequence,
-                            :barcode, :cleaved_prefix, :prefix_name, :reference_name,
+                            :read_count, :cleaned_sequence,
+                            :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
+    
+    def get_all_unique_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int)
+        """
+        Function gets all info of one unique sequence to insert in the clean_sequences table
+        """
+        self.cursor.execute(
+            f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
+        return self.cursor.fetchall()
 
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """
