@@ -1,11 +1,12 @@
 from database_interface import DatabaseInterfaceCleanSequences
-
+import sqlite3
+from tqdm import tqdm
 
 database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
 # database_path = snakemake.output[0]
 
 # Fetch data for raw_sequences
-with DatabaseInterface(path=database_path) as db:
+with DatabaseInterfaceCleanSequences(path=database_path) as db:
     # Fetchall rows only columns (cleaned_sequence, prefix_name, ligand_present)
     pre_data_seq = db.get(table="raw_sequences", columns=["cleaned_sequence", "cleaved_prefix", "ligand_present"])
     
@@ -32,7 +33,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
 
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
-    for i in range(len(unique_rows)):
+    for i in tqdm(range(len(unique_rows))):
         # get for every unique sequence all the read_counts
         sequence_all = db.get_all_unique_sequence(table="raw_sequences", cleaned_sequences=unique_rows[i][0], cleaved_prefix=unique_rows[i][1], ligand_present=unique_rows[i][2])
         read_counts_new = sum([p[1] for p in sequence_all])
