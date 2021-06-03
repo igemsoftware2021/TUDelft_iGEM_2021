@@ -146,6 +146,9 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# snakemake
+.snakemake
+
 # Loulotte's stuff
 .DS_Store
 
