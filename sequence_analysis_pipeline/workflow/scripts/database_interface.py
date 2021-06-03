@@ -260,8 +260,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                             :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
                             :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
-    
-    def get_all_unique_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int)
+
+    def get_all_unique_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int):
         """
         Function gets all info of one unique sequence to insert in the clean_sequences table
         """

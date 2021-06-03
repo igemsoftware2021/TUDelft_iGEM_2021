@@ -56,8 +56,10 @@ inputfiles = [
 database_path = "sequence_analysis_pipeline/data/NGS/processed/T1_D80_database.db"
 # database_path = snakemake.output[0]
 
-ngs_references = seq_helper.read_ngs_references(
-    "sequence_analysis_pipeline/ngs_references.csv")
+ngs_references_path = config_file_path = Path(
+    __file__).resolve().parents[2] / "data" / "ngs_references.csv"
+
+ngs_references = seq_helper.read_ngs_references(ngs_references_path)
 
 # Complement, reverse and cleanup the ngs reference sequences. Cleaning up
 # means removing the prefix and suffix from the sequence.
@@ -87,8 +89,6 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
             elif user_input.lower().startswith('n'):
                 exit()
 
-# TODO remove this
-count = 0
 with DatabaseInterfaceRawSequences(path=database_path) as db:
     print("Insertion of the sequences in the database...")
     for inputfile in inputfiles:
@@ -123,10 +123,6 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
                     sequence, patterns_info=suffix_patterns)
                 sequence_info["mutated_suffix"] = mutated_suffix
 
-                # TODO remove this
-                if prefix_name is None:
-                    count += 1
-
                 clvd_prefix = seq_helper.determine_clvd_prefix(
                     prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
 
@@ -145,8 +141,6 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
 
                 db.insert_sequence_info(TABLE_NAME, sequence_info)
 
-# TODO remove this
-print(count)
 
 with DatabaseInterfaceRawSequences(path=database_path) as db:
     results = db.get(

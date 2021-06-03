@@ -1,0 +1,58 @@
+configfile: "config/config.yaml"
+
+# Example
+# inputfiles:
+# "S1_D80_l0_read_counts.txt"
+# "S1_D80_l1_read_counts.txt"
+# Then dataset = S1_D80 and sample = L0/L1
+
+# dataset = config["dataset"]
+
+rule all:
+    input:
+        # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset=config["dataset"], read=["R1", "R2"])
+        expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset="N41-I14_S14", read=["R1", "R2"])
+
+rule fastqc:
+    input:
+        "data/NGS/{sample}.fastq.gz"
+    output:
+        "results/fastqc_reports/{sample}_fastqc.html",
+        "results/fastqc_reports/{sample}_fastqc.zip"
+    conda:
+        "envs/fastqc.yaml"
+    log:
+        "logs/{sample}_fastqc.log"
+    shell:
+        """
+        #!/bin/bash
+        fastqc {input} -o results/fastqc_reports/ 2> {log}
+        """
+
+# rule pear:
+#     input:
+#         pass
+#     output:
+#         "{dataset}.assembled.fastq"
+#         "{dataset}.discarded.fastq"
+#         "{dataset}.unassembled.forward.fastq"
+#         "{dataset}.unassembled.reverse.fastq"
+#     conda:
+#         "envs/pear.yaml"
+
+# rule calculate_cleavage_fraction:
+#     input:
+#         "/data/processed/{dataset}_database.db"
+#     output:
+#         "/data/processed/{dataset}_database.db"
+
+rule insert_counts_into_database:
+    input:
+        "/data/processed/{dataset}_L0_read_counts.txt",
+        "/data/processed/{dataset}_L1_read_counts.txt"
+    output:
+        "/result/databases/{dataset}_database.db"
+    conda:
+        "envs/database.yaml"
+    script:
+        "/scripts/database_insertion.py"
