@@ -1,10 +1,11 @@
 import sqlite3
-from database_interface import DatabaseInterfaceSequences
+from database_interface import DatabaseInterfaceCleanSequences
 
+#add right path for the table with the clean sequences
 database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
 # database_path = snakemake.input[0]
 
-with DatabaseInterfaceSequences(path=database_path) as db:
+with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
     # 1 - Get number of reads of the references with cleaved prefix in +ligand round
     clv_ref_info = db.get_ref_sequences()

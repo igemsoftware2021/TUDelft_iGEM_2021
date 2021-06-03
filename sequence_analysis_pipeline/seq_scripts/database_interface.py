@@ -202,7 +202,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         Function creates a table in the database with the name given by the variable table.\n
         \n
         The created database has the following columns:\n
-        id: (INTEGER PRIMARY KEY) unique integer for every row\n
+        # id: (INTEGER PRIMARY KEY) unique integer for every row\n
         read_count: (INTEGER) number of reads\n
         # original_sequence: (TEXT) sequence with barcode, prefix and suffix still attached\n
         cleaned_sequence: (TEXT) sequence with barcode, prefix and suffix removed\n
@@ -285,25 +285,25 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
             f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
 
 
-    def get_sequences(self, cleaved_prefix: int = 1, ligand_present: int = 1):
+    def get_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
         1 = yes
         0 = no
         """
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
+            f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
-    def get_ref_sequences(self, cleaved_prefix: int = 1, ligand_present: int=1):
+    def get_ref_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int=1):
         """
         cleaved_prefix = 1 --> reference sequence with prefix corresponding to cleaved sequences
         cleaved_prefix = 0 --> reference sequence with prefix corresponding to uncleaved sequences
         """
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present} AND reference_name IS NOT NULL")
+            f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present} AND reference_name IS NOT NULL")
         return self.cursor.fetchall()
     
-    def get_uncleaved_sequence(self, cleaned_sequence: str, cleaved_prefix: int=0, ligand_present: int=1):
+    def get_uncleaved_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int=0, ligand_present: int=1):
         """
         Function finds the information of the uncleaved variant of a specific sequence
         cleaned_sequence = target sequence
@@ -311,13 +311,13 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         """
 
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
+            f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
-    def get_sequence_negligand(self, cleaned_seqence: str, cleaved_prefix: int=1, ligand_present: int=0):
+    def get_sequence_negligand(self, table: str, cleaned_seqence: str, cleaved_prefix: int=1, ligand_present: int=0):
         """
         Function finds the information of specific sequence in the negative ligand rounds
         """
         self.cursor.execute(
-            f"SELECT * FROM sequences WHERE cleaned_sequence={cleaned_sequence} AND ligand_present={ligand_present} AND cleaved_prefix={cleaved_prefix}")
+            f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND ligand_present={ligand_present} AND cleaved_prefix={cleaved_prefix}")
         return self.cursor.fetchall()

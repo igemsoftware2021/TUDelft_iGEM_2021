@@ -121,11 +121,4 @@ with DatabaseInterfaceSequences(path=database_path) as db:
     # print(testing)
     # print(db.get_sequences(ligand_present=0))
 
-with DatabaseInterfaceCleanSequences(path=database_path) as db:
-# Fetchall rows only columns (cleaned_sequence, prefix_name, ligand_present)
-#with get function
 
-# Put the tuples in a set
-# Go over all the tuples in the set, query the data, add the read counts and put all info
-# in new table.
-# Then do the cleavage fraction and stuff
