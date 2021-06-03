@@ -153,5 +153,7 @@ dmypy.json
 .DS_Store
 
 # Boyd's stuff
-/sequence_analysis_pipeline/data/
 /sponsor_scraping/
+
+# data
+sequence_analysis_pipeline/data/raw/

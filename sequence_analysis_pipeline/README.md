@@ -20,10 +20,13 @@ The pipeline was created and tested on __Ubuntu 20.04__. Here are the steps one 
 4. Now follow the installation steps from snakemake, make sure to do the __full__ installation. The link to the installation steps: https://snakemake.readthedocs.io/en/stable/getting_started/installation.html.
 5. Congratulations you now have succesfully installed snakemake! We recommand that you follow the short snakemake tutorial on the site of snakemake. This will help you understand how snakemake works and how our pipeline is built. Here is the link to the tutorial: https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html.
 
+## Running the pipeline
+
 ### Prepare the data
 1. Create a folder called `raw` in the `data` folder in the `sequence_analysis_pipeline` folder.
 2. Insert the forward and reverse Illumina reads in this folder. They will look something like *..._R1_001.fastq.gz* and *..._R2_001.fastq.gz*.
 3. Adjust the file called `ngs_references.csv` in the `data` folder. Change the reference sequences to your own reference sequences. The columns __name__ and __sequence__ will be read in during the running of the pipeline. The column __information__ won't be read in and this is a place where you can add extra information for yourself, but you can also delete this.
+4. 
 
 ### Run the software
 1. Open the `sequence_analysis_pipeline` folder.
