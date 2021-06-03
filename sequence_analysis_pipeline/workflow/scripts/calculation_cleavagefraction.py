@@ -46,6 +46,10 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         unclv_seq_info = db.get_uncleaved_sequence(cleaned_sequence=one_seq)
         unclv_ID = unclv_seq_info[0]  # get key ID of uncleaved sequence
 
+        #to do, check dit
+
+        r_unclv = unclv_seq_info[1]   # get read count of uncleaved sequence
+
         # calculate the cleavage fraction in +ligand round
         clvg_frac = (r_clv / r_clv_ref) / \
             ((r_unclv / r_unclv_ref) + (r_clv / r_clv_ref))

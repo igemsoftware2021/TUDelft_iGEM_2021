@@ -218,7 +218,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
         mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
-        mutated_prefix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
+        mutated_suffix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
