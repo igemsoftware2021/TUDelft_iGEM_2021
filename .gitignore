@@ -151,4 +151,4 @@ dmypy.json
 
 # Boyd's stuff
 /sequence_analysis_pipeline/data/
-sequence_analysis_pipeline/sponsor_scraping/
+/sponsor_scraping/

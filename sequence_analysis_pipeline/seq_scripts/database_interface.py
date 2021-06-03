@@ -146,6 +146,7 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
         mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
+        mutated_prefix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
@@ -166,7 +167,8 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
                     cleavage_fraction REAL,
                     fold_change REAL,
                     possible_sensor INTEGER,
-                    mutated_prefix INTEGER
+                    mutated_prefix INTEGER,
+                    mutated_suffix INTEGER
                     )""")
 
     def insert_sequence_info(self, table: str, sequence_info: dict):
@@ -182,13 +184,12 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix) VALUES (
+                            fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
-    
-    
+                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
+
 
 class DatabaseInterfaceCleanSequences(DatabaseInterface):
 
@@ -217,6 +218,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
         mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
+        mutated_prefix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
@@ -237,7 +239,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     cleavage_fraction REAL,
                     fold_change REAL,
                     possible_sensor INTEGER,
-                    mutated_prefix INTEGER
+                    mutated_prefix INTEGER,
+                    mutated_suffix INTEGER
                     )""")
 
     # TODO remove unneeded columns
@@ -254,13 +257,11 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix) VALUES (
+                            fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
-
-    
+                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
 
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """
@@ -284,7 +285,6 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.query(
             f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
 
-
     def get_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
         1 = yes
@@ -294,7 +294,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
             f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
-    def get_ref_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int=1):
+    def get_ref_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
         cleaved_prefix = 1 --> reference sequence with prefix corresponding to cleaved sequences
         cleaved_prefix = 0 --> reference sequence with prefix corresponding to uncleaved sequences
@@ -302,8 +302,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.cursor.execute(
             f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present} AND reference_name IS NOT NULL")
         return self.cursor.fetchall()
-    
-    def get_uncleaved_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int=0, ligand_present: int=1):
+
+    def get_uncleaved_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int = 0, ligand_present: int = 1):
         """
         Function finds the information of the uncleaved variant of a specific sequence
         cleaned_sequence = target sequence
@@ -314,7 +314,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
             f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
-    def get_sequence_negligand(self, table: str, cleaned_seqence: str, cleaved_prefix: int=1, ligand_present: int=0):
+    def get_sequence_negligand(self, table: str, cleaned_sequence: str, cleaved_prefix: int = 1, ligand_present: int = 0):
         """
         Function finds the information of specific sequence in the negative ligand rounds
         """
