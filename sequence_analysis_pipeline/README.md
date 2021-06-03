@@ -1,13 +1,22 @@
 # Sequence analysis pipeline
 Developer: TU Delft iGEM team 2021
+
 Questions to: igem@tudelft.nl
 
 ## Setup
-If on *Windows*:
-Download VirtualBox and install a Linux virtual machine. The pipeline was created tested on *Ubuntu 20.04*.
-Step by step instructions: https://itsfoss.com/install-linux-in-virtualbox/.
+### Windows
+Download VirtualBox and install a Linux virtual machine. The pipeline was created tested on __Ubuntu 20.04__.
+Step by step instructions for the installation of the VirtualBox and Ubuntu: https://itsfoss.com/install-linux-in-virtualbox/.
 
-The following steps are for Linux and MacOS.
+Follow the steps for Linux on the the VirtualBox.
+
+### MacOS
+Same steps as for Linux.
+
+### Linux
+The pipeline was created and tested on __Ubuntu 20.04__.
+
+The following steps need to be done on either Linux or MacOS.
 
 
 
