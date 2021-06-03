@@ -1,27 +1,33 @@
-dataset: S1_D80
+dataset: T1_D80
 
 pear_directory: /home/boydpeters/pear-0.9.11-linux-x86_64/bin/pear
+
 
 prefixes:
     cleaved:
         sequence: CTTTTCCGTATATCTCGCCAG
         name: A
+        max_error: 1
     uncleaved:
         sequence: GGGAAACAAACAAA
         name: W
+        max_error: 1
     other:
         sequence: ACAAAACAAAAC
         name: Z
+        max_error: 1
 
-suffix:
+suffixes:
     cleaved:
         sequence: AAAAAGAAA
         name: X
+        max_error: 1
     uncleaved:
         sequence: AAAAAGAAA
         name: X
+        max_error: 1
 
 info_patterns:
     driver_round: "(?<=D)([0-9]+)"
-    selection: "(S[0-9]+)"
+    selection: "(T[0-9]+)"
     ligand_present: "(?<=L)([0-1]+)"

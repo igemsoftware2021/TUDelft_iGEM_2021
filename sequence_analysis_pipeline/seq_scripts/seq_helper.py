@@ -1,3 +1,4 @@
+from typing import Tuple
 import csv
 import regex
 
@@ -20,24 +21,11 @@ def complement_reverse_sequence(sequence: str) -> str:
     complement_seq = [complement[base] for base in sequence]
     # Reverse the list
     complement_seq = complement_seq[::-1]
-    complement_seq = ''.join(complement_seq)
+    complement_seq = "".join(complement_seq)
     return complement_seq
 
 
-def clean_reference_sequence(sequence: str, suffix: str) -> str:
-    """Function cleans a sequence by removing the prefix and the suffix.\n
-    args:\n
-    sequence: (str) sequence to clean up.\n
-    suffix: (str) sequence of the suffix which should be removed.\n
-    \n
-    return values:
-    cleaned_seq: (str) cleaned sequence"""
-    prefix_seq, _ = determine_prefix(sequence)
-    cleaned_seq = clean_sequence(sequence, prefix_seq, suffix)
-    return cleaned_seq
-
-
-def clean_ngs_reference_sequences(ngs_references_dict: dict) -> dict:
+def clean_ngs_reference_sequences(ngs_references_dict: dict, prefix_info: dict, suffix_info: dict) -> dict:
     """Function goes over every reference sequence in a dict. Finds the
     complement for that sequence and reverses it. Then it cleans this sequences
     by removing the prefix and suffix. The cleaned sequence is then stored in a dictionary,
@@ -45,6 +33,7 @@ def clean_ngs_reference_sequences(ngs_references_dict: dict) -> dict:
     \n
     args:\n
     ngs_references_dict: (dict) a dictionary where the key is a reference sequence and the value is the name of this sequence.\n
+    suffix: (str) sequence of the suffix which should be removed.\n
     \n
     return values:\n
     cleaned_ngs_references: (dict) a dictionary where the key is a cleaned reference sequence and the value is the name of this sequence.
@@ -52,7 +41,9 @@ def clean_ngs_reference_sequences(ngs_references_dict: dict) -> dict:
     cleaned_ngs_references = {}
     for reference_seq in ngs_references_dict:
         reversed_seq = complement_reverse_sequence(reference_seq)
-        cleaned_seq = clean_reference_sequence(reversed_seq, "AAAAAGAAA")
+        prefix_seq, _, _ = determine_pattern(reversed_seq, prefix_info)
+        suffix_seq, _, _ = determine_pattern(reversed_seq, suffix_info)
+        cleaned_seq = clean_sequence(reversed_seq, prefix_seq, suffix_seq)
         cleaned_ngs_references[cleaned_seq] = ngs_references_dict[reference_seq]
     return cleaned_ngs_references
 
@@ -78,16 +69,30 @@ def reference_seq(sequence: str, ngs_references_dict: dict):
     return "NULL"
 
 
-def determine_prefix(sequence: str, prefix_info={regex.compile(r"(?e)(ACAAAACAAAAC){e<=1}"): "Z", regex.compile(
-        r"(?e)(AAACAAACAAA){e<=1}"): "W", regex.compile(r"(?e)(CTTTTCCGTATATCTCGCCAG){e<=1}"): "A"}):
-    """"""
-    for prefix_pattern in prefix_info:
-        prefix_match = prefix_pattern.search(sequence)
-        if bool(prefix_match):
-            prefix_name = prefix_info[prefix_pattern]
-            prefix_seq = prefix_match.group()
-            return prefix_seq, prefix_name
-    return None, None
+def determine_pattern(sequence: str, patterns_info: dict) -> Tuple[str, str, int]:
+    """Function loops over all the patterns in patterns_info. The patterns_info should either contain the sequences of the prefixes
+    or suffixes. While looping over the patterns it checks whether there is a match of this pattern in the sequence.
+    If this is the case, it returns the matched sequence and the name of the pattern that matched.\n
+    args:\n
+    sequence: (str) DNA sequence in which you want to check for a pattern.\n
+    patterns_info: (dict) key should be a compiled regex pattern and the value should be the name of the regex pattern. Example:\n
+    {regex.compile(r"(?e)(ACAAAACAAAAC){e<=1}"): "Z", regex.compile(r"(?e)(AAACAAACAAA){e<=1}"): "W", regex.compile(r"(?e)(CTTTTCCGTATATCTCGCCAG){e<=1}"): "A"}\n
+    \n
+    return values:\n
+    pattern_seq: (str) the matched sequence to the pattern, the regex pattern can allow for errors, so this is the actual matched sequence.\n
+    pattern_name: (str) name of the pattern.
+    """
+    for pattern in patterns_info:
+        pattern_match = pattern.search(sequence)
+        if bool(pattern_match):
+            pattern_name = patterns_info[pattern]
+            pattern_seq = pattern_match.group()
+            mutated_pattern = 0
+            # If there is a substitution/insertion/deletion, the pattern is "mutated"
+            if sum(pattern_match.fuzzy_counts) > 0:
+                mutated_pattern = 1
+            return pattern_seq, pattern_name, mutated_pattern
+    return None, None, None
 
 
 def determine_clvd_prefix(prefix_name, clvd_prefix_name="Z", unclvd_prefix_name="W"):

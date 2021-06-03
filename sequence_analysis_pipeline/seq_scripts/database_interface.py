@@ -146,6 +146,7 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
         mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
+        mutated_prefix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
@@ -166,7 +167,8 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
                     cleavage_fraction REAL,
                     fold_change REAL,
                     possible_sensor INTEGER,
-                    mutated_prefix INTEGER
+                    mutated_prefix INTEGER,
+                    mutated_suffix INTEGER
                     )""")
 
     def insert_sequence_info(self, table: str, sequence_info: dict):
@@ -182,11 +184,11 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix) VALUES (
+                            fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
+                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
 
 
 class DatabaseInterfaceCleanSequences(DatabaseInterface):
@@ -216,6 +218,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         fold_change: (REAL) value of the fold change for a sequence\n
         possible_sensor: (INTEGER) indicates whether the sequence is a possible sensor. Yes(1)/No(1)\n
         mutated_prefix: (INTEGER) indicates whether the prefix had a mutation. Yes(1)/No(0)\n
+        mutated_prefix: (INTEGER) indicates whether the suffix had a mutation. Yes(1)/No(0)\n
         \n
         args:\n
         table: (str) name of the table to be created.
@@ -236,7 +239,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     cleavage_fraction REAL,
                     fold_change REAL,
                     possible_sensor INTEGER,
-                    mutated_prefix INTEGER
+                    mutated_prefix INTEGER,
+                    mutated_suffix INTEGER
                     )""")
 
     # TODO remove unneeded columns
@@ -253,11 +257,11 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix) VALUES (
+                            fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix)""", parameters=sequence_info)
+                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
 
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """
