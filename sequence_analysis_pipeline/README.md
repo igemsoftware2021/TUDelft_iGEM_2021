@@ -29,7 +29,7 @@ The pipeline was created and tested on __Ubuntu 20.04__. Here are the steps one 
     * D... -> what was the DRIVER round at the moment of sequencing
     * L... -> ligand present? yes(1)/no(0)
 
-Here is an example, the files `T1_D80_L0_R1_001.fastq.gz` and `T1_D80_L0_R2_001.fastq.gz` indicate that the read sequences are from tube __1__, the sequencing was done at round __80__ and there was __no__ ligand present during the round. You can choose to use the same naming convention or change the matching patterns in the `config.yaml` file in the `config` folder.
+    Here is an example, the files `T1_D80_L0_R1_001.fastq.gz` and `T1_D80_L0_R2_001.fastq.gz` indicate that the read sequences are from tube __1__, the sequencing was done at round __80__ and there was __no__ ligand present during the round. You can choose to use the same naming convention or change the matching patterns in the `config.yaml` file in the `config` folder.
 3. Adjust the file called `ngs_references.csv` in the `data` folder. Change the reference sequences to your own reference sequences. The columns __name__ and __sequence__ will be read in during the running of the pipeline. The column __information__ won't be read in and this is a place where you can add extra information for yourself, but you can also delete this.
 4. Go into the `config.yaml` file in the `config` folder and set the name of the dataset. Set the prefixes and suffixes, so whether a prefix or suffix indicates cleaving or uncleaving and what the corresponding name and sequence are of this prefix/suffix.
 
