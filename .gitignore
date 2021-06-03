@@ -156,4 +156,4 @@ dmypy.json
 /sponsor_scraping/
 
 # data
-sequence_analysis_pipeline/data/raw/
+sequence_analysis_pipeline/data/NGS/

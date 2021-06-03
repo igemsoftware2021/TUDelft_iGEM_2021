@@ -49,11 +49,11 @@ with open(config_file_path, "r") as rf:
 
 # Filename is given by snakemake
 inputfiles = [
-    'sequence_analysis_pipeline/data/raw/T1_D80_L0_read_count.txt']
+    'sequence_analysis_pipeline/data/NGS/T1_D80_L0_read_count.txt']
 # inputfiles = [snakemake.input[0], snakemake.input[1]]
 
 # database_path = ":memory:"
-database_path = "sequence_analysis_pipeline/data/raw/T1_D80_database.db"
+database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
 # database_path = snakemake.output[0]
 
 ngs_references_path = config_file_path = Path(
