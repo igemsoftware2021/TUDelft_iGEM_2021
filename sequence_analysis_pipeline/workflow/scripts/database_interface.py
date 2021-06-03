@@ -290,6 +290,17 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         """
         self.query(
             f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
+    
+    def update_possible_sensor(self, table: str, rowid: int, possible_sensor: int):
+        """
+        Function updates the possible biosensor at the row rowid.\n
+        args:\n
+        table: (str) name of the table\n
+        rowid: (int) row to update\n
+        possible_biosensor: (int) value to insert in the biosensor column\n
+        """
+        self.query(
+            f"UPDATE {table} SET possible_sensor={possible_sensor} WHERE id={rowid}")
 
     def get_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
