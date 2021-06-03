@@ -52,7 +52,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
     for i in tqdm(range(len(sequences_data))):
         seq = sequences_data[i][2]            # get the sequence
         cs_pos = sequences_data[i][9]         # get cleavage fraction
-        seq_ID = sequences-data[i][0]
+        seq_ID = sequences_data[i][0]
 
         # get info of the same sequence but then in the ligand NOT present round, with cleaved_prefix, cause for biosensors, cleaved is definitaly present in -round
         sequences_data_neg = db.get_sequence_negligand(table=TABLE_NAME, cleaned_sequence=seq)
