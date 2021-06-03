@@ -1,3 +1,4 @@
+[![Snakemake](https://img.shields.io/badge/snakemake-≥5.6.0-brightgreen.svg?style=flat)](https://snakemake.readthedocs.io)
 # Sequence analysis pipeline
 Developer: TU Delft iGEM team 2021
 
@@ -38,3 +39,8 @@ The pipeline was created and tested on __Ubuntu 20.04__. Here are the steps one 
 2. Open the terminal, write `conda activate *yoursnakemake_environmentname*` and press return.
 3. Before we can run the pipeline, snakemake needs to create the needed conda environments. To do this run the following command in the terminal: `snakemake --cores 1 --use-conda --conda-create-envs-only`. Now wait for the environments to be downloaded.
 4. Now run the pipeline by using the following command `snakemake --cores N --use-conda`, where __N__ is the number of cores you let the pipeline use.
+
+## References
+* Townshend, B., Xiang, J. Manzanarez, G., Hayden, E. & Smolke, C. *A multiplexed, automated evolution pipeline enables scalable discovery and characterization of biosensors*. http://biorxiv/lookup/doi/10.1101/2020.05.29.117960 (2020) doi:10.1101/2020.05.29.117960
+* Zhang, J., Kobert, K., Flouri T. & Stamatakis, A. *PEAR: a fast and accurate Illumina Paired-End reAd mergeR.* Bioinformatics (Oxford, England) 30, 614-20 (2014).
+* Mölder, F., Jablonski, K.P., Letcher, B., Hall, M.B., Tomkins-Tinch, C.H., Sochat, V., Forster, J., Lee, S., Twardziok, S.O., Kanitz, A., Wilm, A., Holtgrewe, M., Rahmann, S., Nahnsen, S., Köster, J., 2021. *Sustainable data analysis with Snakemake.* F1000Res 10, 33.
