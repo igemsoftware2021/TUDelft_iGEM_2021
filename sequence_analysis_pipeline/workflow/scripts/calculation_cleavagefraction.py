@@ -16,7 +16,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
     r_clv_ref = sum([s[1] for s in clv_ref_info])
 
     # 2 - Get number of reads of the references with uncleaved prefix in +ligand round
-    unclv_ref_info = db.get_ref_sequences(table=TABLE_NAME,cleaved_prefix=0)
+    unclv_ref_info = db.get_ref_sequences(table=TABLE_NAME, cleaved_prefix=0)
     # sums up second column (read_counts)
     r_unclv_ref = sum([p[1] for p in unclv_ref_info])
 
@@ -28,13 +28,13 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
     # uncleaved prefix
     unclv_ref_info_neg = db.get_ref_sequences(table=TABLE_NAME,
-        cleaved_prefix=0, ligand_present=0)
+                                              cleaved_prefix=0, ligand_present=0)
     # sums up second column (read_counts)
     r_unclv_ref_neg = sum([a[1] for a in unclv_ref_info])
 
     # 4 - Select and count the reads of the cleaved sequences in the +ligand round
-    clv_seq_info = db.get_sequences(table=TABLE_NAME)  # returns list of tuples with one value?
-
+    # returns list of tuples with one value?
+    clv_seq_info = db.get_sequences(table=TABLE_NAME)
 
     for i in tqdm(range(len(clv_seq_info))):
         # get specific tuple with information of the sequence
@@ -42,7 +42,6 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         one_seq = one_seq_info[2]  # get cleaned sequence
         one_ID = one_seq_info[0]   # get key ID
         r_clv = one_seq_info[1]    # get read count
-
 
         # find uncleaved reads of the same sequence
         unclv_seq_info = db.get_uncleaved_sequence(cleaned_sequence=one_seq)
@@ -63,7 +62,8 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         # get info of cleaved sequence in negative round
         clv_seq_info_neg = db.get_sequence_negligand(table=TABLE_NAME)
         # get info of uncleaved sequence in negative round
-        unclv_seq_info_neg = db.get_sequence_negligand(table=TABLE_NAME, cleaved_prefix=0)
+        unclv_seq_info_neg = db.get_sequence_negligand(
+            table=TABLE_NAME, cleaved_prefix=0)
 
         # cleaved sequence
         # get ID of cleaved sequence in negative round
