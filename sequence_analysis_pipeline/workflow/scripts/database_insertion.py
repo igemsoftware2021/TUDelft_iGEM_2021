@@ -1,12 +1,16 @@
+from pathlib import Path
 import yaml
 import regex
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceRawSequences
 import seq_helper
 
+# Create the path to the config file
+config_file_path = Path(__file__).resolve(
+).parents[2] / "config" / "config.yaml"
 
 # Read out all the information needed from the 'config.yaml' file
-with open("sequence_analysis_pipeline/config.yaml", "r") as rf:
+with open(config_file_path, "r") as rf:
     try:
         yaml_info = yaml.safe_load(rf)
         prefixes = yaml_info["prefixes"]
@@ -151,5 +155,3 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
     # testing = db.get_ref_sequences()
     # print(testing)
     # print(db.get_sequences(ligand_present=0))
-
-

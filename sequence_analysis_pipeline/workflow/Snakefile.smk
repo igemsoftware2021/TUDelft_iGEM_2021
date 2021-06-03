@@ -1,4 +1,4 @@
-configfile: "config.yaml"
+configfile: "config/config.yaml"
 
 # Example
 # inputfiles:
@@ -7,8 +7,21 @@ configfile: "config.yaml"
 # Then dataset = S1_D80 and sample = L0/L1
 
 rule all:
-    pass
+    input:
 
+
+rule fastqc:
+    input:
+        "../../data/{sample}.fastq"
+    output:
+        "../../results/fastqc_reports/{sample}_fastqc.html"
+    conda:
+        "../envs/fastqc.yaml"
+    shell:
+        """
+        #!/bin/bash
+        fastqc {input} --outdir={output}
+        """
 
 # rule calculate_cleavage_fraction:
 #     input:
@@ -21,6 +34,6 @@ rule insert_counts_into_database:
         "/data/processed/{dataset}_L0_read_counts.txt"
         "/data/processed/{dataset}_L1_read_counts.txt"
     output:
-        "/data/processed/{dataset}_database.db"
+        "/result/databases/{dataset}_database.db"
     script:
         "/seq_scripts/database_insertion.py"
