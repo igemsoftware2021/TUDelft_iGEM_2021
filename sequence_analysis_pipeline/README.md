@@ -5,7 +5,7 @@ Questions to: igem@tudelft.nl
 
 ## Setup
 ### Windows
-Download VirtualBox and install a Linux virtual machine. The pipeline was created tested on __Ubuntu 20.04__.
+Download VirtualBox and install a Linux virtual machine. The pipeline was created and tested on __Ubuntu 20.04__.
 Step by step instructions for the installation of the VirtualBox and Ubuntu: https://itsfoss.com/install-linux-in-virtualbox/.
 
 Now follow the steps for __Linux/MacOS__ in the VirtualBox.
