@@ -11,8 +11,9 @@ configfile: "config/config.yaml"
 rule all:
     input:
         # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset=config["dataset"], read=["R1", "R2"])
-        expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset="N41-I14_S14", read=["R1", "R2"])
-
+        # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset="N41-I14_S14", read=["R1", "R2"]),
+        "results/pear/N41-I14_S14.assembled.fastq"
+    
 rule fastqc:
     input:
         "data/NGS/{sample}.fastq.gz"
@@ -22,23 +23,31 @@ rule fastqc:
     conda:
         "envs/fastqc.yaml"
     log:
-        "logs/{sample}_fastqc.log"
+        "logs/fastqc/{sample}_fastqc.log"
     shell:
         """
         #!/bin/bash
         fastqc {input} -o results/fastqc_reports/ 2> {log}
         """
 
-# rule pear:
-#     input:
-#         pass
-#     output:
-#         "{dataset}.assembled.fastq"
-#         "{dataset}.discarded.fastq"
-#         "{dataset}.unassembled.forward.fastq"
-#         "{dataset}.unassembled.reverse.fastq"
-#     conda:
-#         "envs/pear.yaml"
+rule pear:
+    input:
+        forward_read="data/NGS/{dataset}_R1_001.fastq.gz",
+        reverse_read="data/NGS/{dataset}_R2_001.fastq.gz"
+    output:
+        "results/pear/{dataset}.assembled.fastq",
+        "results/pear/{dataset}.discarded.fastq",
+        "results/pear/{dataset}.unassembled.forward.fastq",
+        "results/pear/{dataset}.unassembled.reverse.fastq"
+    conda:
+        "envs/pear.yaml"
+    log:
+        "logs/pear/{dataset}_pear.log"
+    shell:
+        """
+        #!/bin/bash
+        pear -f {input.forward_read} -r {input.reverse_read} -o results/pear/{wildcards.dataset} > {log}
+        """
 
 # rule calculate_cleavage_fraction:
 #     input:
@@ -51,8 +60,25 @@ rule insert_counts_into_database:
         "/data/processed/{dataset}_L0_read_counts.txt",
         "/data/processed/{dataset}_L1_read_counts.txt"
     output:
-        "/result/databases/{dataset}_database.db"
+        "result/databases/{dataset}_database.db"
     conda:
         "envs/database.yaml"
     script:
         "/scripts/database_insertion.py"
+
+# rule database_movement:
+#     input:
+#         "result/databases/{dataset}_database.db"
+#     output:
+#         touch("database_movement.done")
+#     script:
+#         pass
+
+# rule calculate_cleavage_fraction:
+#     input:
+#         "result/databases/{dataset}_database.db",
+#         "database_movement.done"
+#     output:
+#         pass
+#     script:
+#         pass
