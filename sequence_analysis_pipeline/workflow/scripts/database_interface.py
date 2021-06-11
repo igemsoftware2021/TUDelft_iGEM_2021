@@ -241,7 +241,6 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     mutated_suffix INTEGER
                     )""")
 
-    # TODO remove unneeded columns
     def insert_sequence_info(self, table: str, sequence_info: dict):
         """
         Function inserts sequence info data into the database table 'table'.\n
@@ -290,7 +289,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         """
         self.query(
             f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
-    
+
     def update_possible_sensor(self, table: str, rowid: int, possible_sensor: int):
         """
         Function updates the possible biosensor at the row rowid.\n
