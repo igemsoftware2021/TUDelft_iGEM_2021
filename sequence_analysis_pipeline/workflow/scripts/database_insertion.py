@@ -3,7 +3,7 @@ import yaml
 import regex
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceRawSequences
-import seq_helper
+import seq_helpers
 
 # Create the path to the config file
 config_file_path = Path(__file__).resolve(
@@ -59,16 +59,16 @@ database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
 ngs_references_path = config_file_path = Path(
     __file__).resolve().parents[2] / "data" / "ngs_references.csv"
 
-ngs_references = seq_helper.read_ngs_references(ngs_references_path)
+ngs_references = seq_helpers.read_ngs_references(ngs_references_path)
 
 # Complement, reverse and cleanup the ngs reference sequences. Cleaning up
 # means removing the prefix and suffix from the sequence.
-ready_ngs_references = seq_helper.clean_ngs_reference_sequences(
+ready_ngs_references = seq_helpers.clean_ngs_reference_sequences(
     ngs_references, prefix_patterns, suffix_patterns)
 
 # Create a dictionary with the sequences as compiled regex objects. This is
 # for optimization.
-clean_ngs_reference_patterns = seq_helper.create_ngs_references_patterns(
+clean_ngs_reference_patterns = seq_helpers.create_ngs_references_patterns(
     ready_ngs_references)
 
 TABLE_NAME = "raw_sequences"
@@ -114,29 +114,29 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
                 sequence_info["original_sequence"] = sequence
 
                 # Determine the prefix sequence and the corresponding name
-                prefix_seq, prefix_name, mutated_prefix = seq_helper.determine_pattern(
+                prefix_seq, prefix_name, mutated_prefix = seq_helpers.determine_pattern(
                     sequence, patterns_info=prefix_patterns)
                 sequence_info["mutated_prefix"] = mutated_prefix
 
                 # Determine the suffix sequence and the corresponding name
-                suffix_seq, suffix_name, mutated_suffix = seq_helper.determine_pattern(
+                suffix_seq, suffix_name, mutated_suffix = seq_helpers.determine_pattern(
                     sequence, patterns_info=suffix_patterns)
                 sequence_info["mutated_suffix"] = mutated_suffix
 
-                clvd_prefix = seq_helper.determine_clvd_prefix(
+                clvd_prefix = seq_helpers.determine_clvd_prefix(
                     prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
 
                 sequence_info["cleaved_prefix"] = clvd_prefix
                 sequence_info["prefix_name"] = prefix_name
 
-                sequence_info["barcode"] = seq_helper.retrieve_barcode(
+                sequence_info["barcode"] = seq_helpers.retrieve_barcode(
                     sequence, prefix_seq)
 
-                sequence_info["cleaned_sequence"] = seq_helper.clean_sequence(
+                sequence_info["cleaned_sequence"] = seq_helpers.clean_sequence(
                     sequence, prefix_seq, suffix_seq)
 
                 # Determine whether the cleaned sequence is a cleaned reference sequence
-                sequence_info["reference_name"] = seq_helper.reference_seq(
+                sequence_info["reference_name"] = seq_helpers.reference_seq(
                     sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
 
                 db.insert_sequence_info(TABLE_NAME, sequence_info)
