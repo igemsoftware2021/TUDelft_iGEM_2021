@@ -27,3 +27,8 @@ sdd_sqrt_n = ssd / np.sqrt(n)
 print(sdd_sqrt_n)
 confidence_interval = (sample_mean - 1.96*ssd, sample_mean + 1.96*ssd)
 print(confidence_interval)
+
+
+test_a = np.zeros(20, dtype=np.int8)
+test_a[-10:] = 1
+print(test_a)

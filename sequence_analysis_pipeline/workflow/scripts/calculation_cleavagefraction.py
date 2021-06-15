@@ -11,24 +11,26 @@ TABLE_NAME = "clean_sequences"
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
     # 1 - Get number of reads of the references with cleaved prefix in +ligand round
-    clv_ref_info = db.get_ref_sequences(table=TABLE_NAME)
+    clv_ref_info = db.get_info_ref_sequences(table=TABLE_NAME)
     # sums up second column (read_counts)
     r_clv_ref = sum([s[1] for s in clv_ref_info])
 
     # 2 - Get number of reads of the references with uncleaved prefix in +ligand round
-    unclv_ref_info = db.get_ref_sequences(table=TABLE_NAME, cleaved_prefix=0)
+    unclv_ref_info = db.get_info_ref_sequences(
+        table=TABLE_NAME, cleaved_prefix=0)
     # sums up second column (read_counts)
     r_unclv_ref = sum([p[1] for p in unclv_ref_info])
 
     # 3 - Do the same with the references for the -ligand round
     # cleaved prefix
-    clv_ref_info_neg = db.get_ref_sequences(table=TABLE_NAME, ligand_present=0)
+    clv_ref_info_neg = db.get_info_ref_sequences(
+        table=TABLE_NAME, ligand_present=0)
     # sums up second column (read_counts)
     r_clv_ref_neg = sum([k[1] for k in clv_ref_info_neg])
 
     # uncleaved prefix
-    unclv_ref_info_neg = db.get_ref_sequences(table=TABLE_NAME,
-                                              cleaved_prefix=0, ligand_present=0)
+    unclv_ref_info_neg = db.get_info_ref_sequences(table=TABLE_NAME,
+                                                   cleaved_prefix=0, ligand_present=0)
     # sums up second column (read_counts)
     r_unclv_ref_neg = sum([a[1] for a in unclv_ref_info])
 

@@ -268,6 +268,18 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
             f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
+    def update_column_value(self, table: str, rowid: int, column_name: str, value):
+        """
+        Function updates a value from a specific column at row number rowid.\n
+        args:\n
+        table: (str) name of the table\n
+        rowid: (int) row to update\n
+        column_name: (str) name of the column to update\n
+        value: value to insert in the column\n
+        """
+        self.query(
+            f"UPDATE {table} SET {column_name}={value} WHERE id={rowid}")
+
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """
         Function updates the cleavage fraction at the row rowid.\n
@@ -310,7 +322,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
             f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
-    def get_ref_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
+    def get_info_ref_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
         cleaved_prefix = 1 --> reference sequence with prefix corresponding to cleaved sequences
         cleaved_prefix = 0 --> reference sequence with prefix corresponding to uncleaved sequences
