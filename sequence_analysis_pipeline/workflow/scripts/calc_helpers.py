@@ -30,7 +30,7 @@ def calculate_cleavage_fraction(r_clvd_s: int, r_clvd_ref: int, r_unclvd_s: int,
     return (r_clvd_s/r_clvd_ref) / ((r_unclvd_s/r_unclvd_ref) + (r_clvd_s/r_clvd_ref))
 
 
-def calculate_fold_change(cs_pos: float, cs_neg: float, k: (int, float) = 1):
+def calculate_fold_change(cs_pos: float, cs_neg: float, k: float = 1.0):
     """Function calculates the fold_change. The formula is from the DRIVER paper page 12, equation (2).\n
     args:\n
     cs_pos: (float) cleavage fraction of sequence under condition ligand present.\n

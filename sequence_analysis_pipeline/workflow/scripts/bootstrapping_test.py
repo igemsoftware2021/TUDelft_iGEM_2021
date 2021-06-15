@@ -19,6 +19,8 @@ bootstrap_means = np.mean(new_values, axis=1)
 # print(bootstrap_means)
 n = bootstrap_means.shape[0]
 sample_mean = np.mean(samples)
+print(bootstrap_means, sample_mean)
+print("test", np.sum((bootstrap_means - sample_mean)**2))
 ssd = np.sqrt(np.sum((bootstrap_means - sample_mean)**2)/(n-1))
 print(ssd)
 sdd_sqrt_n = ssd / np.sqrt(n)
