@@ -36,23 +36,13 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
     for i in tqdm(range(len(unique_rows))):
         # get for every unique sequence all the read_counts
-<<<<<<< HEAD
-        sequence_all = db.get_all_unique_sequence(table="raw_sequences", cleaned_sequences=unique_rows[i][0], cleaved_prefix=unique_rows[i][1], ligand_present=unique_rows[i][2]])
-        read_counts_new= sum([p[1] for p in sequence_all])
-
-# Go over all the tuples in the set, query the data, add the read counts and put all info
-# in new table.
-# Then do the cleavage fraction and stuff
-=======
-        sequence_all = db.get_all_unique_sequence(table="raw_sequences", cleaned_sequences=unique_rows[i][0], cleaved_prefix=unique_rows[i][1], ligand_present=unique_rows[i][2])
+        sequence_all = db.get_info_sequence(
+            table="raw_sequences", cleaned_sequence=unique_rows[i][0], cleaved_prefix=unique_rows[i][1], ligand_present=unique_rows[i][2])
         read_counts_new = sum([p[1] for p in sequence_all])
 
         clean_sequence_info = {"read_count": read_counts_new, "cleaned_sequence": sequence_all[0][3], "cleaved_prefix": sequence_all[0][5], "selection": sequence_all[0][8], "ligand_present": sequence_all[0][10],
-                                 "prefix_name": sequence_all[0][6], "reference_name":sequence_all[0][7], "driver_round":sequence_all[0][9], "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0,
-                                 "mutated_prefix": sequence_all[0][14], "mutated_suffix": sequence_all[0][15]}
-        
+                               "prefix_name": sequence_all[0][6], "reference_name": sequence_all[0][7], "driver_round": sequence_all[0][9], "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0,
+                               "mutated_prefix": sequence_all[0][14], "mutated_suffix": sequence_all[0][15]}
+
         # insert the information into the table
         db.insert_sequence_info(TABLE_NAME, clean_sequence_info)
-
-
->>>>>>> 7bb3461392b96908b510d035f69a887b379c1d7d

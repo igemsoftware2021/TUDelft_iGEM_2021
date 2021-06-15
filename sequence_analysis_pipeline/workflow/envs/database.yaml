@@ -8,3 +8,4 @@ dependencies:
   - pyyaml=5.4.*
   - tqdm=4.61.*
   - regex=2021.4.*
+  - pathlib
