@@ -43,4 +43,4 @@ def calculate_fold_change(cs_pos: float, cs_neg: float, k: float = 1.0):
     return k * ((1 - cs_pos)/(1 - cs_neg))
 
 
-print(calculate_cleavage_fraction(np.array([2, 3]), 2, np.array([1, 1.5]), 3))
+print()

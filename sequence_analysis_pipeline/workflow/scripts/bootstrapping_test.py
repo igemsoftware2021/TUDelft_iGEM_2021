@@ -1,5 +1,5 @@
 import numpy as np
-
+import sys
 samples = np.zeros(100)
 samples[-25:] = 1
 # samples = np.array([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -32,3 +32,4 @@ print(confidence_interval)
 test_a = np.zeros(20, dtype=np.int8)
 test_a[-10:] = 1
 print(test_a)
+print(sys.path)

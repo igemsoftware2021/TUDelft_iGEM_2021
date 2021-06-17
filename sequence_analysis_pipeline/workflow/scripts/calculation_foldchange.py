@@ -23,7 +23,8 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         cs_pos = sequences_data[i][9]      # get cleavage fraction
 
         # get info of the same sequence but then in the ligand NOT present round, with cleaved_prefix, cause for biosensors, cleaved is definitaly present in -round
-        sequences_data_neg = db.get_sequence_negligand(table=TABLE_NAME, cleaned_sequence=seq)
+        sequences_data_neg = db.get_sequence_negligand(
+            table=TABLE_NAME, cleaned_sequence=seq)
         cs_neg = sequences_data_neg[0][9]  # get cleavage fraction
 
         # calculate fold-change with k=1
@@ -43,7 +44,7 @@ if (length % 2) == 0:  # even number of sequences
 
 else:
     ind = int(round(length/2))
-    median = fc_list[ind]  
+    median = fc_list[ind]
 
 
 # 3 - Calculate new k with median fold-change value
@@ -55,16 +56,16 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         seq_ID = sequences_data[i][0]
 
         # get info of the same sequence but then in the ligand NOT present round, with cleaved_prefix, cause for biosensors, cleaved is definitaly present in -round
-        sequences_data_neg = db.get_sequence_negligand(table=TABLE_NAME, cleaned_sequence=seq)
+        sequences_data_neg = db.get_sequence_negligand(
+            table=TABLE_NAME, cleaned_sequence=seq)
         cs_neg = sequences_data_neg[0][9]     # get cleavage fraction
-        seq_ID_neg = sequences_data_neg[0][0] # get sequence ID of negative round
+        # get sequence ID of negative round
+        seq_ID_neg = sequences_data_neg[0][0]
 
         # calculate fold-change with k_new
         fc = k_new * ((1-cs_pos) / (1-cs_neg))
-        
+
         # store the fold change in the database
         db.update_fold_change(table=TABLE_NAME, rowid=seq_ID, fold_change=fc)
-        db.update_fold_change(table=TABLE_NAME, rowid=seq_ID_neg, fold_change=fc)
-
-        
-    
+        db.update_fold_change(
+            table=TABLE_NAME, rowid=seq_ID_neg, fold_change=fc)

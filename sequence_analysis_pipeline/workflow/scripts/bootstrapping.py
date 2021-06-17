@@ -25,7 +25,7 @@ def bootstrap_cleavage_fraction_with_replacement(data, r_clvd_ref, r_unclvd_ref,
     return cs, cs_sd, cs_5_perc, cs_95_perc
 
 
-def bootstrap_cleavage_fractions_and_fold_change_with_replacement(data_lig_pos, data_lig_neg, r_clvd_ref, r_unclvd_ref, k=1, num_samples=1000) -> tuple:
+def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1, num_samples=1000) -> tuple:
     """
     Function does bootstrapping for cleavage fraction and fold change on the data.
     args:\n
@@ -49,14 +49,9 @@ def bootstrap_cleavage_fractions_and_fold_change_with_replacement(data_lig_pos, 
     fold_change_95_perc: (float) upper 95% limit for the fold change.\n
     """
 
-    # TODO decide on having the bootstrap_cleavage_fraction_with_replacement() in the function yes or no.
-    # Positive data first
-    cs_pos, cs_pos_sd, cs_pos_5_perc, cs_pos_95_perc = bootstrap_cleavage_fraction_with_replacement(
-        data_lig_pos, r_clvd_ref, r_unclvd_ref, num_samples=num_samples)
-
-    # Then negative data
-    cs_neg, cs_neg_sd, cs_neg_5_perc, cs_neg_95_perc = bootstrap_cleavage_fraction_with_replacement(
-        data_lig_neg, r_clvd_ref, r_unclvd_ref, num_samples=num_samples)
+    if cs_neg.shape != cs_pos.shape:
+        raise ValueError(
+            "Shape of cs_neg is not the same as shape cs_pos, check if the function bootstrap_fold_change_with_replacement has the correct input values.")
 
     fold_changes = calc_helpers.calculate_fold_change(cs_pos, cs_neg, k=k)
     fold_change_sd = calc_helpers.calculate_sample_standard_deviation(
@@ -68,4 +63,4 @@ def bootstrap_cleavage_fractions_and_fold_change_with_replacement(data_lig_pos, 
     # fold change standard error
     fold_change_se = fold_change_sd / np.sqrt(num_samples)
 
-    return cs_pos_sd, cs_pos_5_perc, cs_pos_95_perc, cs_neg_sd, cs_neg_5_perc, cs_neg_95_perc, fold_change_sd, fold_change_se, fold_change_5_perc, fold_change_95_perc
+    return fold_change_sd, fold_change_se, fold_change_5_perc, fold_change_95_perc
