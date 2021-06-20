@@ -92,7 +92,7 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
         e[step + 1] = e[step] + e_dt * dt
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
-    return (tlr, time)
+    return (p, time)
 
 
 tbd = 1  # Placeholder for unkown parameters/concentrations so that they're easy to find
@@ -102,10 +102,10 @@ k_ts = tbd            # (0)  Transcription rate
 k_on = 1              # (1)  Association rate of vitamin and umRNA [1/s]
 k_off = 1             # (2)  Dissociation rate of vitamin and umRNA [1/s]
 k_c = 1               # (3)  Cleaving rate of umRNA [s^-1]
-k_tl = 0.05           # (4)  Enzyme translation rate [AA/s] !!!!!!!!!!!!!!!!
+k_tl = 5*10**-5       # (4)  Enzyme translation rate [1/s]
 k_mat = 0.5*10**-3    # (5)  Maturation rate of beta-galactosidase [1/s]
 k_cat = 4.28*10**-3   # (6)  Catalytic rate of beta-galactosidase [1/s]
-k_s = 8.5*10**(-3)      # (7)  Michaelis constant of transcription [μM]
+k_s = 8.5*10**-3      # (7)  Michaelis constant of transcription [μM]
 kc_s = 1.8*10**-4     # (8)  Scaling factor for the transcription resources [-]
 k_l = 65.8*10**-3     # (9)  Michaelis constant of translation [μM]
 k_tlr = 6*10**-6      # (10) Michaelis constant of translation resources [-]
@@ -115,8 +115,8 @@ deg_tlr = 7.5*10**-5  # (13) Degradation rate of translation resources [1/s]
 parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                        k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
 
-t_tot = 4 * 3600  # total time [s]
-dt = 0.1  # timestep [s]
+t_tot = 3600  # total time [s]
+dt = 0.01  # timestep [s]
 
 
 # Initial concentrations
