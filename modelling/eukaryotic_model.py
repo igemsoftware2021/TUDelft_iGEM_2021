@@ -92,7 +92,7 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
         e[step + 1] = e[step] + e_dt * dt
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
-    return (umrna, time)
+    return (tlr, time)
 
 
 tbd = 1  # Placeholder for unkown parameters/concentrations so that they're easy to find
@@ -115,8 +115,8 @@ deg_tlr = 7.5*10**-5  # (13) Degradation rate of translation resources [1/s]
 parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                        k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
 
-t_tot = 7  # total time [s]
-dt = 1  # timestep [s]
+t_tot = 4 * 3600  # total time [s]
+dt = 0.1  # timestep [s]
 
 
 # Initial concentrations
