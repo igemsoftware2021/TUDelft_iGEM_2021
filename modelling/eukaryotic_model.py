@@ -1,8 +1,10 @@
 # Libraries to import
 import numpy as np
 import matplotlib.pyplot as plt
+from numba import njit
 
 
+# @njit
 def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
@@ -23,9 +25,6 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
     time = np.linspace(0, t_tot, n)  # Array with all timepoints
-    # Array that counts each timepoint as a step, excluding the last step
-    steps = np.linspace(0, n - 2, n - 1)
-    steps = map(int, steps)
 
     # Arrays for the concentration of each species
     # Concentration of the beta-galactosidase gene [μM]
@@ -61,7 +60,7 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     tlr[0] = 1
 
     # A loop with the differential equations
-    for step in steps:
+    for step in range(len(time)-1):
         # Differential of each species w.r.t time
         dna_dt = 0  # could remove this one, zero anyway
         umrna_dt = k_ts * tsr[step] * dna[step] / \
