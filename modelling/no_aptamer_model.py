@@ -25,7 +25,7 @@ def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
     dna = np.zeros(n, dtype=np.float64)
     # Concentration of mRNA [μM]
     mrna = np.zeros(n, dtype=np.float64)
-    # Concentration of degraged mRNA [μM]
+    # Concentration of degraded mRNA [μM] (this does not denote a physical concentraion within the system, but merely tracks the concentration of mRNA that has been degraded)
     dmrna = np.zeros(n, dtype=np.float64)
     # Prefactor that accounts for finite transcription resources and initiation rate [-]
     tsr = np.zeros(n, dtype=np.float64)

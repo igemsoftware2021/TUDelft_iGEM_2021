@@ -33,7 +33,7 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     umrna = np.zeros(n, dtype=np.float64)
     # Concentration of cleaved mRNA [μM]
     cmrna = np.zeros(n, dtype=np.float64)
-    # Concentration of degraged mRNA [μM]
+    # Concentration of degraded mRNA [μM] (this does not denote a physical concentraion within the system, but merely tracks the concentration of mRNA that has been degraded)
     dmrna = np.zeros(n, dtype=np.float64)
     # Vitamine concentration [μM]
     vit = np.zeros(n, dtype=np.float64)
