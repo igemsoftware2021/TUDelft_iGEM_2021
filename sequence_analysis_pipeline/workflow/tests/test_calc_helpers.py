@@ -1,15 +1,9 @@
-
-import numpy as np
 import unittest
-import sys
-import os
+import numpy as np
 from workflow.scripts.calc_helpers import calc_sample_standard_deviation
 from workflow.scripts.calc_helpers import calc_95_confidence_interval
 from workflow.scripts.calc_helpers import calc_cleavage_fraction
 from workflow.scripts.calc_helpers import calc_fold_change
-
-# set module path for testing
-# sys.path.insert(0, "path_in_PYTHONPATH")
 
 
 class TestSuiteCalcHelpers(unittest.TestCase):
@@ -40,7 +34,16 @@ class TestSuiteCalcHelpers(unittest.TestCase):
             calc_95_confidence_interval(0, 0), (0.0, 0.0))
 
     def test_calc_cleavage_fraction(self):
-        pass
+        self.assertAlmostEqual(
+            calc_cleavage_fraction(100, 8, 26, 9), 0.812274368)
+        self.assertAlmostEqual(calc_cleavage_fraction(
+            49, 76, 213, 86), 0.2065483776)
+        self.assertAlmostEqual(calc_cleavage_fraction(
+            1671, 121, 543, 67), 0.6301756163)
+        self.assertAlmostEqual(calc_cleavage_fraction(1, 1, 1, 1), 0.5)
 
     def test_calc_fold_change(self):
-        pass
+        self.assertAlmostEqual(calc_fold_change(0.5, 0.75), 2.0)
+        self.assertAlmostEqual(calc_fold_change(0.5, 0.75, k=1.5), 3.0)
+        self.assertAlmostEqual(calc_fold_change(0.5, 0.75, k=2), 4.0)
+        self.assertAlmostEqual(calc_fold_change(0.5, 0.75, k=0), 0.0)

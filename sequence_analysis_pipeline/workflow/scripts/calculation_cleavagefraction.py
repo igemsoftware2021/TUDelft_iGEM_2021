@@ -62,7 +62,8 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
         # -ligand round
         # get info of cleaved sequence in negative round
-        clv_seq_info_neg = db.get_other_sequences(table=TABLE_NAME, cleaved_prefix= 1, ligand_present= 0)
+        clv_seq_info_neg = db.get_other_sequences(
+            table=TABLE_NAME, cleaved_prefix=1, ligand_present=0)
         # get info of uncleaved sequence in negative round
         unclv_seq_info_neg = db.get_other_sequences(
             table=TABLE_NAME, cleaved_prefix=0, ligand_present=0)
