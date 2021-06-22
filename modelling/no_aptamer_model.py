@@ -15,6 +15,11 @@ def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
     k_m = parameters[11]
     deg_mrna = parameters[12]
     deg_tlr = parameters[13]
+    h = parameters[14]
+    eps_cprg = parameters[15]
+    eps_cpr = parameters[16]
+    i0_cprg = parameters[17]
+    i0_cpr = parameters[18]
 
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -39,6 +44,8 @@ def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
     s = np.zeros(n, dtype=np.float64)
     # Concentration of CPR (product)
     p = np.zeros(n, dtype=np.float64)
+    # Blue over yellow intensity ratio
+    b_y = np.zeros(n, dtype=np.float64)
 
     # Plug in the initial concentrations
     dna[0] = dna_i
@@ -72,4 +79,9 @@ def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
         e[step + 1] = e[step] + e_dt * dt
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
+
+        # Calculating blue over yellow ratio
+        b_y[step + 1] = i0_cpr / i0_cprg * \
+            np.log10(eps_cpr * h * p[step + 1]) / \
+            np.log10(eps_cprg * h * s[step + 1])
     return (p, time)

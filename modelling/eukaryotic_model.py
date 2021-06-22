@@ -21,6 +21,11 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     k_m = parameters[11]
     deg_mrna = parameters[12]
     deg_tlr = parameters[13]
+    h = parameters[14]
+    eps_cprg = parameters[15]
+    eps_cpr = parameters[16]
+    i0_cprg = parameters[17]
+    i0_cpr = parameters[18]
 
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -51,6 +56,8 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     s = np.zeros(n, dtype=np.float64)
     # Concentration of CPR (product)
     p = np.zeros(n, dtype=np.float64)
+    # Blue over yellow intensity ratio
+    b_y = np.zeros(n, dtype=np.float64)
 
     # Plug in the initial concentrations
     dna[0] = dna_i
@@ -92,6 +99,11 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
         e[step + 1] = e[step] + e_dt * dt
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
+
+        # Calculating blue over yellow ratio
+        b_y[step + 1] = i0_cpr / i0_cprg * \
+            np.log10(eps_cpr * h * p[step + 1]) / \
+            np.log10(eps_cprg * h * s[step + 1])
     return (p, time)
 
 # @njit
@@ -108,7 +120,7 @@ if __name__ == "__main__":
     k_c = 1               # (3)  Cleaving rate of umRNA [s^-1]
     k_tl = 5*10**-5       # (4)  Enzyme translation rate [1/s]
     k_mat = 0.5*10**-3    # (5)  Maturation rate of beta-galactosidase [1/s]
-    k_cat = 4.28*10**3   # (6)  Catalytic rate of beta-galactosidase [1/s]
+    k_cat = 4.28*10**3    # (6)  Catalytic rate of beta-galactosidase [1/s]
     k_s = 8.5*10**-3      # (7)  Michaelis constant of transcription [μM]
     # (8)  Scaling factor for the transcription resources [-]
     kc_s = 1.8*10**-4
@@ -119,8 +131,13 @@ if __name__ == "__main__":
     deg_mrna = 1.4*10**-3  # (12) Degradation rate of mRNA [1/s]
     # (13) Degradation rate of translation resources [1/s]
     deg_tlr = 7.5*10**-5
+    h = tbd       # (14) Height of the paper
+    eps_cprg = 1  # (15) Exctinction coefficient of CPRG at a wavelength of ???
+    eps_cpr = 1   # (16) Exctinction coefficient of CPR at a wavelength of ???
+    i0_cprg = 1   # (17) Blanco measurement at a wavelength of ???
+    i0_cpr = 1    # (18) Blanco measurement at a wavelength of ???
     parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
-                           k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
+                           k_tlr, k_m, deg_mrna, deg_tlr, h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])  # Array containing above parameters
 
     t_tot = 3600  # total time [s]
     dt = 0.01  # timestep [s]
