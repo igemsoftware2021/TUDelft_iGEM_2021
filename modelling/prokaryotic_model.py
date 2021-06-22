@@ -132,8 +132,8 @@ if __name__ == "__main__":
     h = tbd       # (14) Height of the paper
     eps_cprg = 1  # (15) Exctinction coefficient of CPRG at a wavelength of ???
     eps_cpr = 1   # (16) Exctinction coefficient of CPR at a wavelength of ???
-    i0_cprg = 1   # (17) Blanco measurement at a wavelength of ???
-    i0_cpr = 1    # (18) Blanco measurement at a wavelength of ???
+    i0_cprg = 1   # (17) Blank measurement at a wavelength of ???
+    i0_cpr = 1    # (18) Blank measurement at a wavelength of ???
     parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                            k_tlr, k_m, deg_mrna, deg_tlr, h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])  # Array containing above parameters
 
