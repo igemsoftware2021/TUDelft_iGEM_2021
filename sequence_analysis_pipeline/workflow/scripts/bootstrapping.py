@@ -25,7 +25,7 @@ def bootstrap_cleavage_fraction_with_replacement(data, r_clvd_ref, r_unclvd_ref,
     return cs, cs_sd, cs_5_perc, cs_95_perc
 
 
-def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1, num_samples=1000) -> tuple:
+def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1) -> tuple:
     """
     Function does bootstrapping for cleavage fraction and fold change on the data.
     args:\n
@@ -52,6 +52,8 @@ def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1, num_samples=1000
     if cs_neg.shape != cs_pos.shape:
         raise ValueError(
             "Shape of cs_neg is not the same as shape cs_pos, check if the function bootstrap_fold_change_with_replacement has the correct input values.")
+
+    num_samples = cs_neg.shape[0]
 
     fold_changes = calc_helpers.calc_fold_change(cs_pos, cs_neg, k=k)
     fold_change_sd = calc_helpers.calc_sample_standard_deviation(
