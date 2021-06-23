@@ -268,6 +268,18 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
             f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
         return self.cursor.fetchall()
 
+    # def get_other_sequences(self, table: str, cleaned_sequence: str, cleaved_prefix: int = 0, ligand_present: int = 1):
+    #     """
+    #     Function finds the information of the sequences in the negative ligand round
+    #     cleaned_sequence = target sequence
+    #     cleaved_prefix
+    #     """
+
+    #     self.cursor.execute(
+    #         f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
+    #     return self.cursor.fetchall()
+
+
     def update_column_value(self, table: str, rowid: int, column_name: str, value):
         """
         Function updates a value from a specific column at row number rowid.\n
@@ -332,13 +344,4 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         return self.cursor.fetchall()
 
     
-     def get_other_sequences(self, table: str, cleaned_sequence: str, cleaved_prefix: int = 0, ligand_present: int = 1):
-        """
-        Function finds the information of the sequences in the negative ligand round
-        cleaned_sequence = target sequence
-        cleaved_prefix
-        """
-
-        self.cursor.execute(
-            f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
-        return self.cursor.fetchall()
+     
