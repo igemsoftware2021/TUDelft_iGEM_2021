@@ -263,6 +263,12 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
     def get_info_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int):
         """
         Function gets all info of one unique sequence to insert in the clean_sequences table
+        args\n
+        cleaned_sequence: (str) name of the table\n
+        cleaved_prefix: (float) value to insert in the cleaved_prefix column\n
+        ligand_present: (float) value to insert in the ligand_present column\n
+        1 = yes
+        0 = no
         """
         self.cursor.execute(
             f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
@@ -327,6 +333,11 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
 
     def get_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
+        Function to get sequences. \n
+        args:\n
+        table: (str) name of the table\n
+        cleaved_prefix: (float) value to insert in the cleaved_prefix column, default = 1\n
+        ligand_present: (float) value to insert in the ligand_present column, default = 1\n
         1 = yes
         0 = no
         """
@@ -336,8 +347,13 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
 
     def get_info_ref_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
-        cleaved_prefix = 1 --> reference sequence with prefix corresponding to cleaved sequences
-        cleaved_prefix = 0 --> reference sequence with prefix corresponding to uncleaved sequences
+        Function to get the reference sequences.\n
+        args:\n
+        table: (str) name of the table\n
+        cleaved_prefix: (float) value to insert in the cleaved_prefix column, default = 1\n
+        ligand_present: (float) value to insert in the ligand_present column, default = 1\n
+        1 = yes
+        0 = no
         """
         self.cursor.execute(
             f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present} AND reference_name IS NOT NULL")
