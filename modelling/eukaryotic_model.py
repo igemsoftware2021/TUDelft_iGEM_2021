@@ -81,8 +81,8 @@ def euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
         tlr_dt = - deg_tlr * tlr[step] / (k_tlr + tlr[step])
         e_mon_dt = k_tl * tlr[step] * \
             (umrna_vit[step] + umrna[step]) / (k_l + (umrna_vit[step] + umrna[step])) - \
-            * k_mat * e_mon[step]
-        e_dt = * k_mat * e_mon[step]
+            k_mat * e_mon[step]
+        e_dt = k_mat * e_mon[step]
         s_dt = - k_cat * e[step] * s[step] / (k_m + s[step])
         p_dt = - s_dt
 
