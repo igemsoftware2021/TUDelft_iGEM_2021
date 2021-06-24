@@ -1,5 +1,7 @@
 dataset: ./sequence_analysis_pipeline/data/NGS/N35-I3_S3.txt
 
+minimum_reads: 30
+
 ligand_positive:
   prefixes:
       cleaved:

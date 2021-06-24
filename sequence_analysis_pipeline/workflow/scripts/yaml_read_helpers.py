@@ -58,7 +58,7 @@ def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_p
     return compiled_patterns
 
 
-def retrieve_prefix_name(yaml_file: str, cleaved: bool = True, ligand_present: bool = True):
+def retrieve_prefix_name(yaml_file: str, cleaved: bool = True, ligand_present: bool = True) -> str:
 
     # First do instance checks
     if not isinstance(cleaved, bool):
@@ -90,7 +90,7 @@ def retrieve_prefix_name(yaml_file: str, cleaved: bool = True, ligand_present: b
     return prefix_name
 
 
-def retrieve_compiled_info_patterns(yaml_file: str):
+def retrieve_compiled_info_patterns(yaml_file: str) -> tuple:
     with open(yaml_file, "r") as rf:
         try:
             yaml_info = yaml.safe_load(rf)
@@ -105,3 +105,16 @@ def retrieve_compiled_info_patterns(yaml_file: str):
         except yaml.YAMLError as exc:
             print(exc)
     return driver_round_pattern, selection_pattern, ligand_present_pattern
+
+
+def retrieve_minimum_reads(yaml_file: str) -> int:
+    """Function that retrieves the minimum amount of reads needed before allowing it in the database."""
+    with open(yaml_file, "r") as rf:
+        try:
+            yaml_info = yaml.safe_load(rf)
+
+            minimum_reads = int(yaml_info["minimum_reads"])
+
+        except yaml.YAMLError as exc:
+            print(exc)
+    return minimum_reads
