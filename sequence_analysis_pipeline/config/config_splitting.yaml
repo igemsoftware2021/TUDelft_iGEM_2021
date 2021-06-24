@@ -1,0 +1,49 @@
+dataset: ./sequence_analysis_pipeline/data/NGS/N35-I3_S3.txt
+
+ligand_positive:
+  prefixes:
+      cleaved:
+          sequence: AGATCTTTTCCGTATATCTCGCCAG
+          name: A
+          max_error: 1
+      uncleaved:
+          sequence: AGATGGGAAACAAACAAA
+          name: W
+          max_error: 1
+      other:
+          sequence: ACAAAACAAAAC
+          name: Z
+          max_error: 1
+  suffixes:
+      cleaved:
+          sequence: AAAAAGAAATT
+          name: X
+          max_error: 1
+      uncleaved:
+          sequence: AAAAAGAAATT
+          name: X
+          max_error: 1
+
+ligand_negative:
+  prefixes:
+      cleaved:
+          sequence: CTTTTCCGTATATCTCGCCAG
+          name: A
+          max_error: 1
+      uncleaved:
+          sequence: GGGAAACAAACAAA
+          name: W
+          max_error: 1
+      other:
+          sequence: ACAAAACAAAAC
+          name: Z
+          max_error: 1
+  suffixes:
+      cleaved:
+          sequence: AAAAAGAAATT
+          name: X
+          max_error: 1
+      uncleaved:
+          sequence: AAAAAGAAATT
+          name: X
+          max_error: 1
