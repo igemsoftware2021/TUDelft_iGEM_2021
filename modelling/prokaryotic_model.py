@@ -129,7 +129,7 @@ if __name__ == "__main__":
     deg_mrna = 1.3*10**-5  # (12) Degradation rate of mRNA [1/s]
     # (13) Degradation rate of translation resources [1/s]
     deg_tlr = 7.5*10**-5
-    h = tbd       # (14) Height of the paper
+    h = 8*10**-5  # (14) Height of the paper [cm]
     eps_cprg = 1  # (15) Exctinction coefficient of CPRG at a wavelength of ???
     eps_cpr = 1   # (16) Exctinction coefficient of CPR at a wavelength of ???
     i0_cprg = 1   # (17) Blank measurement at a wavelength of ???
