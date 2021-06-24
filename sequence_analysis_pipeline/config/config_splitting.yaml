@@ -40,10 +40,10 @@ ligand_negative:
           max_error: 1
   suffixes:
       cleaved:
-          sequence: AAAAAGAAATT
+          sequence: AAAAAGAAAT
           name: X
           max_error: 1
       uncleaved:
-          sequence: AAAAAGAAATT
+          sequence: AAAAAGAAAT
           name: X
           max_error: 1
