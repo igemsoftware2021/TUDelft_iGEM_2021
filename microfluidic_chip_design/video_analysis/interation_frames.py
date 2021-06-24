@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 #define video file name
-filename = './microfluidic_chip_design/video_analysis/test_wells.mp4'
+filename = './microfluidic_chip_design/video_analysis/wells_geenwhatsapp.MOV'
 cap = cv2.VideoCapture(filename)     #load the video
 
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -18,7 +18,7 @@ for i in range(0, total_frames, sample_rate):
     blur = cv2.GaussianBlur(gray, (3,3), 0) 
 
     # create binary image
-    _, bi = cv2.threshold(gray, 80, 255, cv2.THRESH_BINARY)
+    _, bi = cv2.threshold(blur, 120, 255, cv2.THRESH_BINARY)
 
      # show gray image
     cv2.imshow('Frame', bi)
