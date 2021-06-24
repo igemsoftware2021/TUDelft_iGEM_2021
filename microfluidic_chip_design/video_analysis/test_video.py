@@ -3,7 +3,7 @@ import numpy as np
 #import matplotlib
 
 #define video file name
-filename = 'test_wells.mp4'
+filename = './microfluidic_chip_design/video_analysis/test_wells.mp4'
 cap = cv2.VideoCapture(filename)     #load the video
 
 # count = 0
