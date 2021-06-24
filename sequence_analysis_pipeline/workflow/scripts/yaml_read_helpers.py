@@ -2,6 +2,19 @@ import yaml
 import regex
 
 
+def retrieve_dataset_name(yaml_file: str):
+    """Function that retrieves the name of the dataset."""
+    with open(yaml_file, "r") as rf:
+        try:
+            yaml_info = yaml.safe_load(rf)
+
+            dataset_name = yaml_info["dataset"]
+
+        except yaml.YAMLError as exc:
+            print(exc)
+    return dataset_name
+
+
 def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_present: bool = True) -> dict:
     """Function reads a yaml file and retrieves either prefixes or suffixes for a certain condition for
     the ligand. If the ligand present is set to True, then it will retrieve the prefixes or suffixes

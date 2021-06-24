@@ -10,15 +10,16 @@ TABLE_NAME = "clean_sequences"
 
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
-    ref_unclvd_neg = db.get_ref_sequences(
+    ref_unclvd_neg = db.get_info_ref_sequences(
         TABLE_NAME, cleaved_prefix=0, ligand_present=0)
-    ref_clvd_neg = db.get_ref_sequences(
+    ref_clvd_neg = db.get_info_ref_sequences(
         TABLE_NAME, cleaved_prefix=1, ligand_present=0)
-    ref_unclvd_pos = db.get_ref_sequences(
+    ref_unclvd_pos = db.get_info_ref_sequences(
         TABLE_NAME, cleaved_prefix=0, ligand_present=1)
-    ref_clvd_pos = db.get_ref_sequences(
+    ref_clvd_pos = db.get_info_ref_sequences(
         TABLE_NAME, cleaved_prefix=1, ligand_present=1)
 
+    # read count is at second position in every tuple
     r_ref_unclvd_neg = sum(seq_info[1] for seq_info in ref_unclvd_neg)
     r_ref_clvd_neg = sum(seq_info[1] for seq_info in ref_clvd_neg)
     r_ref_unclvd_pos = sum(seq_info[1] for seq_info in ref_unclvd_pos)
@@ -33,13 +34,17 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
         # Ligand not present sequences
         # r_ = read_count
+        # Retrieve read count of sequence with uncleaved prefix
         r_seq_unclvd_neg = db.get_info_sequence(
             TABLE_NAME, cleaned_sequence=sequence, cleaved_prefix=0, ligand_present=0)[0][1]
+        # Retrieve read count of sequence with cleaved prefix
         r_seq_clvd_neg = db.get_info_sequence(
             TABLE_NAME, cleaned_sequence=sequence, cleaved_prefix=1, ligand_present=0)[0][1]
 
+        # Create an array with all zeros
         sample_data_neg = np.zeros(
             r_seq_unclvd_neg+r_seq_clvd_neg, dtype=np.int8)
+        # Fill the array with an amount of r_seq_clvd_neg ones.
         sample_data_neg[-r_seq_clvd_neg:] = 1
 
         cs_neg, cs_neg_sd, cs_neg_5_perc, cs_neg_95_perc = bootstrapping.bootstrap_cleavage_fraction_with_replacement(
@@ -60,4 +65,4 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
         # Now determine the fold change things
         fold_change_sd, fold_change_se, fold_change_5_perc, fold_change_95_perc = bootstrapping.bootstrap_fold_change_with_replacement(
-            cs_neg, cs_pos, k=1, num_samples=sample_data_neg.shape[0])
+            cs_neg, cs_pos, k=1)
