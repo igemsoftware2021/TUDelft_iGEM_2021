@@ -58,7 +58,7 @@ def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_p
     return compiled_patterns
 
 
-def retrieve_cleaved_prefix_name(yaml_file: str, cleaved: bool = True, ligand_present: bool = True):
+def retrieve_prefix_name(yaml_file: str, cleaved: bool = True, ligand_present: bool = True):
 
     # First do instance checks
     if not isinstance(cleaved, bool):
