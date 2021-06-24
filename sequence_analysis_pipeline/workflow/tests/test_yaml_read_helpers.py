@@ -1,5 +1,7 @@
 import unittest
 import regex
+from workflow.scripts.yaml_read_helpers import retrieve_dataset_name
+from workflow.scripts.yaml_read_helpers import retrieve_minimum_reads
 from workflow.scripts.yaml_read_helpers import retrieve_compiled_patterns
 from workflow.scripts.yaml_read_helpers import retrieve_prefix_name
 from workflow.scripts.yaml_read_helpers import retrieve_compiled_info_patterns
@@ -7,6 +9,17 @@ from workflow.scripts.yaml_read_helpers import retrieve_compiled_info_patterns
 
 class TestSuiteCalcHelpers(unittest.TestCase):
     """Test suite to test the calc helpers functions"""
+
+    def test_retrieve_dataset_name(self):
+
+        yaml_file_path = "./config/test_config.yaml"
+
+        self.assertEqual(retrieve_dataset_name(yaml_file_path), "T1_D80")
+
+    def test_retrieve_minimum_reads(self):
+        yaml_file_path = "./config/test_config.yaml"
+
+        self.assertEqual(retrieve_minimum_reads(yaml_file_path), 30)
 
     def test_retrieve_compiled_patterns(self):
         """Function tests the retrieve_compiled_patterns() function."""

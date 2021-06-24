@@ -15,6 +15,19 @@ def retrieve_dataset_name(yaml_file: str):
     return dataset_name
 
 
+def retrieve_minimum_reads(yaml_file: str) -> int:
+    """Function that retrieves the minimum amount of reads needed before allowing it in the database."""
+    with open(yaml_file, "r") as rf:
+        try:
+            yaml_info = yaml.safe_load(rf)
+
+            minimum_reads = int(yaml_info["minimum_reads"])
+
+        except yaml.YAMLError as exc:
+            print(exc)
+    return minimum_reads
+
+
 def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_present: bool = True) -> dict:
     """Function reads a yaml file and retrieves either prefixes or suffixes for a certain condition for
     the ligand. If the ligand present is set to True, then it will retrieve the prefixes or suffixes
@@ -118,16 +131,3 @@ def retrieve_compiled_info_patterns(yaml_file: str) -> tuple:
         except yaml.YAMLError as exc:
             print(exc)
     return driver_round_pattern, selection_pattern, ligand_present_pattern
-
-
-def retrieve_minimum_reads(yaml_file: str) -> int:
-    """Function that retrieves the minimum amount of reads needed before allowing it in the database."""
-    with open(yaml_file, "r") as rf:
-        try:
-            yaml_info = yaml.safe_load(rf)
-
-            minimum_reads = int(yaml_info["minimum_reads"])
-
-        except yaml.YAMLError as exc:
-            print(exc)
-    return minimum_reads
