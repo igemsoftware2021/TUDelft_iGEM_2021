@@ -3,7 +3,7 @@ import numpy as np
 #import matplotlib
 
 #define video file name
-filename = 'test_wells.mp4'
+filename = './microfluidic_chip_design/video_analysis/test_wells.mp4'
 cap = cv2.VideoCapture(filename)     #load the video
 
 # count = 0
@@ -19,7 +19,7 @@ while cap.isOpened():               #play the video by reading frame by frame
     if ret == True:
         
         #optional: image processing here
-    
+        
         cv2.imshow('Frame', frame)       #shows the video
         # cv2.imwrite("frame%d.jpg" % count, frame)
         # count = count + 1
@@ -31,7 +31,9 @@ while cap.isOpened():               #play the video by reading frame by frame
         break
     else:
         break
-print(frame)
+
+# print(frame)
+
 # cap.release()
 # cv2.destroyAllWindows()
 # print(count)
