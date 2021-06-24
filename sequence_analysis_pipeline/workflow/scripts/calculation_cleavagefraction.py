@@ -36,7 +36,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
     # 4 - Select and count the reads of the cleaved sequences in the +ligand round
     # returns list of tuples with one value?
-    clv_seq_info = db.get_sequences(table=TABLE_NAME)
+    clv_seq_info = db.get_sequences(table=TABLE_NAME, cleaved_prefix=1, ligand_present=1)
 
     for i in tqdm(range(len(clv_seq_info))):
         # get specific tuple with information of the sequence
@@ -46,7 +46,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         r_clv = one_seq_info[1]    # get read count
 
         # find uncleaved reads of the same sequence
-        unclv_seq_info = db.get_other_sequences(cleaned_sequence=one_seq)
+        unclv_seq_info = db.get_info_sequence(table=TABLE_NAME, cleaned_sequence=one_seq, cleaved_prefix=0, ligand_present=1)
         unclv_ID = unclv_seq_info[0]  # get key ID of uncleaved sequence
         r_unclv = unclv_seq_info[1]   # get read count of uncleaved sequence
 
@@ -62,11 +62,10 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
         # -ligand round
         # get info of cleaved sequence in negative round
-        clv_seq_info_neg = db.get_other_sequences(
-            table=TABLE_NAME, cleaved_prefix=1, ligand_present=0)
+        clv_seq_info_neg = db.get_info_sequence(table=TABLE_NAME, cleaned_sequence=one_seq, cleaved_prefix= 1, ligand_present= 0)
         # get info of uncleaved sequence in negative round
-        unclv_seq_info_neg = db.get_other_sequences(
-            table=TABLE_NAME, cleaved_prefix=0, ligand_present=0)
+        unclv_seq_info_neg = db.get_info_sequence(
+            table=TABLE_NAME, cleaned_sequence=one_seq, cleaved_prefix=0, ligand_present=0)
 
         # cleaved sequence
         # get ID of cleaved sequence in negative round
