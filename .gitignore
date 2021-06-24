@@ -148,6 +148,7 @@ dmypy.json
 
 # Loulotte's stuff
 .DS_Store
+test_LoulotteW
 
 # Boyd's stuff
 sponsor_scraping
