@@ -63,6 +63,13 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         cs_pos, cs_pos_sd, cs_pos_5_perc, cs_pos_95_perc = bootstrapping.bootstrap_cleavage_fraction_with_replacement(
             sample_data_pos, r_ref_clvd_pos, r_ref_unclvd_pos)
 
+    # TODO change k, read this out from earlier
+
         # Now determine the fold change things
         fold_change_sd, fold_change_se, fold_change_5_perc, fold_change_95_perc = bootstrapping.bootstrap_fold_change_with_replacement(
             cs_neg, cs_pos, k=1)
+
+    # TODO only store the standard deviations
+
+    # update_column_value(self, table: str, rowid: int, column_name: str, value):
+    db.update_column_value(TABLE_NAME, rowid, "fold_change", fold_change_sd)

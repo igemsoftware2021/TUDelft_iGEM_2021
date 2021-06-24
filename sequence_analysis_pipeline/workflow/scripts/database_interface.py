@@ -285,7 +285,6 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
     #         f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
     #     return self.cursor.fetchall()
 
-
     def update_column_value(self, table: str, rowid: int, column_name: str, value):
         """
         Function updates a value from a specific column at row number rowid.\n
@@ -358,6 +357,3 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.cursor.execute(
             f"SELECT * FROM {table} WHERE cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present} AND reference_name IS NOT NULL")
         return self.cursor.fetchall()
-
-    
-     
