@@ -2,13 +2,18 @@ import yaml
 import regex
 
 
-def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_present: bool = True):
+def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_present: bool = True) -> dict:
     """Function reads a yaml file and retrieves either prefixes or suffixes for a certain condition for
     the ligand. If the ligand present is set to True, then it will retrieve the prefixes or suffixes
     for which there was ligand present and otherwise for which no ligand was present.\n
     \n
     args:\n
-
+    yaml_file: (str) path to yaml file.\n
+    pattern: (str) 'prefix' or 'suffix', determines whether you want to retrieve the prefix or suffix patterns.\n
+    ligand_present: (bool) indicates for what ligand condition you want to retrieve the patterns.\n
+    \n
+    returns:\n
+    compiled_patterns: (dict) dictionary where the key, value pair is as follows: regex compiled pattern, name of the sequence.
     """
     # First do some instance checks
     if not isinstance(pattern, str):
