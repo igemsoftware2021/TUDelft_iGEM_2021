@@ -93,7 +93,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
             TABLE_NAME, seq_clvd_pos[0], "cleavage_fraction_standard_deviation", cs_pos_sd)
 
         # k_factor is the 15th position
-        k_factor = seq_clvd_pos[14]
+        k_factor = seq_clvd_pos[12]
 
         # Now determine the fold change things
         fold_change_mean, fold_change_sd, fold_change_se = bootstrapping.bootstrap_fold_change_with_replacement(
