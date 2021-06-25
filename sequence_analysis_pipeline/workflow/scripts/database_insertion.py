@@ -24,9 +24,6 @@ inputfiles = [snakemake.input[0], snakemake.input[1]]
 # database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
 database_path = snakemake.output[0]
 
-print(config_file_path)
-print(ngs_references_path)
-
 # Prep the reference sequences
 reference_prefix_patterns = yaml_read_helpers.retrieve_compiled_reference_patterns(
     config_file_path, pattern="prefix")
@@ -47,6 +44,9 @@ clean_ngs_reference_patterns = seq_helpers.create_ngs_references_patterns(
 
 # Retrieve the compiled info patterns from the config file
 driver_round_pattern, selection_pattern, ligand_present_pattern = yaml_read_helpers.retrieve_compiled_info_patterns(
+    config_file_path)
+
+minimum_number_reads = yaml_read_helpers.retrieve_minimum_reads(
     config_file_path)
 
 # The name of the database table is a constant, because it is the same for all the operations.
@@ -92,39 +92,41 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
         with open(inputfile) as rf:
             lines = rf.readlines()
             for line in tqdm(lines):
-                # Create a dictionary and store all general information for an unique sequence
-                sequence_info = {"driver_round": driver_round, "selection": selection, "ligand_present": ligand_present,
-                                 "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0}
 
                 read_count, sequence = line.strip().split()
-                sequence_info["read_count"] = int(read_count)
-                sequence_info["original_sequence"] = sequence
+                if int(read_count) >= minimum_number_reads:
+                    # Create a dictionary and store all general information for an unique sequence
+                    sequence_info = {"driver_round": driver_round, "selection": selection, "ligand_present": ligand_present,
+                                     "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0}
 
-                # Determine the prefix sequence and the corresponding name
-                prefix_seq, prefix_name = seq_helpers.determine_pattern(
-                    sequence, patterns_info=prefix_patterns)
+                    sequence_info["read_count"] = int(read_count)
+                    sequence_info["original_sequence"] = sequence
 
-                # Determine the suffix sequence and the corresponding name
-                suffix_seq, suffix_name = seq_helpers.determine_pattern(
-                    sequence, patterns_info=suffix_patterns)
+                    # Determine the prefix sequence and the corresponding name
+                    prefix_seq, prefix_name = seq_helpers.determine_pattern(
+                        sequence, patterns_info=prefix_patterns)
 
-                clvd_prefix = seq_helpers.determine_clvd_prefix(
-                    prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
+                    # Determine the suffix sequence and the corresponding name
+                    suffix_seq, suffix_name = seq_helpers.determine_pattern(
+                        sequence, patterns_info=suffix_patterns)
 
-                sequence_info["cleaved_prefix"] = clvd_prefix
-                sequence_info["prefix_name"] = prefix_name
+                    clvd_prefix = seq_helpers.determine_clvd_prefix(
+                        prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)
 
-                sequence_info["barcode"] = seq_helpers.retrieve_barcode(
-                    sequence, prefix_seq)
+                    sequence_info["cleaved_prefix"] = clvd_prefix
+                    sequence_info["prefix_name"] = prefix_name
 
-                sequence_info["cleaned_sequence"] = seq_helpers.clean_sequence(
-                    sequence, prefix_seq, suffix_seq)
+                    sequence_info["barcode"] = seq_helpers.retrieve_barcode(
+                        sequence, prefix_seq)
 
-                # Determine whether the cleaned sequence is a cleaned reference sequence
-                sequence_info["reference_name"] = seq_helpers.reference_seq(
-                    sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
+                    sequence_info["cleaned_sequence"] = seq_helpers.clean_sequence(
+                        sequence, prefix_seq, suffix_seq)
 
-                db.insert_sequence_info(TABLE_NAME, sequence_info)
+                    # Determine whether the cleaned sequence is a cleaned reference sequence
+                    sequence_info["reference_name"] = seq_helpers.reference_seq(
+                        sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
+
+                    db.insert_sequence_info(TABLE_NAME, sequence_info)
 
 
 # with DatabaseInterfaceRawSequences(path=database_path) as db:

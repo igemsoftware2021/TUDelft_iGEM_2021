@@ -102,7 +102,7 @@ class DatabaseInterface:
             raise Exception("There is no database connection")
 
         if limit is None:
-            self.cursor.execute(f"SELECT * FROM {table} ")
+            self.cursor.execute(f"SELECT * FROM {table}")
         else:
             self.cursor.execute(
                 f"SELECT * FROM {table} LIMIT {limit} OFFSET {offset}")
@@ -120,7 +120,7 @@ class DatabaseInterface:
         self.query(
             f"UPDATE {table} SET {column_name}={value} WHERE id={rowid}")
 
-    def query(self, sql: str, parameters=None):
+    def query(self, sql: str, parameters=None, fetchall=False):
         """Function to query any SQL statement."""
 
         if not self.is_open():
@@ -130,6 +130,8 @@ class DatabaseInterface:
             self.cursor.execute(sql)
         else:
             self.cursor.execute(sql, parameters)
+        if fetchall:
+            return self.cursor.fetchall()
 
 
 class DatabaseInterfaceRawSequences(DatabaseInterface):

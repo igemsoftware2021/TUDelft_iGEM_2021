@@ -99,7 +99,7 @@ rule database_movement:
     input:
         "results/databases/{dataset}_database.db"
     output:
-        touch("{dataset}_database_movement.done")
+        touch("results/checkpoints/{dataset}_database_movement.done")
     conda:
         "envs/database.yaml"
     script:
@@ -107,10 +107,10 @@ rule database_movement:
 
 rule database_calculate_cleavage_fraction:
     input:
-        "{dataset}_database_movement.done",
-        "results/databases/{dataset}_database.db"
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}_database_movement.done"
     output:
-        touch("{dataset}_database_cleavage_fraction.done")
+        touch("results/checkpoints/{dataset}_database_cleavage_fraction.done")
     conda:
         "envs/database.yaml"
     script:
@@ -118,10 +118,10 @@ rule database_calculate_cleavage_fraction:
 
 rule database_calculate_fold_change:
     input:
-        "{dataset}_database_cleavage_fraction.done",
-        "results/databases/{dataset}_database.db"
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}_database_cleavage_fraction.done"
     output:
-        touch("{dataset}_database_fold_change.done")
+        touch("results/checkpoints/{dataset}_database_fold_change.done")
     conda:
         "envs/database.yaml"
     script:
@@ -129,10 +129,10 @@ rule database_calculate_fold_change:
 
 rule database_bootstrapping:
     input:
-        "{dataset}_database_fold_change.done",
-        "results/databases/{dataset}_database.db"
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}_database_fold_change.done"
     output:
-        touch("{dataset}_database_bootstrapping.done")
+        touch("results/checkpoints/{dataset}_database_bootstrapping.done")
     conda:
         "envs/database.yaml"
     script:
@@ -140,10 +140,10 @@ rule database_bootstrapping:
 
 rule database_biosensor_assay:
     input:
-        "{dataset}_database_bootstrapping.done",
-        "results/databases/{dataset}_database.db"
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}_database_bootstrapping.done"
     output:
-        touch("{dataset}_database_biosensor_assay.done")
+        touch("results/checkpoints/{dataset}_database_biosensor_assay.done")
     conda:
         "envs/database.yaml"
     script:
@@ -151,8 +151,8 @@ rule database_biosensor_assay:
 
 rule plotting:
     input:
-        "{dataset}_database_biosensor_assay.done",
-        "results/databases/{dataset}_database.db"
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}_database_biosensor_assay.done"
     output:
         "results/plots/{dataset}_fold_change_vs_fold_change_se.pdf"
     conda:

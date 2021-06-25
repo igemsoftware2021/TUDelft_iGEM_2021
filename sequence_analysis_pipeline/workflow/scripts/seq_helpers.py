@@ -41,8 +41,8 @@ def clean_ngs_reference_sequences(ngs_references_dict: dict, prefix_info: dict, 
     cleaned_ngs_references = {}
     for reference_seq in ngs_references_dict:
         reversed_seq = complement_reverse_sequence(reference_seq)
-        prefix_seq, _, _ = determine_pattern(reversed_seq, prefix_info)
-        suffix_seq, _, _ = determine_pattern(reversed_seq, suffix_info)
+        prefix_seq, _ = determine_pattern(reversed_seq, prefix_info)
+        suffix_seq, _ = determine_pattern(reversed_seq, suffix_info)
         cleaned_seq = clean_sequence(reversed_seq, prefix_seq, suffix_seq)
         cleaned_ngs_references[cleaned_seq] = ngs_references_dict[reference_seq]
     return cleaned_ngs_references

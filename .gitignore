@@ -157,6 +157,7 @@ dmypy.json
 
 # data
 sequence_analysis_pipeline/data/NGS/
+sequence_analysis_pipeline/results/
 
 # minke's stuff
 \test_microfluidic_minke
