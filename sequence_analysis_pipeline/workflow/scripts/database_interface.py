@@ -108,6 +108,18 @@ class DatabaseInterface:
                 f"SELECT * FROM {table} LIMIT {limit} OFFSET {offset}")
         return self.cursor.fetchall()
 
+    def update_column_value(self, table: str, rowid: int, column_name: str, value):
+        """
+        Function updates a value from a specific column at row number rowid.\n
+        args:\n
+        table: (str) name of the table\n
+        rowid: (int) row to update\n
+        column_name: (str) name of the column to update\n
+        value: value to insert in the column\n
+        """
+        self.query(
+            f"UPDATE {table} SET {column_name}={value} WHERE id={rowid}")
+
     def query(self, sql: str, parameters=None):
         """Function to query any SQL statement."""
 
@@ -238,7 +250,12 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     fold_change REAL,
                     possible_sensor INTEGER,
                     mutated_prefix INTEGER,
-                    mutated_suffix INTEGER
+                    mutated_suffix INTEGER,
+                    cleavage_fraction_estimated_mean REAL,
+                    cleavage_fraction_standard_deviation REAL,
+                    fold_change_estimated_mean REAL,
+                    fold_change_standard_error REAL,
+                    fold_change_standard_error REAL
                     )""")
 
     def insert_sequence_info(self, table: str, sequence_info: dict):
@@ -254,11 +271,17 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, cleaned_sequence,
                             cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
+                            fold_change, possible_sensor, mutated_prefix, mutated_suffix,
+                            cleavage_fraction_estimated_mean, cleavage_fraction_standard_deviation,
+                            fold_change_estimated_mean, fold_change_standard_error,
+                            fold_change_standard_error) VALUES (
                             :read_count, :cleaned_sequence,
                             :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
+                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix,
+                            :cleavage_fraction_estimated_mean, :cleavage_fraction_standard_deviation,
+                            :fold_change_estimated_mean, :fold_change_standard_error,
+                            :fold_change_standard_error)""", parameters=sequence_info)
 
     def get_info_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int):
         """
@@ -284,18 +307,6 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
     #     self.cursor.execute(
     #         f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
     #     return self.cursor.fetchall()
-
-    def update_column_value(self, table: str, rowid: int, column_name: str, value):
-        """
-        Function updates a value from a specific column at row number rowid.\n
-        args:\n
-        table: (str) name of the table\n
-        rowid: (int) row to update\n
-        column_name: (str) name of the column to update\n
-        value: value to insert in the column\n
-        """
-        self.query(
-            f"UPDATE {table} SET {column_name}={value} WHERE id={rowid}")
 
     def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
         """

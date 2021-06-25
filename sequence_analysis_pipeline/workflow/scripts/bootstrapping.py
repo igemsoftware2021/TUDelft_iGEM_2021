@@ -17,15 +17,17 @@ def bootstrap_cleavage_fraction_with_replacement(data, r_clvd_ref, r_unclvd_ref,
     cs = calc_helpers.calc_cleavage_fraction(
         r_clvd_s, r_clvd_ref, r_unclvd_s, r_unclvd_ref)
 
+    # Calculate estimated mean
+    cs_mean = np.mean(cs)
+
     # Calculate standard deviation of the bootstrapped cleavage fractions
     cs_sd = calc_helpers.calc_sample_standard_deviation(cs)
 
-    # Store the 5% and 95% percentiles of the mean cleavage fraction
-    cs_5_perc, cs_95_perc = calc_helpers(np.mean(cs), cs_sd)
-    return cs, cs_sd, cs_5_perc, cs_95_perc
+    return cs, cs_mean, cs_sd
 
 
 def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1) -> tuple:
+    # TODO update doc string
     """
     Function does bootstrapping for cleavage fraction and fold change on the data.
     args:\n
@@ -56,13 +58,13 @@ def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1) -> tuple:
     num_samples = cs_neg.shape[0]
 
     fold_changes = calc_helpers.calc_fold_change(cs_pos, cs_neg, k=k)
+
+    fold_change_mean = np.mean(fold_changes)
+
     fold_change_sd = calc_helpers.calc_sample_standard_deviation(
         fold_changes)
-
-    fold_change_5_perc, fold_change_95_perc = calc_helpers.calc_95_confidence_interval(
-        np.mean(fold_changes), fold_change_sd)
 
     # fold change standard error
     fold_change_se = fold_change_sd / np.sqrt(num_samples)
 
-    return fold_change_sd, fold_change_se, fold_change_5_perc, fold_change_95_perc
+    return fold_change_mean, fold_change_sd, fold_change_se

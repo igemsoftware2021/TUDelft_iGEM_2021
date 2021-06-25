@@ -42,7 +42,8 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
         clean_sequence_info = {"read_count": read_counts_new, "cleaned_sequence": sequence_all[0][3], "cleaved_prefix": sequence_all[0][5], "selection": sequence_all[0][8], "ligand_present": sequence_all[0][10],
                                "prefix_name": sequence_all[0][6], "reference_name": sequence_all[0][7], "driver_round": sequence_all[0][9], "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0,
-                               "mutated_prefix": sequence_all[0][14], "mutated_suffix": sequence_all[0][15]}
+                               "mutated_prefix": sequence_all[0][14], "mutated_suffix": sequence_all[0][15], "cleavage_fraction_estimated_mean": "NULL", "cleavage_fraction_standard_deviation": "NULL",
+                               "fold_change_estimated_mean": "NULL", "fold_change_standard_error": "NULL", "fold_change_standard_error": "NULL"}
 
         # insert the information into the table
         db.insert_sequence_info(TABLE_NAME, clean_sequence_info)
