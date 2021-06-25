@@ -84,6 +84,53 @@ def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_p
     return compiled_patterns
 
 
+def retrieve_compiled_reference_patterns(yaml_file: str, pattern: str = "prefix") -> dict:
+    """Function reads a yaml file and retrieves either prefixes or suffixes for a certain condition for
+    the ligand. If the ligand present is set to True, then it will retrieve the prefixes or suffixes
+    for which there was ligand present and otherwise for which no ligand was present.\n
+    \n
+    args:\n
+    yaml_file: (str) path to yaml file.\n
+    pattern: (str) 'prefix' or 'suffix', determines whether you want to retrieve the prefix or suffix patterns.\n
+    ligand_present: (bool) indicates for what ligand condition you want to retrieve the patterns.\n
+    \n
+    returns:\n
+    compiled_patterns: (dict) dictionary where the key, value pair is as follows: regex compiled pattern, name of the sequence.
+    """
+    # First do some instance checks
+    if not isinstance(pattern, str):
+        raise TypeError(
+            "pattern keyword argument should be of type string")
+
+    if pattern == "prefix":
+        pattern_key = "prefixes"
+    elif pattern == "suffix":
+        pattern_key = "suffixes"
+    else:
+        raise ValueError(
+            "pattern keyword argument should be 'prefix' or 'suffix'")
+    with open(yaml_file, "r") as rf:
+        try:
+            yaml_info = yaml.safe_load(rf)
+
+            # Retrieve the cleave states for a certain ligand condition
+            # This can be either: cleaved/uncleaved/other
+            cleave_states = yaml_info["references"][pattern_key]
+
+            # Create regex patterns from the prefix sequences
+            compiled_patterns = {}
+            for cleave_state in cleave_states:
+                sequence = yaml_info["references"][pattern_key][cleave_state]["sequence"]
+                sequence_name = yaml_info["references"][pattern_key][cleave_state]["name"]
+                max_error = yaml_info["references"][pattern_key][cleave_state]["max_error"]
+                compiled_patterns[regex.compile(
+                    fr"(?e)({sequence}){{e<={max_error}}}")] = sequence_name
+
+        except yaml.YAMLError as exc:
+            print(exc)
+    return compiled_patterns
+
+
 def retrieve_prefix_name(yaml_file: str, cleaved: bool = True, ligand_present: bool = True) -> str:
 
     # First do instance checks

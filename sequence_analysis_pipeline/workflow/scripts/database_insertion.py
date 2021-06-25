@@ -4,73 +4,49 @@ import regex
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceRawSequences
 import seq_helpers
+import yaml_read_helpers
 
-# Create the path to the config file
+# Find the path to the config file
 config_file_path = Path(__file__).resolve(
 ).parents[2] / "config" / "config.yaml"
 
-# Read out all the information needed from the 'config.yaml' file
-with open(config_file_path, "r") as rf:
-    try:
-        yaml_info = yaml.safe_load(rf)
-        prefixes = yaml_info["prefixes"]
+# Find the path to the references file
+ngs_references_path = config_file_path = Path(
+    __file__).resolve().parents[2] / "data" / "ngs_references.csv"
 
-        # Create regex patterns from the prefix sequences
-        prefix_patterns = {}
-        for prefix in prefixes:
-            sequence = yaml_info["prefixes"][prefix]["sequence"]
-            prefix_name = yaml_info["prefixes"][prefix]["name"]
-            max_error = yaml_info["prefixes"][prefix]["max_error"]
-            prefix_patterns[regex.compile(
-                fr"(?e)({sequence}){{e<={max_error}}}")] = prefix_name
-
-        # Create a dictionary with regex patterns for the suffix sequences
-        suffixes = yaml_info["suffixes"]
-        suffix_patterns = {}
-        for suffix in suffixes:
-            sequence = yaml_info["suffixes"][suffix]["sequence"]
-            suffix_name = yaml_info["suffixes"][suffix]["name"]
-            max_error = yaml_info["suffixes"][suffix]["max_error"]
-            suffix_patterns[regex.compile(
-                fr"(?e)({sequence}){{e<={max_error}}}")] = suffix_name
-
-        # Store the name of the cleaved prefix
-        clvd_prefix_name = yaml_info["prefixes"]["cleaved"]["name"]
-
-        # Store the name of the uncleaved prefix
-        unclvd_prefix_name = yaml_info["prefixes"]["uncleaved"]["name"]
-
-        driver_round_pattern = yaml_info["info_patterns"]["driver_round"]
-        selection_pattern = yaml_info["info_patterns"]["selection"]
-        ligand_present_pattern = yaml_info["info_patterns"]["ligand_present"]
-
-    except yaml.YAMLError as exc:
-        print(exc)
-
-# Filename is given by snakemake
+# Store the input filenames in a variable. The inputfile names are given by snakemake.
 inputfiles = [
     'sequence_analysis_pipeline/data/NGS/T1_D80_L0_read_count.txt']
 # inputfiles = [snakemake.input[0], snakemake.input[1]]
 
+# Store the output filename in a variable. The outputfile name is given by snakemake.
 # database_path = ":memory:"
 database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
 # database_path = snakemake.output[0]
 
-ngs_references_path = config_file_path = Path(
-    __file__).resolve().parents[2] / "data" / "ngs_references.csv"
+# Prep the reference sequences
+reference_prefix_patterns = yaml_read_helpers.retrieve_compiled_reference_patterns(
+    config_file_path, pattern="prefix")
+reference_suffix_patterns = yaml_read_helpers.retrieve_compiled_reference_patterns(
+    config_file_path, pattern="suffix")
 
 ngs_references = seq_helpers.read_ngs_references(ngs_references_path)
 
 # Complement, reverse and cleanup the ngs reference sequences. Cleaning up
 # means removing the prefix and suffix from the sequence.
 ready_ngs_references = seq_helpers.clean_ngs_reference_sequences(
-    ngs_references, prefix_patterns, suffix_patterns)
+    ngs_references, reference_prefix_patterns, reference_suffix_patterns)
 
 # Create a dictionary with the sequences as compiled regex objects. This is
 # for optimization.
 clean_ngs_reference_patterns = seq_helpers.create_ngs_references_patterns(
     ready_ngs_references)
 
+# Retrieve the compiled info patterns from the config file
+driver_round_pattern, selection_pattern, ligand_present_pattern = yaml_read_helpers.retrieve_compiled_info_patterns(
+    config_file_path)
+
+# The name of the database table is a constant, because it is the same for all the operations.
 TABLE_NAME = "raw_sequences"
 
 # Create the database
@@ -96,11 +72,19 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
 
         # Retrieve the round of DRIVER, which selection it is and whether the ligand
         # is present from the file
-        driver_round = int(regex.search(
-            driver_round_pattern, inputfile).group())
-        selection = regex.search(selection_pattern, inputfile).group()
-        ligand_present = int(
-            regex.search(ligand_present_pattern, inputfile).group())
+        driver_round = int(driver_round_pattern.search(inputfile).group())
+        selection = selection_pattern.search(inputfile).group()
+        ligand_present = int(ligand_present_pattern.search(inputfile).group())
+
+        prefix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
+            config_file_path, pattern="prefix", ligand_present=bool(ligand_present))
+        suffix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
+            config_file_path, pattern="suffix", ligand_present=bool(ligand_present))
+
+        clvd_prefix_name = yaml_read_helpers.retrieve_prefix_name(
+            config_file_path, cleaved=True, ligand_present=bool(ligand_present))
+        unclvd_prefix_name = yaml_read_helpers.retrieve_prefix_name(
+            config_file_path, cleaved=False, ligand_present=bool(ligand_present))
 
         with open(inputfile) as rf:
             lines = rf.readlines()
@@ -142,10 +126,10 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
                 db.insert_sequence_info(TABLE_NAME, sequence_info)
 
 
-with DatabaseInterfaceRawSequences(path=database_path) as db:
-    results = db.get(
-        TABLE_NAME, ["original_sequence", "cleaned_sequence"], limit=10)
+# with DatabaseInterfaceRawSequences(path=database_path) as db:
+#     results = db.get(
+#         TABLE_NAME, ["original_sequence", "cleaned_sequence"], limit=10)
 
-    # testing = db.get_ref_sequences()
-    # print(testing)
-    # print(db.get_sequences(ligand_present=0))
+#     # testing = db.get_ref_sequences()
+#     # print(testing)
+#     # print(db.get_sequences(ligand_present=0))
