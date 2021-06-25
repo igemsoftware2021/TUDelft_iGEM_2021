@@ -3,6 +3,7 @@ import regex
 from workflow.scripts.yaml_read_helpers import retrieve_dataset_name
 from workflow.scripts.yaml_read_helpers import retrieve_minimum_reads
 from workflow.scripts.yaml_read_helpers import retrieve_compiled_patterns
+from workflow.scripts.yaml_read_helpers import retrieve_compiled_reference_patterns
 from workflow.scripts.yaml_read_helpers import retrieve_prefix_name
 from workflow.scripts.yaml_read_helpers import retrieve_compiled_info_patterns
 
@@ -41,6 +42,20 @@ class TestSuiteCalcHelpers(unittest.TestCase):
              regex.compile("(?e)(ACAAAACAAAAC){e<=1}"): "Z"})
         self.assertEqual(retrieve_compiled_patterns(
             yaml_file_path, pattern="suffix", ligand_present=False),
+            {regex.compile("(?e)(AAAAAGAAAT){e<=1}"): "X"})
+
+    def test_retrieve_compiled_reference_patterns(self):
+        """Function tests the retrieve_compiled_patterns() function."""
+
+        yaml_file_path = "./config/test_config.yaml"
+
+        self.assertEqual(retrieve_compiled_reference_patterns(
+            yaml_file_path, pattern="prefix"),
+            {regex.compile("(?e)(CTTTTCCGTATATCTCGCCAG){e<=1}"): "A",
+             regex.compile("(?e)(GGGAAACAAACAAA){e<=1}"): "W",
+             regex.compile("(?e)(ACAAAACAAAAC){e<=1}"): "Z"})
+        self.assertEqual(retrieve_compiled_reference_patterns(
+            yaml_file_path, pattern="suffix"),
             {regex.compile("(?e)(AAAAAGAAAT){e<=1}"): "X"})
 
     def test_retrieve_prefix_name(self):

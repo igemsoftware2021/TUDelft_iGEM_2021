@@ -3,8 +3,8 @@ from database_interface import DatabaseInterfaceCleanSequences
 from tqdm import tqdm
 
 # add right path for the table with the clean sequences
-database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
-# database_path = snakemake.input[0]
+# database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
+database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 

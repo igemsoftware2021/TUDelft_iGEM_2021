@@ -1,9 +1,8 @@
 from database_interface import DatabaseInterfaceCleanSequences
-import sqlite3
 from tqdm import tqdm
 
-database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
-# database_path = snakemake.output[0]
+# database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
+database_path = snakemake.input[0]
 
 # Fetch data for raw_sequences
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
@@ -14,10 +13,10 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
     # Create a set of the list of tuples of the retrieved sequence data
     unique_rows = list(set(pre_data_seq))
 
+TABLE_NAME = "clean_sequences"
 
 # Create table
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
-    TABLE_NAME = "clean_sequences"
 
     if not db.table_exists(TABLE_NAME):
         db.create_table(TABLE_NAME)
@@ -32,18 +31,18 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
             elif user_input.lower().startswith('n'):
                 exit()
 
-
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
     for i in tqdm(range(len(unique_rows))):
         # get for every unique sequence all the read_counts
         sequence_all = db.get_info_sequence(
-            table="raw_sequences", cleaned_sequence=unique_rows[i][0], cleaved_prefix=unique_rows[i][1], ligand_present=unique_rows[i][2])
+            "raw_sequences", unique_rows[i][0], unique_rows[i][1], unique_rows[i][2])
+
         read_counts_new = sum([p[1] for p in sequence_all])
 
         clean_sequence_info = {"read_count": read_counts_new, "cleaned_sequence": sequence_all[0][3], "cleaved_prefix": sequence_all[0][5], "selection": sequence_all[0][8], "ligand_present": sequence_all[0][10],
                                "prefix_name": sequence_all[0][6], "reference_name": sequence_all[0][7], "driver_round": sequence_all[0][9], "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0,
-                               "mutated_prefix": sequence_all[0][14], "mutated_suffix": sequence_all[0][15], "k_factor": "NULL", "cleavage_fraction_estimated_mean": "NULL", "cleavage_fraction_standard_deviation": "NULL",
-                               "fold_change_estimated_mean": "NULL", "fold_change_standard_error": "NULL", "fold_change_standard_error": "NULL"}
+                               "k_factor": "NULL", "cleavage_fraction_estimated_mean": "NULL", "cleavage_fraction_standard_deviation": "NULL", "fold_change_estimated_mean": "NULL", "fold_change_standard_deviation": "NULL",
+                               "fold_change_standard_error": "NULL"}
 
-        # insert the information into the table
+        # insert the information into the new table
         db.insert_sequence_info(TABLE_NAME, clean_sequence_info)

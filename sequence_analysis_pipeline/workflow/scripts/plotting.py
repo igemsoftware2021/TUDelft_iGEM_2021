@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceCleanSequences
 
-database_path = "./data/NGS/T1_D80_database.db"
-# database_path = snakemake.output[0]
+# database_path = "./data/NGS/T1_D80_database.db"
+database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 

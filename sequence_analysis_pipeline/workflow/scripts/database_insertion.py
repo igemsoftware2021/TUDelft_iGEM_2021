@@ -11,18 +11,21 @@ config_file_path = Path(__file__).resolve(
 ).parents[2] / "config" / "config.yaml"
 
 # Find the path to the references file
-ngs_references_path = config_file_path = Path(
+ngs_references_path = Path(
     __file__).resolve().parents[2] / "data" / "ngs_references.csv"
 
 # Store the input filenames in a variable. The inputfile names are given by snakemake.
-inputfiles = [
-    'sequence_analysis_pipeline/data/NGS/T1_D80_L0_read_count.txt']
-# inputfiles = [snakemake.input[0], snakemake.input[1]]
+# inputfiles = [
+# 'sequence_analysis_pipeline/data/NGS/T1_D80_L0_read_count.txt']
+inputfiles = [snakemake.input[0], snakemake.input[1]]
 
 # Store the output filename in a variable. The outputfile name is given by snakemake.
 # database_path = ":memory:"
-database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
-# database_path = snakemake.output[0]
+# database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
+database_path = snakemake.output[0]
+
+print(config_file_path)
+print(ngs_references_path)
 
 # Prep the reference sequences
 reference_prefix_patterns = yaml_read_helpers.retrieve_compiled_reference_patterns(
@@ -98,14 +101,12 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
                 sequence_info["original_sequence"] = sequence
 
                 # Determine the prefix sequence and the corresponding name
-                prefix_seq, prefix_name, mutated_prefix = seq_helpers.determine_pattern(
+                prefix_seq, prefix_name = seq_helpers.determine_pattern(
                     sequence, patterns_info=prefix_patterns)
-                sequence_info["mutated_prefix"] = mutated_prefix
 
                 # Determine the suffix sequence and the corresponding name
-                suffix_seq, suffix_name, mutated_suffix = seq_helpers.determine_pattern(
+                suffix_seq, suffix_name = seq_helpers.determine_pattern(
                     sequence, patterns_info=suffix_patterns)
-                sequence_info["mutated_suffix"] = mutated_suffix
 
                 clvd_prefix = seq_helpers.determine_clvd_prefix(
                     prefix_name, clvd_prefix_name=clvd_prefix_name, unclvd_prefix_name=unclvd_prefix_name)

@@ -13,7 +13,9 @@ rule all:
         # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset=config["dataset"], read=["R1", "R2"])
         # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset="N41-I14_S14", read=["R1", "R2"]),
         # "results/pear/N41-I14_S14.assembled.fastq"
-        "results/plots/fold_change_vs_fold_change_se.pdf"
+        expand("results/plots/{dataset}_fold_change_vs_fold_change_se.pdf", dataset=config["dataset"]),
+        expand("results/databases/{dataset}_database.db", dataset=config["dataset"])
+
     
 rule fastqc:
     input:
@@ -80,18 +82,18 @@ rule split_file:
     conda:
         "envs/tqdm.yaml"
     script:
-        "/scripts/file_splitting.py"
+        "scripts/file_splitting.py"
 
 rule database_insert_read_counts:
     input:
         "results/read_counts/{dataset}_L0_read_count.txt",
         "results/read_counts/{dataset}_L1_read_count.txt"
     output:
-        "results/database/{dataset}_database.db"
+        "results/databases/{dataset}_database.db"
     conda:
         "envs/database.yaml"
     script:
-        "/scripts/database_insertion.py"
+        "scripts/database_insertion.py"
 
 rule database_movement:
     input:
@@ -101,7 +103,7 @@ rule database_movement:
     conda:
         "envs/database.yaml"
     script:
-        "/scripts/database_movement.py"
+        "scripts/database_movement.py"
 
 rule database_calculate_cleavage_fraction:
     input:
@@ -112,7 +114,7 @@ rule database_calculate_cleavage_fraction:
     conda:
         "envs/database.yaml"
     script:
-        "/scripts/calculation_cleavagefraction.py"
+        "scripts/calculation_cleavagefraction.py"
 
 rule database_calculate_fold_change:
     input:
@@ -123,7 +125,7 @@ rule database_calculate_fold_change:
     conda:
         "envs/database.yaml"
     script:
-        "/scripts/calculation_foldchange.py"
+        "scripts/calculation_foldchange.py"
 
 rule database_bootstrapping:
     input:
@@ -134,7 +136,7 @@ rule database_bootstrapping:
     conda:
         "envs/database.yaml"
     script:
-        "/scripts/database_bootstrapping.py"
+        "scripts/database_bootstrapping.py"
 
 rule database_biosensor_assay:
     input:
@@ -145,14 +147,14 @@ rule database_biosensor_assay:
     conda:
         "envs/database.yaml"
     script:
-        "/scripts/database_bionsensor_assay.py"
+        "scripts/database_bionsensor_assay.py"
 
 rule plotting:
     input:
         "{dataset}_database_biosensor_assay.done",
         "results/databases/{dataset}_database.db"
     output:
-        "results/plots/fold_change_vs_fold_change_se.pdf"
+        "results/plots/{dataset}_fold_change_vs_fold_change_se.pdf"
     conda:
         "envs/plotting.yaml"
     script:

@@ -88,11 +88,11 @@ def determine_pattern(sequence: str, patterns_info: dict) -> Tuple[str, str, int
             pattern_name = patterns_info[pattern]
             pattern_seq = pattern_match.group()
             mutated_pattern = 0
-            # If there is a substitution/insertion/deletion, the pattern is "mutated"
-            if sum(pattern_match.fuzzy_counts) > 0:
-                mutated_pattern = 1
-            return pattern_seq, pattern_name, mutated_pattern
-    return None, None, None
+            # # If there is a substitution/insertion/deletion, the pattern is "mutated"
+            # if sum(pattern_match.fuzzy_counts) > 0:
+            #     mutated_pattern = 1
+            return pattern_seq, pattern_name  # , mutated_pattern
+    return None, None  # , None
 
 
 def determine_clvd_prefix(prefix_name, clvd_prefix_name="Z", unclvd_prefix_name="W"):

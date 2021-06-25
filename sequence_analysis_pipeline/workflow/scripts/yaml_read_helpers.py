@@ -85,6 +85,7 @@ def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_p
 
 
 def retrieve_compiled_reference_patterns(yaml_file: str, pattern: str = "prefix") -> dict:
+    # TODO update doc string
     """Function reads a yaml file and retrieves either prefixes or suffixes for a certain condition for
     the ligand. If the ligand present is set to True, then it will retrieve the prefixes or suffixes
     for which there was ligand present and otherwise for which no ligand was present.\n

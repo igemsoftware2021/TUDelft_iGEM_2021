@@ -178,9 +178,7 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
                     ligand_present INTEGER,
                     cleavage_fraction REAL,
                     fold_change REAL,
-                    possible_sensor INTEGER,
-                    mutated_prefix INTEGER,
-                    mutated_suffix INTEGER
+                    possible_sensor INTEGER
                     )""")
 
     def insert_sequence_info(self, table: str, sequence_info: dict):
@@ -196,11 +194,11 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix, mutated_suffix) VALUES (
+                            fold_change, possible_sensor) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix)""", parameters=sequence_info)
+                            :fold_change, :possible_sensor)""", parameters=sequence_info)
 
 
 class DatabaseInterfaceCleanSequences(DatabaseInterface):
@@ -249,13 +247,11 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     cleavage_fraction REAL,
                     fold_change REAL,
                     possible_sensor INTEGER,
-                    mutated_prefix INTEGER,
-                    mutated_suffix INTEGER,
                     k_factor REAL,
                     cleavage_fraction_estimated_mean REAL,
                     cleavage_fraction_standard_deviation REAL,
                     fold_change_estimated_mean REAL,
-                    fold_change_standard_error REAL,
+                    fold_change_standard_deviation REAL,
                     fold_change_standard_error REAL
                     )""")
 
@@ -272,16 +268,16 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         self.query(f"""INSERT INTO {table}(read_count, cleaned_sequence,
                             cleaved_prefix, prefix_name, reference_name,
                             selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, mutated_prefix, mutated_suffix, k_factor,
-                            cleavage_fraction_estimated_mean, cleavage_fraction_standard_deviation,
-                            fold_change_estimated_mean, fold_change_standard_error,
+                            fold_change, possible_sensor, k_factor, cleavage_fraction_estimated_mean,
+                            cleavage_fraction_standard_deviation,
+                            fold_change_estimated_mean, fold_change_standard_deviation,
                             fold_change_standard_error) VALUES (
                             :read_count, :cleaned_sequence,
                             :cleaved_prefix, :prefix_name, :reference_name,
                             :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :mutated_prefix, :mutated_suffix, :k_factor,
+                            :fold_change, :possible_sensor, :k_factor,
                             :cleavage_fraction_estimated_mean, :cleavage_fraction_standard_deviation,
-                            :fold_change_estimated_mean, :fold_change_standard_error,
+                            :fold_change_estimated_mean, :fold_change_standard_deviation,
                             :fold_change_standard_error)""", parameters=sequence_info)
 
     def get_info_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int):
@@ -294,8 +290,10 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
         1 = yes
         0 = no
         """
+        # There should be quotes around a string when searching for it in a column, otherwise SQLite3 thinks it is a column
+        # https://stackoverflow.com/questions/11821203/sqlite3-operationalerror-no-such-column-but-thats-not-a-column
         self.cursor.execute(
-            f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
+            f"""SELECT * FROM {table} WHERE cleaned_sequence="{cleaned_sequence}" AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}""")
         return self.cursor.fetchall()
 
     # def get_other_sequences(self, table: str, cleaned_sequence: str, cleaved_prefix: int = 0, ligand_present: int = 1):

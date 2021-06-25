@@ -1,55 +1,74 @@
 dataset: T1_D80
-
 minimum_reads: 30
-
 ligand_positive:
-  prefixes:
-      cleaved:
-          sequence: AGATCTTTTCCGTATATCTCGCCAG
-          name: A
-          max_error: 1
-      uncleaved:
-          sequence: AGATGGGAAACAAACAAA
-          name: W
-          max_error: 1
-      other:
-          sequence: AGATACAAAACAAAAC
-          name: Z
-          max_error: 1
-  suffixes:
-      cleaved:
-          sequence: AAAAAGAAATT
-          name: X
-          max_error: 1
-      uncleaved:
-          sequence: AAAAAGAAATT
-          name: X
-          max_error: 1
-
+    prefixes:
+        cleaved:
+            sequence: AGATCTTTTCCGTATATCTCGCCAG
+            name: A
+            max_error: 1
+        uncleaved:
+            sequence: AGATGGGAAACAAACAAA
+            name: W
+            max_error: 1
+        other:
+            sequence: AGATACAAAACAAAAC
+            name: Z
+            max_error: 1
+    suffixes:
+        cleaved:
+            sequence: AAAAAGAAATT
+            name: X
+            max_error: 1
+        uncleaved:
+            sequence: AAAAAGAAATT
+            name: X
+            max_error: 1
 ligand_negative:
-  prefixes:
-      cleaved:
-          sequence: CTTTTCCGTATATCTCGCCAG
-          name: A
-          max_error: 1
-      uncleaved:
-          sequence: GGGAAACAAACAAA
-          name: W
-          max_error: 1
-      other:
-          sequence: ACAAAACAAAAC
-          name: Z
-          max_error: 1
-  suffixes:
-      cleaved:
-          sequence: AAAAAGAAAT
-          name: X
-          max_error: 1
-      uncleaved:
-          sequence: AAAAAGAAAT
-          name: X
-          max_error: 1
-
+    prefixes:
+        cleaved:
+            sequence: CTTTTCCGTATATCTCGCCAG
+            name: A
+            max_error: 1
+        uncleaved:
+            sequence: GGGAAACAAACAAA
+            name: W
+            max_error: 1
+        other:
+            sequence: ACAAAACAAAAC
+            name: Z
+            max_error: 1
+    suffixes:
+        cleaved:
+            sequence: AAAAAGAAAT
+            name: X
+            max_error: 1
+        uncleaved:
+            sequence: AAAAAGAAAT
+            name: X
+            max_error: 1
+references:
+    prefixes:
+        cleaved:
+            sequence: CTTTTCCGTATATCTCGCCAG
+            name: A
+            max_error: 1
+        uncleaved:
+            sequence: GGGAAACAAACAAA
+            name: W
+            max_error: 1
+        other:
+            sequence: ACAAAACAAAAC
+            name: Z
+            max_error: 1
+    suffixes:
+        cleaved:
+            sequence: AAAAAGAAAT
+            name: X
+            max_error: 1
+        uncleaved:
+            sequence: AAAAAGAAAT
+            name: X
+            max_error: 1
 info_patterns:
     driver_round: "(?<=D)([0-9]+)"
     selection: "(T[0-9]+)"
