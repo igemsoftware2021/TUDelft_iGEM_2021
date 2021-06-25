@@ -1,0 +1,7 @@
+name: tqdm
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - tqdm=4.61.*

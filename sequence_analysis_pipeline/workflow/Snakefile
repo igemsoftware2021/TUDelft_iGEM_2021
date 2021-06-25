@@ -32,53 +32,127 @@ rule fastqc:
 
 rule pear:
     input:
-        forward_read="data/NGS/{dataset}_R1_001.fastq.gz",
-        reverse_read="data/NGS/{dataset}_R2_001.fastq.gz"
+        forward_read="data/NGS/{sample}_R1_001.fastq.gz",
+        reverse_read="data/NGS/{sample}_R2_001.fastq.gz"
     output:
-        "results/pear/{dataset}.assembled.fastq",
-        "results/pear/{dataset}.discarded.fastq",
-        "results/pear/{dataset}.unassembled.forward.fastq",
-        "results/pear/{dataset}.unassembled.reverse.fastq"
+        "results/pear/{sample}.assembled.fastq",
+        "results/pear/{sample}.discarded.fastq",
+        "results/pear/{sample}.unassembled.forward.fastq",
+        "results/pear/{sample}.unassembled.reverse.fastq"
     conda:
         "envs/pear.yaml"
     log:
-        "logs/pear/{dataset}_pear.log"
+        "logs/pear/{sample}_pear.log"
     shell:
         """
         #!/bin/bash
         pear -f {input.forward_read} -r {input.reverse_read} -o results/pear/{wildcards.dataset} > {log}
         """
 
-# rule calculate_cleavage_fraction:
-#     input:
-#         "/data/processed/{dataset}_database.db"
-#     output:
-#         "/data/processed/{dataset}_database.db"
-
-rule insert_counts_into_database:
+rule fastq_to_fasta:
     input:
-        "/data/processed/{dataset}_L0_read_counts.txt",
-        "/data/processed/{dataset}_L1_read_counts.txt"
+        "results/pear/{dataset}.assembled.fastq"
     output:
-        "result/databases/{dataset}_database.db"
+        "results/fasta/{dataset}.assembled.seq"
+    shell:
+        """
+        #!/bin/bash
+        awk '{if(NR%4==2) print $0}' {input} > {output}
+        """
+
+rule sort_fasta:
+    input:
+        "results/fasta/{dataset}.assembled.seq"
+    output:
+        "results/read_counts/{dataset}_read_count.txt"
+    shell:
+        """
+        sort {input} | uniq -dc  | sort -nr > {output}
+        """
+
+rule split_file:
+    input:
+        "results/read_counts/{dataset}_read_count.txt"
+    output:
+        "results/read_counts/{dataset}_L0_read_count.txt",
+        "results/read_counts/{dataset}_L1_read_count.txt"
+    conda:
+        "envs/tqdm.yaml"
+    script:
+        "/scripts/file_splitting.py"
+
+rule database_insert_read_counts:
+    input:
+        "results/read_counts/{dataset}_L0_read_count.txt",
+        "results/read_counts/{dataset}_L1_read_count.txt"
+    output:
+        "results/database/{dataset}_database.db"
     conda:
         "envs/database.yaml"
     script:
         "/scripts/database_insertion.py"
 
-# rule database_movement:
-#     input:
-#         "result/databases/{dataset}_database.db"
-#     output:
-#         touch("database_movement.done")
-#     script:
-#         pass
+rule database_movement:
+    input:
+        "results/databases/{dataset}_database.db"
+    output:
+        touch("{dataset}_database_movement.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "/scripts/database_movement.py"
 
-# rule calculate_cleavage_fraction:
-#     input:
-#         "result/databases/{dataset}_database.db",
-#         "database_movement.done"
-#     output:
-#         pass
-#     script:
-#         pass
+rule database_calculate_cleavage_fraction:
+    input:
+        "{dataset}_database_movement.done",
+        "results/databases/{dataset}_database.db"
+    output:
+        touch("{dataset}_database_cleavage_fraction.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "/scripts/calculation_cleavagefraction.py"
+
+rule database_calculate_fold_change:
+    input:
+        "{dataset}_database_cleavage_fraction.done",
+        "results/databases/{dataset}_database.db"
+    output:
+        touch("{dataset}_database_fold_change.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "/scripts/calculation_foldchange.py"
+
+rule database_bootstrapping:
+    input:
+        "{dataset}_database_fold_change.done",
+        "results/databases/{dataset}_database.db"
+    output:
+        touch("{dataset}_database_bootstrapping.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "/scripts/database_bootstrapping.py"
+
+rule database_biosensor_assay:
+    input:
+        "{dataset}_database_bootstrapping.done",
+        "results/databases/{dataset}_database.db"
+    output:
+        touch("{dataset}_database_biosensor_assay.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "/scripts/database_bionsensor_assay.py"
+
+rule plotting:
+    input:
+        "{dataset}_database_biosensor_assay.done",
+        "results/databases/{dataset}_database.db"
+    output:
+        "results/plots/quals.svg"
+    conda:
+        "envs/plotting.yaml"
+    script:
+        "/scripts/plotting.py"

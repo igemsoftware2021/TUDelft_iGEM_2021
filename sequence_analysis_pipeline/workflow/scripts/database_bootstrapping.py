@@ -1,9 +1,8 @@
 import numpy as np
 from database_interface import DatabaseInterfaceCleanSequences
 import bootstrapping
-from workflow.scripts.bootstrapping import bootstrap_cleavage_fraction_with_replacement, bootstrap_fold_change_with_replacement
 
-database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
+database_path = "./data/NGS/T1_D80_database.db"
 # database_path = snakemake.output[0]
 
 TABLE_NAME = "clean_sequences"

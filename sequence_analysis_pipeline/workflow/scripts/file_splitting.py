@@ -1,6 +1,4 @@
-import yaml
 from pathlib import Path
-import regex
 from tqdm import tqdm
 import seq_helpers
 import yaml_read_helpers
