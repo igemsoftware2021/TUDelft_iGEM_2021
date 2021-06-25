@@ -12,7 +12,8 @@ rule all:
     input:
         # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset=config["dataset"], read=["R1", "R2"])
         # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset="N41-I14_S14", read=["R1", "R2"]),
-        "results/pear/N41-I14_S14.assembled.fastq"
+        # "results/pear/N41-I14_S14.assembled.fastq"
+        "results/plots/fold_change_vs_fold_change_se.pdf"
     
 rule fastqc:
     input:
@@ -151,7 +152,7 @@ rule plotting:
         "{dataset}_database_biosensor_assay.done",
         "results/databases/{dataset}_database.db"
     output:
-        "results/plots/quals.svg"
+        "results/plots/fold_change_vs_fold_change_se.pdf"
     conda:
         "envs/plotting.yaml"
     script:

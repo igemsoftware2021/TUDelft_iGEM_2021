@@ -92,11 +92,12 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         db.update_column_value(
             TABLE_NAME, seq_clvd_pos[0], "cleavage_fraction_standard_deviation", cs_pos_sd)
 
-    # TODO change k, read this out from earlier
+        # k_factor is the 15th position
+        k_factor = seq_clvd_pos[14]
 
         # Now determine the fold change things
         fold_change_mean, fold_change_sd, fold_change_se = bootstrapping.bootstrap_fold_change_with_replacement(
-            cs_neg, cs_pos, k=1)
+            cs_neg, cs_pos, k=k_factor)
 
         # First update for ligand condition not present
         db.update_column_value(

@@ -1,4 +1,6 @@
 import scipy.stats
+from database_interface import DatabaseInterfaceCleanSequences
+
 # We need to do one-sided
 
 seq_fold_change = 3.0

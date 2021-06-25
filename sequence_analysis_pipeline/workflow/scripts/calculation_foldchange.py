@@ -50,6 +50,9 @@ else:
 # 3 - Calculate new k with median fold-change value
 k_new = 1 / median
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
+
+    db.query(f"UPDATE {TABLE_NAME} SET k_factor={k_new}")
+
     for i in tqdm(range(len(sequences_data))):
         seq = sequences_data[i][2]            # get the sequence
         cs_pos = sequences_data[i][9]         # get cleavage fraction
