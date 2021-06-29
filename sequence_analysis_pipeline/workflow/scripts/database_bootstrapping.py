@@ -9,6 +9,7 @@ TABLE_NAME = "clean_sequences"
 
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
+    # Get all the reference sequence info for certain conditions
     ref_unclvd_neg = db.get_info_ref_sequences(
         TABLE_NAME, cleaved_prefix=0, ligand_present=0)
     ref_clvd_neg = db.get_info_ref_sequences(

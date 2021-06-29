@@ -96,8 +96,8 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
                 read_count, sequence = line.strip().split()
                 if int(read_count) >= minimum_number_reads:
                     # Create a dictionary and store all general information for an unique sequence
-                    sequence_info = {"driver_round": driver_round, "selection": selection, "ligand_present": ligand_present,
-                                     "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0}
+                    sequence_info = {"driver_round": driver_round,
+                                     "selection": selection, "ligand_present": ligand_present}
 
                     sequence_info["read_count"] = int(read_count)
                     sequence_info["original_sequence"] = sequence

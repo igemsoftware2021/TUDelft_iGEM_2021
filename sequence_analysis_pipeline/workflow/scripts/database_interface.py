@@ -177,10 +177,7 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
                     reference_name TEXT,
                     selection TEXT,
                     driver_round INTEGER,
-                    ligand_present INTEGER,
-                    cleavage_fraction REAL,
-                    fold_change REAL,
-                    possible_sensor INTEGER
+                    ligand_present INTEGER
                     )""")
 
     def insert_sequence_info(self, table: str, sequence_info: dict):
@@ -195,12 +192,10 @@ class DatabaseInterfaceRawSequences(DatabaseInterface):
 
         self.query(f"""INSERT INTO {table}(read_count, original_sequence, cleaned_sequence,
                             barcode, cleaved_prefix, prefix_name, reference_name,
-                            selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor) VALUES (
+                            selection, driver_round, ligand_present) VALUES (
                             :read_count, :original_sequence, :cleaned_sequence,
                             :barcode, :cleaved_prefix, :prefix_name, :reference_name,
-                            :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor)""", parameters=sequence_info)
+                            :selection, :driver_round, :ligand_present)""", parameters=sequence_info)
 
 
 class DatabaseInterfaceCleanSequences(DatabaseInterface):
@@ -257,7 +252,7 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     fold_change_standard_error REAL
                     )""")
 
-    def insert_sequence_info(self, table: str, sequence_info: dict):
+    def insert_movement_sequence_info(self, table: str, sequence_info: dict):
         """
         Function inserts sequence info data into the database table 'table'.\n
         args:\n
@@ -269,18 +264,10 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
 
         self.query(f"""INSERT INTO {table}(read_count, cleaned_sequence,
                             cleaved_prefix, prefix_name, reference_name,
-                            selection, driver_round, ligand_present, cleavage_fraction,
-                            fold_change, possible_sensor, k_factor, cleavage_fraction_estimated_mean,
-                            cleavage_fraction_standard_deviation,
-                            fold_change_estimated_mean, fold_change_standard_deviation,
-                            fold_change_standard_error) VALUES (
+                            selection, driver_round, ligand_present) VALUES (
                             :read_count, :cleaned_sequence,
                             :cleaved_prefix, :prefix_name, :reference_name,
-                            :selection, :driver_round, :ligand_present, :cleavage_fraction,
-                            :fold_change, :possible_sensor, :k_factor,
-                            :cleavage_fraction_estimated_mean, :cleavage_fraction_standard_deviation,
-                            :fold_change_estimated_mean, :fold_change_standard_deviation,
-                            :fold_change_standard_error)""", parameters=sequence_info)
+                            :selection, :driver_round, :ligand_present)""", parameters=sequence_info)
 
     def get_info_sequence(self, table: str, cleaned_sequence: str, cleaved_prefix: int, ligand_present: int):
         """
