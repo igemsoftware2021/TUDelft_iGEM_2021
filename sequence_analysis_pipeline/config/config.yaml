@@ -1,5 +1,5 @@
 dataset: T1_D80
-minimum_reads: 0
+minimum_reads: 30
 ligand_positive:
     prefixes:
         cleaved:
