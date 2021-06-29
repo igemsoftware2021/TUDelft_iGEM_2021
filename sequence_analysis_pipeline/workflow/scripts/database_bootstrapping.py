@@ -26,7 +26,8 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
     r_ref_clvd_pos = sum(seq_info[1] for seq_info in ref_clvd_pos)
 
     # First retrieve all sequences
-    sequences_all = db.get(TABLE_NAME, columns=["cleaned_sequence"])
+    rowids_with_fold_change = db.query(
+        f"SELECT id FROM {TABLE_NAME} WHERE fold_change IS NOT NULL", fetchall=True)
     # Remove duplicate sequences
     sequences_unique = list(set(sequences_all))
 
