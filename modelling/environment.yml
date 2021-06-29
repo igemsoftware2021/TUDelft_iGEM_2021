@@ -7,3 +7,4 @@ dependencies:
   - numpy=1.20.*
   - matplotlib=3.4.*
   - numba=0.53.*
+  - salib=1.3.*
