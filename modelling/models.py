@@ -292,16 +292,18 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         s[ii + 1] = s[ii] + s_dt * dt
         p[ii + 1] = p[ii] + p_dt * dt
 
-        # Calculating blue over yellow ratio
-        b_y[ii + 1] = i0_cpr / i0_cprg * \
-            np.log10(eps_cpr * h * p[ii + 1]) / \
-            np.log10(eps_cprg * h * s[ii + 1])
-    blue = beer_lambert(s, i0_cpr)
-    return (time, b_y)
+    # Calculating blue over yellow ratio
+    blue = beer_lambert(p, h, eps_cpr, i0_cpr)
+    yellow = beer_lambert(s, h, eps_cprg, i0_cprg)
+    b_y = np.divide(blue, yellow)
+
+    return (time, blue, yellow, b_y, e)
 
 
-def beer_lambert(concentration, i0, epsilon, h):
+def beer_lambert(concentration, h, epsilon, i0):
+    print(concentration)
     min_index = np.argmax(concentration > 0)
-    concentration[min_index:] = i0 * \
+    intensity = np.zeros(concentration.shape[0])
+    intensity[min_index:] = i0 * \
         np.log10(epsilon * h * concentration[min_index:])
-    return concentration
+    return intensity

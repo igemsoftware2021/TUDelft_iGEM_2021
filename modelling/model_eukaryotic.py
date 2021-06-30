@@ -30,16 +30,16 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
 
 # Constants
 # (#) denotes the position in the constants array
-h = 8*10**-5  # (0) Height of the paper [cm]
-eps_cprg = 1  # (1) Exctinction coefficient of CPRG at a wavelength of ???
-eps_cpr = 1   # (2) Exctinction coefficient of CPR at a wavelength of ???
-i0_cprg = 1   # (3) Blank measurement at a wavelength of ???
-i0_cpr = 1    # (4) Blank measurement at a wavelength of ???
+h = 8*10**-5 * 1  # (0) Height of the paper [cm]
+eps_cprg = tbd  # (1) Exctinction coefficient of CPRG at a wavelength of ???
+eps_cpr = tbd   # (2) Exctinction coefficient of CPR at a wavelength of ???
+i0_cprg = tbd   # (3) Blank measurement at a wavelength of ???
+i0_cpr = tbd    # (4) Blank measurement at a wavelength of ???
 # Array containing above constants
 constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
 
-t_tot = 3600  # Total time [s]
-dt = 0.001  # Timestep [s]
+t_tot = 500  # Total time [s]
+dt = 0.01  # Timestep [s]
 
 # Initial concentrations
 dna_i = tbd  # Initial concentration of the beta-galactosidase gene [μM]
@@ -50,9 +50,12 @@ initial_conditions = np.array([dna_i, s_i, vit_i])
 
 
 # Running the model
-(time, b_y) = model_eukaryotic(parameters,
-                               constants, initial_conditions, dt=dt, t_tot=t_tot)
+(time, s, p, b_y, umrna) = model_eukaryotic(parameters,
+                                            constants, initial_conditions, dt=dt, t_tot=t_tot)
 
 # Plotting to check if sth happened at all
 plt.plot(time, b_y)
+#plt.plot(time, s)
+plt.plot(time, p)
+
 plt.show()
