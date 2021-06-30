@@ -15,7 +15,7 @@ def morris_run_simulations(func, parameters, constants, initial_conditions, dt: 
     constants: (np.ndarray)\n
     \tArray containing the constants of the model that the functions describes.\n
     initial_condition: (np.ndarray)\n
-    \tArray containing the intial conditions of the model that the functions describes.\n
+    \tArray containing the initial conditions of the model that the functions describes.\n
     dt: (int)\n
     \tThe time each timestep takes in seconds. (default 0.01)\n
     t_tot: (int)\n
