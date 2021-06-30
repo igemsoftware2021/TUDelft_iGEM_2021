@@ -84,4 +84,4 @@ def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
         b_y[step + 1] = i0_cpr / i0_cprg * \
             np.log10(eps_cpr * h * p[step + 1]) / \
             np.log10(eps_cprg * h * s[step + 1])
-    return (p, time)
+    return p
