@@ -1,7 +1,7 @@
 # Libraries to import
 import numpy as np
 import matplotlib.pyplot as plt
-from numba import njit
+from models import model_eukaryotic
 
 tbd = 1  # Placeholder for unkown parameters/concentrations so that they're easy to find
 
@@ -28,7 +28,7 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                        k_tlr, k_m, deg_mrna, deg_tlr, k_on, k_off, k_c])  # Array containing above parameters
 
 
-# Parameters
+# Constants
 # (#) denotes the position in the constants array
 h = 8*10**-5  # (0) Height of the paper [cm]
 eps_cprg = 1  # (1) Exctinction coefficient of CPRG at a wavelength of ???
@@ -36,22 +36,23 @@ eps_cpr = 1   # (2) Exctinction coefficient of CPR at a wavelength of ???
 i0_cprg = 1   # (3) Blank measurement at a wavelength of ???
 i0_cpr = 1    # (4) Blank measurement at a wavelength of ???
 # Array containing above constants
-parameters = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
+constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
 
 t_tot = 3600  # Total time [s]
-dt = 0.01  # Timestep [s]
+dt = 0.001  # Timestep [s]
 
 # Initial concentrations
 dna_i = tbd  # Initial concentration of the beta-galactosidase gene [μM]
 s_i = tbd   # Initial substrate concentration
 vit_i = tbd   # Initial vitamin concentration
-parameters = np.array([dna_i, s_i, vit_i])  # Array containing above constants
+# Array containing above constants
+initial_conditions = np.array([dna_i, s_i, vit_i])
 
 
 # Running the model
-# (data, time) = euk_model(parameters, dt, t_tot, dna_i, vit_i, s_i)
-# (data_2, time_2) = euk_model_no_aptamer(parameters, dt, t_tot, dna_i, s_i)
+(time, b_y) = model_eukaryotic(parameters,
+                               constants, initial_conditions, dt=dt, t_tot=t_tot)
 
 # Plotting to check if sth happened at all
-# plt.plot(time_2, data_2)
-# plt.show()
+plt.plot(time, b_y)
+plt.show()

@@ -1,5 +1,10 @@
+import numpy as np
+from numba import njit
+
 # @njit(cache=True, nogil=True)
-def no_aptamer_model(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
+
+
+def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
     k_tl = parameters[1]
@@ -83,7 +88,7 @@ def no_aptamer_model(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         b_y[ii + 1] = i0_cpr / i0_cprg * \
             np.log10(eps_cpr * h * p[ii + 1]) / \
             np.log10(eps_cprg * h * s[ii + 1])
-    return b_y
+    return (time, b_y)
 
 
 # @njit(cache=True, nogil=True)
@@ -188,7 +193,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
         b_y[step + 1] = i0_cpr / i0_cprg * \
             np.log10(eps_cpr * h * p[step + 1]) / \
             np.log10(eps_cprg * h * s[step + 1])
-    return b_y
+    return (time, b_y)
 
 
 # @njit(cache=True, nogil=True)
@@ -245,8 +250,6 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     s = np.zeros(n, dtype=np.float64)
     # Concentration of CPR (product)
     p = np.zeros(n, dtype=np.float64)
-    # Blue over yellow intensity ratio
-    b_y = np.zeros(n, dtype=np.float64)
 
     # "Unpacking" the array with initial conditions into individual initial conditions
     dna[0] = initial_conditions[0]
@@ -293,4 +296,12 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         b_y[ii + 1] = i0_cpr / i0_cprg * \
             np.log10(eps_cpr * h * p[ii + 1]) / \
             np.log10(eps_cprg * h * s[ii + 1])
-    return b_y
+    blue = beer_lambert(s, i0_cpr)
+    return (time, b_y)
+
+
+def beer_lambert(concentration, i0, epsilon, h):
+    min_index = np.argmax(concentration > 0)
+    concentration[min_index:] = i0 * \
+        np.log10(epsilon * h * concentration[min_index:])
+    return concentration

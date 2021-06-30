@@ -1,5 +1,4 @@
 from SALib.sample import morris as morris_sample
-from model_no_aptamer import no_aptamer_model
 from SALib.analyze import morris as morris_analyze
 import numpy as np
 
