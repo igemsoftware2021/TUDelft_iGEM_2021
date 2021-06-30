@@ -1,4 +1,4 @@
-# @njit
+# @njit(cache=true, nogil=true)
 def no_aptamer_model(parameters, constants, dt, t_tot, dna_i, s_i):
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
@@ -53,7 +53,7 @@ def no_aptamer_model(parameters, constants, dt, t_tot, dna_i, s_i):
     tlr[0] = 1
 
     # A loop with the differential equations
-    for step in range(len(time)-1):
+    for step in range(time.shape[0]-1):
         # Differential of each species w.r.t time
         dna_dt = 0  # could remove this one, zero anyway
         mrna_dt = k_ts * tsr[step] * dna[step] / \
