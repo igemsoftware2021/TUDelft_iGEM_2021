@@ -150,7 +150,9 @@ dmypy.json
 .DS_Store
 
 # Boyd's stuff
-sponsor_scraping
+/sequence_analysis_pipeline/.snakemake
+/sequence_analysis_pipeline/data/NGS
+/sequence_analysis_pipeline/results
 
 # Koen's stuff
 testing
