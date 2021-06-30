@@ -297,7 +297,7 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     yellow = beer_lambert(s, h, eps_cprg, i0_cprg)
     b_y = np.divide(blue, yellow)
 
-    return (time, blue, yellow, b_y, e)
+    return (time, b_y, yellow, blue, e)
 
 
 def beer_lambert(concentration, h, epsilon, i0):
