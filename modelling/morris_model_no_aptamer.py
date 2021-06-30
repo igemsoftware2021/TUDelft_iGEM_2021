@@ -41,39 +41,39 @@ t_tot = 1  # Total time [s]
 dt = 0.001  # Timestep [s]
 
 # Determening the timepoints of the simulation.
-n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-
+n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
 time = np.linspace(0, t_tot, n)  # Array with all timepoints.
 
 # Defining arrays for sensitivity indices.
 # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
 mu = np.zeros((time.shape[0], num_parameters),
               dtype=np.float32)  # The mean elementary effect
-mu_star = np.zeros((time.shape[0], num_parameters), dtype=np.float32))
-sigma=np.zeros((time.shape[0], num_parameters), dtype = np.float32))
-mu_star_conf=np.zeros((time.shape[0], num_parameters), dtype=np.float32))
+mu_star = np.zeros((time.shape[0], num_parameters), dtype=np.float32)
+sigma = np.zeros((time.shape[0], num_parameters), dtype=np.float32)
+mu_star_conf = np.zeros((time.shape[0], num_parameters), dtype=np.float32)
 
 # Generating input parameters for the model
 # Each column is a parameter, one row contains all input parameters for one simulation
-model_input=morris_sample.sample(no_aptamer_problem, trajectories)
+model_input = morris_sample.sample(no_aptamer_problem, trajectories)
 
 # Number of different parameter sets to run the model with, so the number of simulations
-simulations=model_input.shape[0]
+simulations = model_input.shape[0]
 # An array for the output of the model (B/Y ratio)
-model_output=np.zeros([time.shape[0], simulations])
+model_output = np.zeros([time.shape[0], simulations])
 
 # Running the model for each set of parameters. The output is stored for each timepoint of each simulation
 for ii in range(simulations):
-    parameters=model_input[ii, :]
+    parameters = model_input[ii, :]
     # Each column is a simulation, each row is the output of the simulation at one timestep
-    model_output[:, ii]=no_aptamer_model(
+    model_output[:, ii] = no_aptamer_model(
         parameters, constants, dt, t_tot, dna_i, s_i)
 
 # Running the Morris analysis at each timepoint (using tne output of all the different simulations)
 for ii in range(time.shape[0]):
-    indices_dict=morris_analyze.analyze(no_aptamer_problem, model_input,
+    indices_dict = morris_analyze.analyze(no_aptamer_problem, model_input,
                                           model_output[ii, :], num_levels=4)
     # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
-    mu[ii, :]=indices_dict['mu']
-    mu_star[ii, :]=indices_dict['mu_star']
-    sigma[ii, :]=indices_dict['sigma']
-    mu_star_conf[ii, :]=indices_dict['mu_star_conf']
+    mu[ii, :] = indices_dict['mu']
+    mu_star[ii, :] = indices_dict['mu_star']
+    sigma[ii, :] = indices_dict['sigma']
+    mu_star_conf[ii, :] = indices_dict['mu_star_conf']
