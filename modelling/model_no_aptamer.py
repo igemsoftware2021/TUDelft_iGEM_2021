@@ -1,5 +1,5 @@
-# @njit(cache=true, nogil=true)
-def no_aptamer_model(parameters, constants, dt, t_tot, dna_i, s_i):
+# @njit(cache=True, nogil=True)
+def model_no_aptamer(parameters, constants, dt, t_tot, dna_i, s_i):
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
     k_tl = parameters[1]

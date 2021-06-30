@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from numba import njit
 
 
-# @njit(cache=true, nogil=true)
+# @njit(cache=True, nogil=True)
 def prok_model(parameters, dt, t_tot, dna_i, vit_i, s_i):
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
