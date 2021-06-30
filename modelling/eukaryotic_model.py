@@ -139,8 +139,8 @@ if __name__ == "__main__":
     parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                            k_tlr, k_m, deg_mrna, deg_tlr, h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])  # Array containing above parameters
 
-    t_tot = 3600  # total time [s]
-    dt = 0.01  # timestep [s]
+    t_tot = 3600  # Total time [s]
+    dt = 0.01  # Timestep [s]
 
     # Initial concentrations
     dna_i = tbd  # Initial concentration of the beta-galactosidase gene [μM]
