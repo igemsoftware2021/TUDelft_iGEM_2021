@@ -1,25 +1,24 @@
 # @njit
-def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
+def no_aptamer_model(parameters, constants, dt, t_tot, dna_i, s_i):
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
-    k_on = parameters[1]
-    k_off = parameters[2]
-    k_c = parameters[3]
-    k_tl = parameters[4]
-    k_mat = parameters[5]
-    k_cat = parameters[6]
-    k_s = parameters[7]
-    kc_s = parameters[8]
-    k_l = parameters[9]
-    k_tlr = parameters[10]
-    k_m = parameters[11]
-    deg_mrna = parameters[12]
-    deg_tlr = parameters[13]
-    h = parameters[14]
-    eps_cprg = parameters[15]
-    eps_cpr = parameters[16]
-    i0_cprg = parameters[17]
-    i0_cpr = parameters[18]
+    k_tl = parameters[1]
+    k_mat = parameters[2]
+    k_cat = parameters[3]
+    k_s = parameters[4]
+    kc_s = parameters[5]
+    k_l = parameters[6]
+    k_tlr = parameters[7]
+    k_m = parameters[8]
+    deg_mrna = parameters[9]
+    deg_tlr = parameters[10]
+
+    # "Unpacking" the array with constants into individual constants
+    h = constants[0]
+    eps_cprg = constants[1]
+    eps_cpr = constants[2]
+    i0_cprg = constants[3]
+    i0_cpr = constants[4]
 
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -84,4 +83,4 @@ def no_aptamer_model(parameters, dt, t_tot, dna_i, s_i):
         b_y[step + 1] = i0_cpr / i0_cprg * \
             np.log10(eps_cpr * h * p[step + 1]) / \
             np.log10(eps_cprg * h * s[step + 1])
-    return p
+    return b_y
