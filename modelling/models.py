@@ -251,7 +251,6 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     blue = i0_cpr * 10 ** (eps_cpr * p * h)
     yellow = i0_cprg * 10 ** (eps_cprg * s * h)
     b_y = np.divide(blue, yellow)
-
     return time, b_y
 
 
@@ -385,5 +384,4 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     blue = i0_cpr * 10 ** (eps_cpr * p * h)
     yellow = i0_cprg * 10 ** (eps_cprg * s * h)
     b_y = np.divide(blue, yellow)
-
     return time, b_y
