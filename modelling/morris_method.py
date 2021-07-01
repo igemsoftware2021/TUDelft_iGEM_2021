@@ -6,26 +6,26 @@ from numba import njit, prange
 
 @njit(parallel=True)
 def morris_run_simulations(func, parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
-    """Function runs a function in parallel using the Numba library.\n
-    \n
-    Parameters\n
-    ----------\n
-    func: function\n
-        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]\n
-    parameters: numpy.array\n
-        The Numpy array containing all the parameters for the model of dtype=float\n
-    constants: numpy.array\n
-        The Numpy array containing all the constants for the model of dtype=float\n
-    initial_condition: numpy.array\n
-        The Numpy array containing all the initial conditions for the model of dtype=float\n
-    dt: int\n
-        The time each timestep takes in seconds. (default 0.01)\n
-    t_tot: int\n
-        The total time the model should run in seconds. (default 7200)\n
-    \n
-    Returns\n
-    -------\n
-    model_output: numpy.ndarray\n
+    """Function runs a function in parallel using the Numba library.
+
+    Parameters
+    ----------
+    func: function
+        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]
+    parameters: numpy.array
+        The Numpy array containing all the parameters for the model of dtype=float
+    constants: numpy.array
+        The Numpy array containing all the constants for the model of dtype=float
+    initial_condition: numpy.array
+        The Numpy array containing all the initial conditions for the model of dtype=float
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+
+    Returns
+    -------
+    model_output: numpy.ndarray
         The Numpy array contains all the model output values. Every row is a time point and
         every column contains the results of each unique simulation over all the timepoints.
         The resulting array has ceil(t_tot/dt) + 1 rows and parameters.shape[0] columns.
@@ -43,68 +43,67 @@ def morris_run_simulations(func, parameters, constants, initial_conditions, dt: 
 
 
 def morris_analysis(problem, trajectories, func, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
-    """Function does Morris analysis on a function/model.\n
+    """Function does Morris analysis on a function/model.
 
     This is a wrapper function that creates model inputs required for Method of Morris. It then runs these model inputs through
     a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf_level.
-    \n
+
     This is a wrapper function that uses two functions from the SAlib library. Hence the description for the parameters:
     problem, trajectories, num_levels, optimal_trajectories, local_optimization, num_resamples, conf_level, print_to_console
     and seed where directly taken from https://salib.readthedocs.io/en/latest/api.html.
 
-    \n
-    Parameters\n
-    ----------\n
-    problem: dict\n
-        The problem definition\n
-    trajectories: int\n
-        Number of trajectories to generate.\n
-    func: function\n
-        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]\n
-    parameters: numpy.array\n
-        The Numpy array containing all the parameters for the model of dtype=float\n
-    constants: numpy.array\n
-        The Numpy array containing all the constants for the model of dtype=float\n
-    initial_condition: numpy.array\n
-        The Numpy array containing all the initial conditions for the model of dtype=float\n
-    dt: int\n
-        The time each timestep takes in seconds. (default 0.01)\n
-    t_tot: int\n
-        The total time the model should run in seconds. (default 7200)\n
-    num_levels: int\n
-        The number of grid levels (should be even) (default 4)\n
-    optimal_trajectories: int\n
-        The number of optimal trajectories to sample (between 2 and N) (default None)\n
-    local_optimization: bool\n
+    Parameters
+    ----------
+    problem: dict
+        The problem definition
+    trajectories: int
+        Number of trajectories to generate.
+    func: function
+        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]
+    parameters: numpy.array
+        The Numpy array containing all the parameters for the model of dtype=float
+    constants: numpy.array
+        The Numpy array containing all the constants for the model of dtype=float
+    initial_condition: numpy.array
+        The Numpy array containing all the initial conditions for the model of dtype=float
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+    num_levels: int
+        The number of grid levels (should be even) (default 4)
+    optimal_trajectories: int
+        The number of optimal trajectories to sample (between 2 and N) (default None)
+    local_optimization: bool
         Flag whether to use local optimization according to Ruano et al. (2012) Speeds up the process
         tremendously for bigger N and num_levels. If set to False brute force method used, unless
-        gurobipy is available (default True)\n
-    num_resamples: int\n
-        The number of resamples used to compute the confidence intervals (default 1000)\n
-    conf_level: float\n
+        gurobipy is available (default True)
+    num_resamples: int
+        The number of resamples used to compute the confidence intervals (default 1000)
+    conf_level: float
         The confidence interval level (default 0.95)
-    print_to_console: bool\n
+    print_to_console: bool
         Print results directly to console (default False)
-    seed: int\n
-        Seed to generate a random number (default None)\n
-    \n
-    Returns\n
-    -------\n
-    time: numpy.array\n
-        The Numpy array containing all the timepoints at which the simulation was run. The Numpy array is of dtype=float.\n
-    mu: numpy.array\n
+    seed: int
+        Seed to generate a random number (default None)
+
+    Returns
+    -------
+    time: numpy.array
+        The Numpy array containing all the timepoints at which the simulation was run. The Numpy array is of dtype=float.
+    mu: numpy.array
         The Numpy array containing the mean elementary effects over time. Each row is a timepoint and every column
-        contains the mean elementary effects for a certain parameter. The Numpy array is of dtype=float.\n
-    mu_star: numpy.array\n
+        contains the mean elementary effects for a certain parameter. The Numpy array is of dtype=float.
+    mu_star: numpy.array
         The Numpy array containing the absolute mean elementary effects over time. Each row is a timepoint and every column
-        contains the absolute mean elementary effects for a certain parameter. The Numpy array is of dtype=float.\n
-    sigma: numpy.array\n
+        contains the absolute mean elementary effects for a certain parameter. The Numpy array is of dtype=float.
+    sigma: numpy.array
         The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
         and every column contains the standard deviations of the mean elementary effect for a certain parameter.
-        The Numpy array is of dtype=float.\n
-    time: numpy.array\n
+        The Numpy array is of dtype=float.
+    time: numpy.array
         The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
-        contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.\n
+        contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.
     """
     # First do some checks whether the problem variable contains all the needed keys for the function.
     if "num_vars" not in problem:
