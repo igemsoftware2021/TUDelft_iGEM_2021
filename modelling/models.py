@@ -20,7 +20,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     \tThe total time the model should run in seconds. (default 7200)\n
     \n
     return value:\n
-    (time, b_y): (tuple)\n
+    time, b_y: (tuple)\n
     \tTuple of which the first entry contains an array with all the timepoints of the simulation and the second entry the blue over yellow light intensity ratio at each timepoint.
     """
     # "Unpacking" the array with parameters into individual parameters
@@ -106,7 +106,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     blue = i0_cpr * 10 ** (eps_cpr * p * h)
     yellow = i0_cprg * 10 ** (eps_cprg * s * h)
     b_y = np.divide(blue, yellow)
-    return (time, b_y)
+    return time, b_y
 
 
 # @njit(cache=True, nogil=True)
@@ -230,7 +230,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     yellow = i0_cprg * 10 ** (eps_cprg * s * h)
     b_y = np.divide(blue, yellow)
 
-    return (time, b_y)
+    return time, b_y
 
 
 # @njit(cache=True, nogil=True)
@@ -352,4 +352,4 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     yellow = i0_cprg * 10 ** (eps_cprg * s * h)
     b_y = np.divide(blue, yellow)
 
-    return (time, b_y, s, p, e, blue, yellow)
+    return time, b_y
