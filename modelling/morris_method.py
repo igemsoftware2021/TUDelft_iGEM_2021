@@ -37,7 +37,7 @@ def morris_run_simulations(func, parameters, constants, initial_conditions, dt: 
     model_output = np.zeros((n, num_simulations))
     # Every column is a unique simulation
     for ii in prange(parameters.shape[0]):
-        _, model_output[ii, :] = func(
+        _, model_output[:, ii] = func(
             parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
     return model_output
 
@@ -90,12 +90,21 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     \n
     Returns\n
     -------\n
-    time: numpy.array
-
-
-    model_output: (np.array (2D))\n
-    Every row is a time point and the column contains the results of each unique simulation.
-
+    time: numpy.array\n
+        The Numpy array containing all the timepoints at which the simulation was run. The Numpy array is of dtype=float.\n
+    mu: numpy.array\n
+        The Numpy array containing the mean elementary effects over time. Each row is a timepoint and every column
+        contains the mean elementary effects for a certain parameter. The Numpy array is of dtype=float.\n
+    mu_star: numpy.array\n
+        The Numpy array containing the absolute mean elementary effects over time. Each row is a timepoint and every column
+        contains the absolute mean elementary effects for a certain parameter. The Numpy array is of dtype=float.\n
+    sigma: numpy.array\n
+        The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
+        and every column contains the standard deviations of the mean elementary effect for a certain parameter.
+        The Numpy array is of dtype=float.\n
+    time: numpy.array\n
+        The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
+        contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.\n
     """
     # First do some checks whether the problem variable contains all the needed keys for the function.
     if "num_vars" not in problem:
