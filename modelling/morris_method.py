@@ -10,7 +10,7 @@ def morris_run_simulations(func, parameters, constants, initial_conditions, dt: 
     \n
     Parameters\n
     ----------\n
-    func: (function)\n
+    func: function\n
         The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]\n
     parameters: numpy.array\n
         The Numpy array containing all the parameters for the model of dtype=float\n
@@ -59,7 +59,7 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
         The problem definition\n
     trajectories: int\n
         Number of trajectories to generate.\n
-    func: (function)\n
+    func: function\n
         The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]\n
     parameters: numpy.array\n
         The Numpy array containing all the parameters for the model of dtype=float\n
