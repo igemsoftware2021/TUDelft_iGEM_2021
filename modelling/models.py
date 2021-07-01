@@ -5,23 +5,33 @@ from numba import njit
 
 
 def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
-    """Function does a simulation of the kinetics of the AptaVita system without aptamers.\n
-    args:\n
-    parameters: (np.ndarray)\n
-    \tArray containing the model parameters (float): transcription rate, translation rate, maturation rate, 
-        \tcatalytic rate of the enzyme, Michaelis constant transcription, scaling factor transcription resources, Michaelis constant translation, Michaelis constant translation resources, Michaelis constant enzymatic reaction, degradation rate mRNA, degredation rate transcription resources.\n
-    constants: (np.ndarray)\n
-    \tArray containing the model constants (float): height of the microfluidic paper, extinction coefficient CPRG, extinction coefficient CPR, blank intensity measurement CPRG, blank intensity measurement CPR.\n
-    constants: (np.ndarray)\n
-    \tArray containing the initial conditions: gene concentration, substrate concentration.\n
-    dt: (int)\n
-    \tThe time each timestep takes in seconds. (default 0.01)\n
-    t_tot: (int)\n
-    \tThe total time the model should run in seconds. (default 7200)\n
-    \n
-    return value:\n
-    time, b_y: (tuple)\n
-    \tTuple of which the first entry contains an array with all the timepoints of the simulation and the second entry the blue over yellow light intensity ratio at each timepoint.
+    """Function does a simulation of the kinetics of the AptaVita system without aptamers.
+
+    Parameters:
+    ----------
+    parameters: np.ndarray
+        Array containing the model parameters (float): transcription rate, translation rate, 
+        maturation rate, catalytic rate of the enzyme, Michaelis constant transcription, 
+        scaling factor transcription resources, Michaelis constant translation, Michaelis 
+        constant translation resources, Michaelis constant enzymatic reaction, degradation 
+        rate mRNA, degredation rate transcription resources.
+    constants: np.ndarray
+        Array containing the model constants (float): height of the microfluidic paper, 
+        extinction coefficient CPRG, extinction coefficient CPR, blank intensity 
+        measurement CPRG, blank intensity measurement CPR.
+    initial_conditions: np.ndarray
+        Array containing the initial conditions: gene concentration, substrate concentration.
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+
+    Returns
+    ----------
+    time: np.ndarray
+        Array containing all timepoints of the simulation.
+    b_y: np.ndarray 
+        Array containing the blue over yellow light intensity ratio at each timepoint.
     """
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
@@ -111,23 +121,35 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
 
 # @njit(cache=True, nogil=True)
 def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
-    """Function does a simulation of the kinetics of the prokaryotic AptaVita system.\n
-    args:\n
-    parameters: (np.ndarray)\n
-    \tArray containing the model parameters (float): transcription rate, translation rate, maturation rate, 
-        \tcatalytic rate of the enzyme, Michaelis constant transcription, scaling factor transcription resources, Michaelis constant translation, Michaelis constant translation resources, Michaelis constant enzymatic reaction, degradation rate mRNA, degredation rate transcription resources, association rate aptamer and vitamin, dissociation rate aptamer and vitamin, cleaving rate aptamer.\n
-    constants: (np.ndarray)\n
-    \tArray containing the model constants (float): height of the microfluidic paper, extinction coefficient CPRG, extinction coefficient CPR, blank intensity measurement CPRG, blank intensity measurement CPR.\n
-    constants: (np.ndarray)\n
-    \tArray containing the initial conditions: gene concentration, substrate concentration.\n
-    dt: (int)\n
-    \tThe time each timestep takes in seconds. (default 0.01)\n
-    t_tot: (int)\n
-    \tThe total time the model should run in seconds. (default 7200)\n
-    \n
-    return value:\n
-    (time, b_y): (tuple)\n
-    \tTuple of which the first entry contains an array with all the timepoints of the simulation and the second entry the blue over yellow light intensity ratio at each timepoint.
+    """Function does a simulation of the kinetics of the prokaryotic AptaVita system.
+
+    Parameters:
+    ----------
+    parameters: np.ndarray
+        Array containing the model parameters (float): transcription rate, translation rate, 
+        maturation rate, catalytic rate of the enzyme, Michaelis constant transcription, 
+        scaling factor transcription resources, Michaelis constant translation, Michaelis 
+        constant translation resources, Michaelis constant enzymatic reaction, degradation 
+        rate mRNA, degredation rate transcription resources association rate aptamer and 
+        vitamin, dissociation rate aptamer and vitamin, cleaving rate aptamer.
+    constants: np.ndarray
+        Array containing the model constants (float): height of the microfluidic paper, 
+        extinction coefficient CPRG, extinction coefficient CPR, blank intensity measurement 
+        CPRG, blank intensity measurement CPR.
+    initial_conditions: np.ndarray
+        Array containing the initial conditions: gene concentration, substrate 
+        concentration, vitamin concentration.
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+
+    Returns
+    ----------
+    time: np.ndarray
+        Array containing all timepoints of the simulation.
+    b_y: np.ndarray 
+        Array containing the blue over yellow light intensity ratio at each timepoint.
     """
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
@@ -235,23 +257,35 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
 
 # @njit(cache=True, nogil=True)
 def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
-    """Function does a simulation of the kinetics of the eukaryotic AptaVita system.\n
-    args:\n
-    parameters: (np.ndarray)\n
-    \tArray containing the model parameters (float): transcription rate, translation rate, maturation rate, 
-        \tcatalytic rate of the enzyme, Michaelis constant transcription, scaling factor transcription resources, Michaelis constant translation, Michaelis constant translation resources, Michaelis constant enzymatic reaction, degradation rate mRNA, degredation rate transcription resources, association rate aptamer and vitamin, dissociation rate aptamer and vitamin, cleaving rate aptamer.\n
-    constants: (np.ndarray)\n
-    \tArray containing the model constants (float): height of the microfluidic paper, extinction coefficient CPRG, extinction coefficient CPR, blank intensity measurement CPRG, blank intensity measurement CPR.\n
-    constants: (np.ndarray)\n
-    \tArray containing the initial conditions: gene concentration, substrate concentration.\n
-    dt: (int)\n
-    \tThe time each timestep takes in seconds. (default 0.01)\n
-    t_tot: (int)\n
-    \tThe total time the model should run in seconds. (default 7200)\n
-    \n
-    return value:\n
-    (time, b_y): (tuple)\n
-    \tTuple of which the first entry contains an array with all the timepoints of the simulation and the second entry the blue over yellow light intensity ratio at each timepoint.
+    """Function does a simulation of the kinetics of the eukaryotic AptaVita system.
+
+    Parameters:
+    ----------
+    parameters: np.ndarray
+        Array containing the model parameters (float): transcription rate, translation rate, 
+        maturation rate, catalytic rate of the enzyme, Michaelis constant transcription, 
+        scaling factor transcription resources, Michaelis constant translation, Michaelis 
+        constant translation resources, Michaelis constant enzymatic reaction, degradation 
+        rate mRNA, degredation rate transcription resources association rate aptamer and 
+        vitamin, dissociation rate aptamer and vitamin, cleaving rate aptamer.
+    constants: np.ndarray
+        Array containing the model constants (float): height of the microfluidic paper, 
+        extinction coefficient CPRG, extinction coefficient CPR, blank intensity measurement 
+        CPRG, blank intensity measurement CPR.
+    initial_conditions: np.ndarray
+        Array containing the initial conditions: gene concentration, substrate 
+        concentration, vitamin concentration.
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+
+    Returns
+    ----------
+    time: np.ndarray
+        Array containing all timepoints of the simulation.
+    b_y: np.ndarray 
+        Array containing the blue over yellow light intensity ratio at each timepoint.
     """
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
