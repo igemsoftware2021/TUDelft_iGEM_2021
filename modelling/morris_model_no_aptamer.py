@@ -9,7 +9,7 @@ num_levels = 4
 num_parameters = 11
 
 # Prokaryotic problem definition
-no_aptamer_problem_prokaryotic = {
+no_aptamer_prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
               "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
@@ -27,7 +27,7 @@ no_aptamer_problem_prokaryotic = {
 }
 
 # Eukaryotic problem definition
-no_aptamer_problem_eukaryotic = {
+no_aptamer_eukaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
               "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
@@ -62,5 +62,5 @@ t_tot = 1  # Total time [s]
 dt = 0.1  # Timestep [s]
 
 # Doing Morris sensitivity analysis
-(time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_problem, trajectories,
+(time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_prokaryotic_problem, trajectories,
                                                                  run_simulations_no_aptamer, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
