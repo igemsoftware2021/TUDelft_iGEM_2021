@@ -101,7 +101,7 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
         The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
         and every column contains the standard deviations of the mean elementary effect for a certain parameter.
         The Numpy array is of dtype=float.
-    time: numpy.array
+    mu_star_conf_level: numpy.array
         The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
         contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.
     """
