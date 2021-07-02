@@ -50,16 +50,9 @@ initial_conditions = np.array([dna_i, s_i, vit_i])
 
 
 # Running the model
-(time, b_y, s, p, e, blue, yellow) = model_eukaryotic(parameters,
-                                                      constants, initial_conditions, dt=dt, t_tot=t_tot)
+(time, b_y) = model_eukaryotic(parameters,
+                               constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-# Plotting to check if sth happened at all
-plt.plot(time, s)
-plt.plot(time, p)
-plt.figure()
-plt.plot(time, yellow)
-plt.plot(time, blue)
-plt.figure()
+# Plotting
 plt.plot(time, b_y)
-
 plt.show()
