@@ -7,7 +7,27 @@ import csv
 trajectories = 10
 num_levels = 4
 num_parameters = 11
-no_aptamer_problem = {
+
+# Prokaryotic problem definition
+no_aptamer_problem_prokaryotic = {
+    'num_vars': num_parameters,
+    'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
+              "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
+    'bounds': [[-1, 1],  # (0) k_ts
+               [-1, 1],  # (1) k_tl
+               [-1, 1],  # (2) k_mat
+               [-1, 1],  # (3) k_cat
+               [-1, 1],  # (4) k_s
+               [-1, 1],  # (5) kc_s
+               [-1, 1],  # (6) k_l
+               [-1, 1],  # (7) k_tlr
+               [-1, 1],  # (8) k_m
+               [-1, 1],  # (9) deg_mrna
+               [-1, 1], ]  # (10) deg_tlr
+}
+
+# Eukaryotic problem definition
+no_aptamer_problem_eukaryotic = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
               "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
