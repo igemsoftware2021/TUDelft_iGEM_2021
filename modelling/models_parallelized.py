@@ -8,12 +8,11 @@ from numba import njit, prange
 
 @njit(parallel=True)
 def run_simulations_no_aptamer(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
-    """Function runs a function in parallel using the Numba library.
+    """Function runs a simulations of the kinetics of the AptaVita system 
+    without aptamers parallel using the Numba library.
 
     Parameters
     ----------
-    func: function
-        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]
     parameters: numpy.array
         The Numpy array containing all the parameters for the model of dtype=float
     constants: numpy.array
@@ -46,12 +45,11 @@ def run_simulations_no_aptamer(parameters, constants, initial_conditions, dt: in
 
 @njit(parallel=True)
 def run_simulations_prokaryotic(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
-    """Function runs a function in parallel using the Numba library.
+    """"Function runs a simulations of the kinetics of the prokaryotic
+    AptaVita system parallel using the Numba library.
 
     Parameters
     ----------
-    func: function
-        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]
     parameters: numpy.array
         The Numpy array containing all the parameters for the model of dtype=float
     constants: numpy.array
@@ -84,12 +82,11 @@ def run_simulations_prokaryotic(parameters, constants, initial_conditions, dt: i
 
 @njit(parallel=True)
 def run_simulations_eukaryotic(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
-    """Function runs a function in parallel using the Numba library.
+    """Function runs a simulations of the kinetics of the prokaryotic
+    AptaVita system parallel using the Numba library.
 
     Parameters
     ----------
-    func: function
-        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]
     parameters: numpy.array
         The Numpy array containing all the parameters for the model of dtype=float
     constants: numpy.array
