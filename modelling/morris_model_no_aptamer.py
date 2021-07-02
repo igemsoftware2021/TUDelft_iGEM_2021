@@ -1,5 +1,5 @@
 from morris_method import morris_analysis
-from models import model_no_aptamer
+from models_parallelized import run_simulations_no_aptamer
 import numpy as np
 import csv
 
@@ -43,4 +43,4 @@ dt = 0.1  # Timestep [s]
 
 # Doing Morris sensitivity analysis
 (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_problem, trajectories,
-                                                                 model_no_aptamer, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
+                                                                 run_simulations_no_aptamer, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)

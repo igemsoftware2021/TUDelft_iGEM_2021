@@ -1,45 +1,6 @@
 from SALib.sample import morris as morris_sample
 from SALib.analyze import morris as morris_analyze
 import numpy as np
-from numba import njit, prange
-
-
-@njit(parallel=True)
-def morris_run_simulations(func, parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
-    """Function runs a function in parallel using the Numba library.
-
-    Parameters
-    ----------
-    func: function
-        The function that has as input args: parameters, constants, initial_conditions[, dt, t_tot]
-    parameters: numpy.array
-        The Numpy array containing all the parameters for the model of dtype=float
-    constants: numpy.array
-        The Numpy array containing all the constants for the model of dtype=float
-    initial_condition: numpy.array
-        The Numpy array containing all the initial conditions for the model of dtype=float
-    dt: int
-        The time each timestep takes in seconds. (default 0.01)
-    t_tot: int
-        The total time the model should run in seconds. (default 7200)
-
-    Returns
-    -------
-    model_output: numpy.ndarray
-        The Numpy array contains all the model output values. Every row is a time point and
-        every column contains the results of each unique simulation over all the timepoints.
-        The resulting array has ceil(t_tot/dt) + 1 rows and parameters.shape[0] columns.
-    """
-    # The amount of time steps
-    n = int(np.ceil(t_tot/dt) + 1)
-    # The number of simulations
-    num_simulations = parameters.shape[0]
-    model_output = np.zeros((n, num_simulations))
-    # Every column is a unique simulation
-    for ii in prange(parameters.shape[0]):
-        _, model_output[:, ii] = func(
-            parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
-    return model_output
 
 
 def morris_analysis(problem, trajectories, func, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
@@ -136,8 +97,8 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    model_output = morris_run_simulations(
-        func, model_input, constants, initial_conditions, dt=dt, t_tot=t_tot)
+    model_output = func(model_input, constants,
+                        initial_conditions, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis at each timepoint (using tne output of all the different simulations)
     for ii in range(n):
