@@ -1,11 +1,11 @@
-from SALib.sample import morris as morris_sample
-from SALib.analyze import morris as morris_analyze
+from morris_method import morris_analysis
+from models import model_no_aptamer
 import numpy as np
-from numba import njit, prange
+import csv
 
 # Defining the properties of the Morris sensitivity analysis
 trajectories = 10
-levels = 4
+num_levels = 4
 num_parameters = 11
 no_aptamer_problem = {
     'num_vars': num_parameters,
@@ -35,7 +35,12 @@ constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
 # Initial concentrations
 dna_i = 1  # Initial concentration of the beta-galactosidase gene [μM]
 s_i = 1   # Initial substrate concentration
+initial_conditions = np.array([dna_i, s_i])
 
 # Defining timescale of the model
 t_tot = 1  # Total time [s]
-dt = 0.001  # Timestep [s]
+dt = 0.1  # Timestep [s]
+
+# Doing Morris sensitivity analysis
+(time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_problem, trajectories,
+                                                                 model_no_aptamer, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
