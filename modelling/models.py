@@ -1,9 +1,8 @@
 import numpy as np
 from numba import njit
 
-# @njit(cache=True, nogil=True)
 
-
+@njit(cache=True, nogil=True)
 def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
     """Function does a simulation of the kinetics of the AptaVita system without aptamers.
 
@@ -119,7 +118,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     return time, b_y
 
 
-# @njit(cache=True, nogil=True)
+@njit(cache=True, nogil=True)
 def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
     """Function does a simulation of the kinetics of the prokaryotic AptaVita system.
 
@@ -254,7 +253,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     return time, b_y
 
 
-# @njit(cache=True, nogil=True)
+@njit(cache=True, nogil=True)
 def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
     """Function does a simulation of the kinetics of the eukaryotic AptaVita system.
 
