@@ -26,7 +26,7 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                        k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
 
 t_tot = 3600  # total time [s]
-dt = 0.01  # timestep [s]
+dt = 1  # timestep [s]
 
 # Initial concentrations
 dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
