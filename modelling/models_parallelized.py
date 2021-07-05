@@ -37,7 +37,7 @@ def run_simulations_no_aptamer(parameters, constants, initial_conditions, dt: in
     num_simulations = parameters.shape[0]
     model_output = np.zeros((n, num_simulations))
     # Every column is a unique simulation
-    for ii in prange(parameters.shape[0]):
+    for ii in prange(num_simulations):
         _, model_output[:, ii] = model_no_aptamer(
             parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
     return model_output
@@ -74,7 +74,7 @@ def run_simulations_prokaryotic(parameters, constants, initial_conditions, dt: i
     num_simulations = parameters.shape[0]
     model_output = np.zeros((n, num_simulations))
     # Every column is a unique simulation
-    for ii in prange(parameters.shape[0]):
+    for ii in prange(num_simulations):
         _, model_output[:, ii] = model_prokaryotic(
             parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
     return model_output
@@ -111,7 +111,7 @@ def run_simulations_eukaryotic(parameters, constants, initial_conditions, dt: in
     num_simulations = parameters.shape[0]
     model_output = np.zeros((n, num_simulations))
     # Every column is a unique simulation
-    for ii in prange(parameters.shape[0]):
+    for ii in prange(num_simulations):
         _, model_output[:, ii] = model_eukaryotic(
             parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
     return model_output
