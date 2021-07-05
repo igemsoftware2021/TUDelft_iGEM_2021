@@ -34,9 +34,7 @@ prokaryotic_problem = {
 h = 8*10**-5  # (0) Height of the paper [cm]
 eps_cprg = 1  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = 1   # (2) Exctinction coefficient of CPR at a wavelength of ???
-i0_cprg = 1   # (3) Blank measurement at a wavelength of ???
-i0_cpr = 1    # (4) Blank measurement at a wavelength of ???
-constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
+constants = np.array([h, eps_cprg, eps_cpr])
 
 # Initial concentrations
 dna_i = 1  # Initial concentration of the beta-galactosidase gene [μM]
