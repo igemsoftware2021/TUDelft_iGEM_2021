@@ -146,7 +146,7 @@ def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_st
 
 
 def morris_datareader(parameter, index, path, filenumber):
-    filename = path + "\ " + index + "_" + filenumber + ".csv"
+    filename = path + "\\" + index + "_" + filenumber + ".csv"
     print(filename)
     file = open(filename, "r")
     csv_reader = csv.DictReader(file)
