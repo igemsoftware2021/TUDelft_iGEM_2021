@@ -1,6 +1,9 @@
 from SALib.sample import morris as morris_sample
 from SALib.analyze import morris as morris_analyze
 import numpy as np
+import csv
+
+from numpy.core.fromnumeric import transpose
 
 
 def morris_analysis(problem, trajectories, func, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
@@ -110,5 +113,46 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
         sigma[ii, :] = indices_dict['sigma']
         mu_star_conf_level[ii, :] = np.array(
             indices_dict['mu_star_conf'], dtype=np.float32)
+        print(ii)
 
     return time, mu, mu_star, sigma, mu_star_conf_level
+
+
+def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_star_conf_level):
+    # Names of the 4 files
+    filenames = ["\mu", "\mu_star", "\sigma", "\mu_star_conf_level"]
+    # Names of the columns of each file, namely time and all the parameters
+    fieldnames = ["time"]
+    for parameter in problem["names"]:
+        fieldnames.append(parameter)
+    # Put all data in 1 list
+    indices = [mu, mu_star, sigma, mu_star_conf_level]
+    # A column array containing all timepoints
+    time_column = np.zeros((time.shape[0], 1), dtype=np.float64)
+    time_column[:, 0] = time
+    # Loop over the four files
+    for ii in range(4):
+        # Make file
+        new_file_name = path + filenames[ii] + "_" + filenumber + ".csv"
+        new_file = open(new_file_name, "x")
+        csv_writer = csv.writer(new_file)
+        # Write header
+        csv_writer.writerow(fieldnames)
+        # Store all the information to be saved in the data variable
+        data = np.concatenate((time_column, indices[ii]), axis=1)
+        # Loop over rows of each file (each row denoting a timepoint)
+        for jj in range(time.shape[0]):
+            csv_writer.writerow(data[jj, :])
+
+
+def morris_datareader(parameter, index, path, filenumber):
+    filename = path + "\ " + index + "_" + filenumber + ".csv"
+    print(filename)
+    file = open(filename, "r")
+    csv_reader = csv.DictReader(file)
+    data = []
+    for line in csv_reader:
+        data.append(line[parameter])
+    map(int, data)
+    data = np.array(data, dtype=np.float64)
+    return data
