@@ -49,8 +49,6 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     h = constants[0]
     eps_cprg = constants[1]
     eps_cpr = constants[2]
-    i0_cprg = constants[3]
-    i0_cpr = constants[4]
 
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -75,7 +73,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     s = np.zeros(n, dtype=np.float64)
     # Concentration of CPR (product)
     p = np.zeros(n, dtype=np.float64)
-    # Blue over yellow intensity ratio
+    # Blue over yellow absorbance ratio
     b_y = np.zeros(n, dtype=np.float64)
 
     # "Unpacking" the array with initial conditions into individual initial conditions
@@ -112,8 +110,8 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         p[ii + 1] = p[ii] + p_dt * dt
 
     # Calculating blue over yellow ratio
-    blue = i0_cpr * 10 ** (eps_cpr * p * h)
-    yellow = i0_cprg * 10 ** (eps_cprg * s * h)
+    blue = eps_cpr * p * h
+    yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
     return time, b_y
 
@@ -170,8 +168,6 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     h = constants[0]
     eps_cprg = constants[1]
     eps_cpr = constants[2]
-    i0_cprg = constants[3]
-    i0_cpr = constants[4]
 
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -202,7 +198,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     s = np.zeros(n, dtype=np.float64)
     # Concentration of CPR (product)
     p = np.zeros(n, dtype=np.float64)
-    # Blue over yellow intensity ratio
+    # Blue over yellow absorbance ratio
     b_y = np.zeros(n, dtype=np.float64)
 
     # "Unpacking" the array with initial conditions into individual initial conditions
@@ -247,8 +243,8 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
         p[step + 1] = p[step] + p_dt * dt
 
     # Calculating blue over yellow ratio
-    blue = i0_cpr * 10 ** (eps_cpr * p * h)
-    yellow = i0_cprg * 10 ** (eps_cprg * s * h)
+    blue = eps_cpr * p * h
+    yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
     return time, b_y
 
@@ -305,8 +301,6 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     h = constants[0]
     eps_cprg = constants[1]
     eps_cpr = constants[2]
-    i0_cprg = constants[3]
-    i0_cpr = constants[4]
 
     # Determine the timepoints of the simulation
     n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -337,6 +331,8 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     s = np.zeros(n, dtype=np.float64)
     # Concentration of CPR (product)
     p = np.zeros(n, dtype=np.float64)
+    # Blue over yellow absorbance ratio
+    b_y = np.zeros(n, dtype=np.float64)
 
     # "Unpacking" the array with initial conditions into individual initial conditions
     dna[0] = initial_conditions[0]
@@ -380,7 +376,7 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         p[ii + 1] = p[ii] + p_dt * dt
 
     # Calculating blue over yellow ratio
-    blue = i0_cpr * 10 ** (eps_cpr * p * h)
-    yellow = i0_cprg * 10 ** (eps_cprg * s * h)
+    blue = eps_cpr * p * h
+    yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
     return time, b_y

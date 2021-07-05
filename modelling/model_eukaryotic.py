@@ -33,10 +33,8 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
 h = 8*10**-5 * 1  # (0) Height of the paper [cm]
 eps_cprg = tbd  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = tbd   # (2) Exctinction coefficient of CPR at a wavelength of ???
-i0_cprg = tbd   # (3) Blank measurement at a wavelength of ???
-i0_cpr = tbd    # (4) Blank measurement at a wavelength of ???
 # Array containing above constants
-constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
+constants = np.array([h, eps_cprg, eps_cpr])
 
 t_tot = 500  # Total time [s]
 dt = 0.01  # Timestep [s]

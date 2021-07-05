@@ -25,13 +25,8 @@ k_m = 0.9             # (11) Michaelis constant of beta-galactosidase [μM]
 deg_mrna = 1.3*10**-5  # (12) Degradation rate of mRNA [1/s]
 # (13) Degradation rate of translation resources [1/s]
 deg_tlr = 7.5*10**-5
-h = 8*10**-5  # (14) Height of the paper [cm]
-eps_cprg = 1  # (15) Exctinction coefficient of CPRG at a wavelength of ???
-eps_cpr = 1   # (16) Exctinction coefficient of CPR at a wavelength of ???
-i0_cprg = 1   # (17) Blank measurement at a wavelength of ???
-i0_cpr = 1    # (18) Blank measurement at a wavelength of ???
 parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
-                       k_tlr, k_m, deg_mrna, deg_tlr, h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])  # Array containing above parameters
+                       k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
 
 t_tot = 3600  # total time [s]
 dt = 0.01  # timestep [s]
@@ -48,10 +43,8 @@ initial_conditions = np.array([dna_i, s_i, vit_i])
 h = 8*10**-5 * 1  # (0) Height of the paper [cm]
 eps_cprg = tbd  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = tbd   # (2) Exctinction coefficient of CPR at a wavelength of ???
-i0_cprg = tbd   # (3) Blank measurement at a wavelength of ???
-i0_cpr = tbd    # (4) Blank measurement at a wavelength of ???
 # Array containing above constants
-constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
+constants = np.array([h, eps_cprg, eps_cpr])
 
 # Running the model
 (time, data) = model_prokaryotic(parameters,
