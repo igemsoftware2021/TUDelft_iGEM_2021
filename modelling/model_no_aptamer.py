@@ -11,7 +11,7 @@ tbd = 1  # Placeholder for unkown parameters/concentrations so that they're easy
 k_ts = 6.7*10**-5     # (0)  Transcription rate [uM/s]
 k_tl = 7.2*10**-5     # (1)  Enzyme translation rate [uM/s]
 k_mat = 0.5*10**-3    # (2)  Maturation rate of beta-galactosidase [1/s]
-k_cat = 5.14*10**1    # (3)  Catalytic rate of beta-galactosidase [1/s]
+k_cat = 5.14*10**1   # (3)  Catalytic rate of beta-galactosidase [1/s]
 k_s = 8.5*10**-3      # (4)  Michaelis constant of transcription [μM]
 # (5)  Scaling factor for the transcription resources [-]
 kc_s = 1.8*10**-4
