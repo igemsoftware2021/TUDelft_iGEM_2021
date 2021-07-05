@@ -9,24 +9,24 @@ tbd = 1  # Placeholder for unkown parameters/concentrations so that they're easy
 # Parameters
 # (#) denotes the position in the parameters array
 k_ts = tbd            # (0)  Transcription rate
-k_on = 1              # (1)  Association rate of vitamin and umRNA [1/s]
-k_off = 1             # (2)  Dissociation rate of vitamin and umRNA [1/s]
-k_c = 1               # (3)  Cleaving rate of umRNA [s^-1]
-k_tl = 3*10**-5       # (4)  Enzyme translation rate [1/s]
-k_mat = 0.5*10**-3    # (5)  Maturation rate of beta-galactosidase [1/s]
-k_cat = 4.28*10**3   # (6)  Catalytic rate of beta-galactosidase [1/s]
-k_s = 8.5*10**-3      # (7)  Michaelis constant of transcription [μM]
-# (8)  Scaling factor for the transcription resources [-]
+k_tl = 3*10**-5       # (1)  Enzyme translation rate [1/s]
+k_mat = 0.5*10**-3    # (2)  Maturation rate of beta-galactosidase [1/s]
+k_cat = 4.28*10**3    # (3)  Catalytic rate of beta-galactosidase [1/s]
+k_s = 8.5*10**-3      # (4)  Michaelis constant of transcription [μM]
+# (5)  Scaling factor for the transcription resources [-]
 kc_s = 1.8*10**-4
-k_l = 65.8*10**-3     # (9)  Michaelis constant of translation [μM]
-# (10) Michaelis constant of translation resources [-]
-k_tlr = 6*10**-6
-k_m = 0.9             # (11) Michaelis constant of beta-galactosidase [μM]
-deg_mrna = 1.3*10**-5  # (12) Degradation rate of mRNA [1/s]
-# (13) Degradation rate of translation resources [1/s]
+k_l = 65.8*10**-3     # (6)  Michaelis constant of translation [μM]
+# (7) Michaelis constant of translation resources [-]
+k_tlr = 6*10**-5
+k_m = 50             # (8) Michaelis constant of beta-galactosidase [μM]
+deg_mrna = 1.3*10**-5  # (9) Degradation rate of mRNA [1/s]
+# (10) Degradation rate of translation resources [1/s]
 deg_tlr = 7.5*10**-5
-parameters = np.array([k_ts, k_on, k_off, k_c, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
-                       k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
+k_on = 1              # (11)  Association rate of vitamin and umRNA [1/s]
+k_off = 1             # (12)  Dissociation rate of vitamin and umRNA [1/s]
+k_c = 1               # (13)  Cleaving rate of umRNA [s^-1]
+parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
+                       k_tlr, k_m, deg_mrna, deg_tlr, k_on, k_off, k_c])  # Array containing above parameters
 
 t_tot = 3600  # total time [s]
 dt = 0.01  # timestep [s]

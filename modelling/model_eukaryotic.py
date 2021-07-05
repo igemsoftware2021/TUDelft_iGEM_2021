@@ -16,8 +16,8 @@ k_s = 8.5*10**-3      # (4)  Michaelis constant of transcription [μM]
 kc_s = 1.8*10**-4
 k_l = 65.8*10**-3     # (6)  Michaelis constant of translation [μM]
 # (7) Michaelis constant of translation resources [-]
-k_tlr = 6*10**-6
-k_m = 0.9             # (8) Michaelis constant of beta-galactosidase [μM]
+k_tlr = 6*10**-5
+k_m = 50               # (8) Michaelis constant of beta-galactosidase [μM]
 deg_mrna = 1.4*10**-3  # (9) Degradation rate of mRNA [1/s]
 # (10) Degradation rate of translation resources [1/s]
 deg_tlr = 7.5*10**-5
