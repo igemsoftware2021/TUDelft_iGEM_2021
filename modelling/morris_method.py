@@ -143,6 +143,7 @@ def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_st
         # Loop over rows of each file (each row denoting a timepoint)
         for jj in range(time.shape[0]):
             csv_writer.writerow(data[jj, :])
+        new_file.close()
 
 
 def morris_datareader(parameter, index, path, filenumber):
@@ -153,6 +154,7 @@ def morris_datareader(parameter, index, path, filenumber):
     data = []
     for line in csv_reader:
         data.append(line[parameter])
+    file.close()
     map(int, data)
     data = np.array(data, dtype=np.float64)
     return data
