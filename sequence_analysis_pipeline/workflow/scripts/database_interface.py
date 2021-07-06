@@ -296,39 +296,6 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
     #         f"SELECT * FROM {table} WHERE cleaned_sequence={cleaned_sequence} AND cleaved_prefix={cleaved_prefix} AND ligand_present={ligand_present}")
     #     return self.cursor.fetchall()
 
-    def update_cleavage_fraction(self, table: str, rowid: int, cleavage_fraction: float):
-        """
-        Function updates the cleavage fraction at the row rowid.\n
-        args:\n
-        table: (str) name of the table\n
-        rowid: (int) row to update\n
-        cleavage_fraction: (float) value to insert in the cleavage_fraction column\n
-        """
-        self.query(
-            f"UPDATE {table} SET cleavage_fraction={cleavage_fraction} WHERE id={rowid}")
-
-    def update_fold_change(self, table: str, rowid: int, fold_change: float):
-        """
-        Function updates the cleavage fraction at the row rowid.\n
-        args:\n
-        table: (str) name of the table\n
-        rowid: (int) row to update\n
-        fold_change: (float) value to insert in the fold_change column\n
-        """
-        self.query(
-            f"UPDATE {table} SET fold_change={fold_change} WHERE id={rowid}")
-
-    def update_possible_sensor(self, table: str, rowid: int, possible_sensor: int):
-        """
-        Function updates the possible biosensor at the row rowid.\n
-        args:\n
-        table: (str) name of the table\n
-        rowid: (int) row to update\n
-        possible_biosensor: (int) value to insert in the biosensor column\n
-        """
-        self.query(
-            f"UPDATE {table} SET possible_sensor={possible_sensor} WHERE id={rowid}")
-
     def get_sequences(self, table: str, cleaved_prefix: int = 1, ligand_present: int = 1):
         """
         Function to get sequences. \n

@@ -27,7 +27,7 @@ for row_info in rows_info_seq:
     rowid = row_info[0]
     info_seq_rowid_dict[key_tuple] = rowid
 
-# Dictionary where key is the rowid, and the value is the read count
+# Dictionary where key is the rowid, and the value is the cleavage_fraction
 id_cs_dict = {row_info[0]: row_info[1]
               for row_info in rows_id_and_cs}
 

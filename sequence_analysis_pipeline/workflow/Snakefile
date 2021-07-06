@@ -145,7 +145,7 @@ rule database_biosensor_assay:
     output:
         touch("results/checkpoints/{dataset}_database_biosensor_assay.done")
     conda:
-        "envs/database.yaml"
+        "envs/biosensor_assay.yaml"
     script:
         "scripts/database_bionsensor_assay.py"
 

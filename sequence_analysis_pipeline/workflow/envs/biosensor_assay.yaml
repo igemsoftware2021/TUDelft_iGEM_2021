@@ -1,7 +1,8 @@
-name: tqdm
+name: database
 channels:
   - conda-forge
   - defaults
 dependencies:
+  - python=3.9.*
   - tqdm=4.61.*
-  - pyyaml=5.4.*
+  - scipy=1.7.*
