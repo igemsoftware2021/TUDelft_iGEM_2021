@@ -45,11 +45,11 @@ eps_cpr = 0.539   # (2) Exctinction coefficient of CPR at a wavelength of ???
 constants = np.array([h, eps_cprg, eps_cpr])
 
 # Running the model
-(time, data) = model_no_aptamer(parameters,
-                                constants, initial_conditions, dt=dt, t_tot=t_tot)
+time, data = model_no_aptamer(parameters,
+                              constants, initial_conditions, dt=dt, t_tot=t_tot)
 
 
-slide_parameter = "k_ts"
+slide_parameter = "k_cat"
 
 
 # Create parameter dictionairy
@@ -83,7 +83,7 @@ parameter_slider = Slider(
 def update(val):
     parameters[parameter_dict[slide_parameter]] = parameter_slider.val
     time, data = model_no_aptamer(parameters,
-                                  constants, initial_conditions, dt=dt, t_tot=7200)
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
     line.set_ydata(data)
     fig.canvas.draw_idle()
 
