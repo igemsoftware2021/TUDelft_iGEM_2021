@@ -103,7 +103,7 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     model_output = func(model_input, constants,
                         initial_conditions, dt=dt, t_tot=t_tot)
 
-    # Running the Morris analysis at each timepoint (using tne output of all the different simulations)
+    # Running the Morris analysis at each timepoint (using the output of all the different simulations)
     for ii in range(n):
         indices_dict = morris_analyze.analyze(problem, model_input,
                                               model_output[ii, :], num_levels=num_levels)
