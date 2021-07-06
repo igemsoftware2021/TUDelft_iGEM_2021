@@ -68,12 +68,13 @@ ax.margins(x=0)
 plt.subplots_adjust(left=0.25, bottom=0.25)
 # Make a horizontal slider to control the frequency.
 axfreq = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
+slide_parameter_initial_value = parameters[parameter_dict[slide_parameter]]
 parameter_slider = Slider(
     ax=axfreq,
     label=slide_parameter,
-    valmin=0.01 * parameters[parameter_dict[slide_parameter]],
-    valmax=10 * parameters[parameter_dict[slide_parameter]],
-    valinit=parameters[parameter_dict[slide_parameter]],
+    valmin=0.1 * slide_parameter_initial_value,
+    valmax=10 * slide_parameter_initial_value,
+    valinit=slide_parameter_initial_value,
 )
 
 # The function to be called anytime a slider's value changes
@@ -81,8 +82,8 @@ parameter_slider = Slider(
 
 def update(val):
     parameters[parameter_dict[slide_parameter]] = parameter_slider.val
-    (time, data) = model_no_aptamer(parameters,
-                                    constants, initial_conditions, dt=dt, t_tot=7200)
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=7200)
     line.set_ydata(data)
     fig.canvas.draw_idle()
 
