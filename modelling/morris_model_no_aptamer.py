@@ -33,17 +33,17 @@ no_aptamer_prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
               "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
-    'bounds': [[0.33 * parameters[0], 3 * parameters[0]],     # (0) k_ts
-               [0.33 * parameters[1], 3 * parameters[1]],     # (1) k_tl
-               [0.33 * parameters[2], 3 * parameters[2]],     # (2) k_mat
-               [0.33 * parameters[3], 3 * parameters[3]],     # (3) k_cat
-               [0.33 * parameters[4], 3 * parameters[4]],     # (4) k_s
-               [0.33 * parameters[5], 3 * parameters[5]],     # (5) kc_s
-               [0.33 * parameters[6], 3 * parameters[6]],     # (6) k_l
-               [0.33 * parameters[7], 3 * parameters[7]],     # (7) k_tlr
-               [0.33 * parameters[8], 3 * parameters[8]],     # (8) k_m
-               [0.33 * parameters[9], 3 * parameters[9]],     # (9) deg_mrna
-               [0.33 * parameters[10], 3 * parameters[10]], ]  # (10) deg_tlr
+    'bounds': [[0.1 * parameters[0], 10 * parameters[0]],     # (0) k_ts
+               [0.1 * parameters[1], 10 * parameters[1]],     # (1) k_tl
+               [0.1 * parameters[2], 10 * parameters[2]],     # (2) k_mat
+               [0.1 * parameters[3], 10 * parameters[3]],     # (3) k_cat
+               [0.1 * parameters[4], 10 * parameters[4]],     # (4) k_s
+               [0.1 * parameters[5], 10 * parameters[5]],     # (5) kc_s
+               [0.1 * parameters[6], 10 * parameters[6]],     # (6) k_l
+               [0.1 * parameters[7], 10 * parameters[7]],     # (7) k_tlr
+               [0.1 * parameters[8], 10 * parameters[8]],     # (8) k_m
+               [0.1 * parameters[9], 10 * parameters[9]],     # (9) deg_mrna
+               [0.1 * parameters[10], 10 * parameters[10]], ]  # (10) deg_tlr
 }
 
 # Eukaryotic problem definition
@@ -79,7 +79,7 @@ initial_conditions = np.array([dna_i, s_i])
 
 # Defining timescale of the model
 t_tot = 3600  # Total time [s]
-dt = 1  # Timestep [s]
+dt = 0.01  # Timestep [s]
 
 # Doing Morris sensitivity analysis
 (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_prokaryotic_problem, trajectories,
@@ -87,4 +87,4 @@ dt = 1  # Timestep [s]
 
 # Saving the data
 morris_datawriter(no_aptamer_prokaryotic_problem, "modelling\data\morris_no_aptamer",
-                  "0", time, mu, mu_star, sigma, mu_star_conf_level)
+                  "2", time, mu, mu_star, sigma, mu_star_conf_level)
