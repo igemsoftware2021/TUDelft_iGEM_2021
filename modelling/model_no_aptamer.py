@@ -1,5 +1,6 @@
 # Libraries to import
 from models import model_no_aptamer
+from morris_method import morris_datareader
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
@@ -46,6 +47,25 @@ constants = np.array([h, eps_cprg, eps_cpr])
 (time, data) = model_no_aptamer(parameters,
                                 constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-# Plotting
-plt.plot(time, data)
+
+names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
+         "k_tlr", "k_m", "deg_mrna", "deg_tlr"]
+path = "modelling\data\morris_no_aptamer"
+filenumber = "0"
+time = morris_datareader("time", "mu", path, filenumber)
+for name in names:
+    mu_star = morris_datareader(name, "mu_star", path, filenumber)
+    sigma = morris_datareader(name, "sigma", path, filenumber)
+    mu = morris_datareader(name, "mu", path, filenumber)
+    fig1 = plt.figure()
+    plt.plot(time, data, label="product", color="#9B0138")
+    plt.plot(time, mu_star, label="mu_star", color="#FFCF39")
+    plt.plot(time, sigma, label="sigma", color="#667817")
+    plt.plot(time, mu, label="mu", color="#E389BB")
+    plt.title(name)
+    plt.legend()
+    plt.xlabel("Time (s)"), plt.ylabel("Product (uM)")
+    fig1.savefig("modelling\data\morris_no_aptamer\\" + name +
+                 "_" + filenumber + "_1" ".svg", format="svg", dpi=1200)
+
 plt.show()
