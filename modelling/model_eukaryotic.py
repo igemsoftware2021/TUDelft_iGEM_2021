@@ -16,8 +16,8 @@ k_s = 8.5*10**-3      # (4)  Michaelis constant of transcription [μM]
 kc_s = 1.8*10**-4
 k_l = 65.8*10**-3     # (6)  Michaelis constant of translation [μM]
 # (7) Michaelis constant of translation resources [-]
-k_tlr = 6*10**-6
-k_m = 0.9             # (8) Michaelis constant of beta-galactosidase [μM]
+k_tlr = 6*10**-5
+k_m = 50               # (8) Michaelis constant of beta-galactosidase [μM]
 deg_mrna = 1.4*10**-3  # (9) Degradation rate of mRNA [1/s]
 # (10) Degradation rate of translation resources [1/s]
 deg_tlr = 7.5*10**-5
@@ -33,10 +33,8 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
 h = 8*10**-5 * 1  # (0) Height of the paper [cm]
 eps_cprg = tbd  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = tbd   # (2) Exctinction coefficient of CPR at a wavelength of ???
-i0_cprg = tbd   # (3) Blank measurement at a wavelength of ???
-i0_cpr = tbd    # (4) Blank measurement at a wavelength of ???
 # Array containing above constants
-constants = np.array([h, eps_cprg, eps_cpr, i0_cprg, i0_cpr])
+constants = np.array([h, eps_cprg, eps_cpr])
 
 t_tot = 500  # Total time [s]
 dt = 0.01  # Timestep [s]
@@ -50,16 +48,9 @@ initial_conditions = np.array([dna_i, s_i, vit_i])
 
 
 # Running the model
-(time, b_y, s, p, e, blue, yellow) = model_eukaryotic(parameters,
-                                                      constants, initial_conditions, dt=dt, t_tot=t_tot)
+(time, b_y) = model_eukaryotic(parameters,
+                               constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-# Plotting to check if sth happened at all
-plt.plot(time, s)
-plt.plot(time, p)
-plt.figure()
-plt.plot(time, yellow)
-plt.plot(time, blue)
-plt.figure()
+# Plotting
 plt.plot(time, b_y)
-
 plt.show()
