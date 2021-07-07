@@ -1,9 +1,8 @@
 from SALib.sample import morris as morris_sample
 from SALib.analyze import morris as morris_analyze
+from tqdm import tqdm
 import numpy as np
 import csv
-
-from numpy.core.fromnumeric import transpose
 
 
 def morris_analysis(problem, trajectories, func, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
@@ -104,7 +103,7 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
                         initial_conditions, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis at each timepoint (using the output of all the different simulations)
-    for ii in range(n):
+    for ii in tqdm(range(n)):
         indices_dict = morris_analyze.analyze(problem, model_input,
                                               model_output[ii, :], num_levels=num_levels)
         # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
@@ -113,7 +112,6 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
         sigma[ii, :] = indices_dict['sigma']
         mu_star_conf_level[ii, :] = np.array(
             indices_dict['mu_star_conf'], dtype=np.float32)
-        print(ii)
 
     return time, mu, mu_star, sigma, mu_star_conf_level
 
