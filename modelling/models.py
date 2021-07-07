@@ -68,7 +68,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     tlr = np.zeros(n, dtype=np.float64)
     # Concentration of monomeric subunits of beta-galactosidase
     e_mon = np.zeros(n, dtype=np.float64)
-    # Concentration of active sites of beta-galactosidase (enzyme)
+    # Concentration of beta-galactosidase (enzyme)
     e = np.zeros(n, dtype=np.float64)
     # Concentration of CPRG (substrate)
     s = np.zeros(n, dtype=np.float64)
@@ -94,8 +94,8 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         tlr_dt = - deg_tlr * tlr[ii] / (k_tlr + tlr[ii])
         e_mon_dt = k_tl * tlr[ii] * \
             mrna[ii] / (k_l + mrna[ii]) - \
-            k_mat * e_mon[ii]
-        e_dt = k_mat * e_mon[ii]
+            0.25 * k_mat * e_mon[ii]
+        e_dt = 0.25 * k_mat * e_mon[ii]
         s_dt = - k_cat * e[ii] * s[ii] / (k_m + s[ii])
         p_dt = - s_dt
 
@@ -193,7 +193,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     tlr = np.zeros(n, dtype=np.float64)
     # Concentration of monomeric subunits of beta-galactosidase
     e_mon = np.zeros(n, dtype=np.float64)
-    # Concentration of active sites of beta-galactosidase (enzyme)
+    # Concentration of beta-galactosidase (enzyme)
     e = np.zeros(n, dtype=np.float64)
     # Concentration of CPRG (substrate)
     s = np.zeros(n, dtype=np.float64)
@@ -224,8 +224,8 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
         tlr_dt = - deg_tlr * tlr[step] / (k_tlr + tlr[step])
         e_mon_dt = k_tl * tlr[step] * \
             cmrna[step] / (k_l + cmrna[step]) - \
-            k_mat * e_mon[step]
-        e_dt = k_mat * e_mon[step]
+            0.25 * k_mat * e_mon[step]
+        e_dt = 0.25 * k_mat * e_mon[step]
         s_dt = - k_cat * e[step] * s[step] / (k_m + s[step])
         p_dt = - s_dt
 
@@ -326,7 +326,7 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     tlr = np.zeros(n, dtype=np.float64)
     # Concentration of monomeric subunits of beta-galactosidase
     e_mon = np.zeros(n, dtype=np.float64)
-    # Concentration of active sites of beta-galactosidase (enzyme)
+    # Concentration of beta-galactosidase (enzyme)
     e = np.zeros(n, dtype=np.float64)
     # Concentration of CPRG (substrate)
     s = np.zeros(n, dtype=np.float64)
@@ -357,8 +357,8 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
         tlr_dt = - deg_tlr * tlr[ii] / (k_tlr + tlr[ii])
         e_mon_dt = k_tl * tlr[ii] * \
             (umrna_vit[ii] + umrna[ii]) / (k_l + (umrna_vit[ii] + umrna[ii])) - \
-            k_mat * e_mon[ii]
-        e_dt = k_mat * e_mon[ii]
+            0.25 * k_mat * e_mon[ii]
+        e_dt = 0.25 * k_mat * e_mon[ii]
         s_dt = - k_cat * e[ii] * s[ii] / (k_m + s[ii])
         p_dt = - s_dt
 
