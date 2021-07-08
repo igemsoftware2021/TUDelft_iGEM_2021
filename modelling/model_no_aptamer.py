@@ -53,8 +53,10 @@ slide_parameter = "k_cat"
 
 
 # Create parameter dictionairy
-parameter_dict = dict(zip(["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-                           "k_tlr", "k_m", "deg_mrna", "deg_tlr"], range(len(parameters))))
+parameter_names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
+                           "k_tlr", "k_m", "deg_mrna", "deg_tlr"]
+
+
 # Create the figure and the line
 fig, ax = plt.subplots()
 line, = plt.plot(time, data, lw=2)
@@ -65,23 +67,118 @@ axcolor = 'lightgoldenrodyellow'
 ax.margins(x=0)
 
 # adjust the main plot to make room for the sliders
-plt.subplots_adjust(left=0.25, bottom=0.25)
-# Make a horizontal slider to control the frequency.
+# probably need more room
+left = 0.25
+plt.subplots_adjust(left=left, bottom=0.65)
+
+# Make an array with axes that are sufficiently spaced
+sliders_position = np.zeros([parameters.shape[0], 4])
+spacer = 0.05
+for ii in range(len(parameters)):
+    sliders_position[ii, 0] = left  # left
+    sliders_position[ii, 1] = 0.55 - ii * spacer
+    sliders_position[ii, 2] = 0.65  # width
+    sliders_position[ii, 3] = 0.03  # height
+
+
 axfreq = plt.axes([0.25, 0.1, 0.65, 0.03], facecolor=axcolor)
-slide_parameter_initial_value = parameters[parameter_dict[slide_parameter]]
-parameter_slider = Slider(
-    ax=axfreq,
-    label=slide_parameter,
-    valmin=0.1 * slide_parameter_initial_value,
-    valmax=10 * slide_parameter_initial_value,
-    valinit=slide_parameter_initial_value,
-)
+# Make a horizontal sliders to control each parameter.
+parameter_sliders = []
+for ii in range(len(parameters)):
+    parameter_sliders.append(Slider(
+        ax=plt.axes(sliders_position[ii, :], facecolor=axcolor),
+        label=parameter_names[ii],
+        valmin=0.1 * parameters[ii],
+        valmax=10 * parameters[ii],
+        valinit=parameters[ii],
+    ))
 
-# The function to be called anytime a slider's value changes
+# The functions to be called anytime a slider's value changes
 
 
-def update(val):
-    parameters[parameter_dict[slide_parameter]] = parameter_slider.val
+def update_k_ts(val):
+    parameters[0] = parameter_sliders[0].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_tl(val):
+    parameters[1] = parameter_sliders[1].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_mat(val):
+    parameters[2] = parameter_sliders[2].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_cat(val):
+    parameters[3] = parameter_sliders[3].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_s(val):
+    parameters[4] = parameter_sliders[4].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_kc_s(val):
+    slide_parameter = "kc_s"
+    parameters[5] = parameter_sliders[5].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_l(val):
+    parameters[6] = parameter_sliders[6].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_tlr(val):
+    parameters[7] = parameter_sliders[7].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_k_m(val):
+    parameters[8] = parameter_sliders[8].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_deg_mrna(val):
+    parameters[9] = parameter_sliders[9].val
+    time, data = model_no_aptamer(parameters,
+                                  constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
+def update_deg_tlr(val):
+    parameters[10] = parameter_sliders[10].val
     time, data = model_no_aptamer(parameters,
                                   constants, initial_conditions, dt=dt, t_tot=t_tot)
     line.set_ydata(data)
@@ -89,44 +186,29 @@ def update(val):
 
 
 # register the update function with each slider
-parameter_slider.on_changed(update)
+
+parameter_sliders[0].on_changed(update_k_ts)
+parameter_sliders[1].on_changed(update_k_tl)
+parameter_sliders[2].on_changed(update_k_mat)
+parameter_sliders[3].on_changed(update_k_cat)
+parameter_sliders[4].on_changed(update_k_s)
+parameter_sliders[5].on_changed(update_kc_s)
+parameter_sliders[6].on_changed(update_k_l)
+parameter_sliders[7].on_changed(update_k_tlr)
+parameter_sliders[8].on_changed(update_k_m)
+parameter_sliders[9].on_changed(update_deg_mrna)
+parameter_sliders[10].on_changed(update_deg_tlr)
+
 
 # Create a `matplotlib.widgets.Button` to reset the sliders to initial values.
-resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
-button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
+# resetax = plt.axes([0.8, 0.025, 0.1, 0.04])
+# button = Button(resetax, 'Reset', color=axcolor, hovercolor='0.975')
 
 
-def reset(event):
-    parameter_slider.reset()
+# def reset(event):
+#   parameter_slider.reset()
 
 
-button.on_clicked(reset)
+# button.on_clicked(reset)
 
 plt.show()
-
-##
-# names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-#          "k_tlr", "k_m", "deg_mrna", "deg_tlr"]
-# path = "modelling\data\morris_no_aptamer"
-# filenumber = "1"
-# time = morris_datareader("time", "mu", path, filenumber)
-# for name in names:
-#     mu_star = morris_datareader(name, "mu_star", path, filenumber)
-#     sigma = morris_datareader(name, "sigma", path, filenumber)
-#     mu = morris_datareader(name, "mu", path, filenumber)
-#     mu_star_conf_level = morris_datareader(
-#         name, "mu_star_conf_level", path, filenumber)
-#     fig1 = plt.figure()
-#     plt.fill_between(time, mu_star - 0.5 * mu_star_conf_level, mu_star + 0.5 *
-#                      mu_star_conf_level, color="#8B992F")
-#     plt.plot(time, data, label="product", color="#9B0138")
-#     plt.plot(time, mu, label="mu", color="#FFCF39")
-#     plt.plot(time, mu_star, label="mu_star", color="#667817")
-#     plt.plot(time, sigma, label="sigma", color="#E389BB")
-#     plt.title(name)
-#     plt.legend()
-#     plt.xlabel("Time (s)"), plt.ylabel("Product (uM)")
-#     fig1.savefig("modelling\data\morris_no_aptamer\\" + name +
-#                  "_" + filenumber + "_2" ".svg", format="svg", dpi=1200)
-
-# plt.show()
