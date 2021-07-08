@@ -27,23 +27,35 @@ deg_tlr = 7.5*10**-5
 parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                        k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
 
+lower_range = 0.1
+upper_range = 10
+
 
 # Problem definition for prokaryotic system
 no_aptamer_prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
               "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
-    'bounds': [[0.1 * parameters[0], 10 * parameters[0]],     # (0) k_ts
-               [0.1 * parameters[1], 10 * parameters[1]],     # (1) k_tl
-               [0.1 * parameters[2], 10 * parameters[2]],     # (2) k_mat
-               [0.1 * parameters[3], 10 * parameters[3]],     # (3) k_cat
-               [0.1 * parameters[4], 10 * parameters[4]],     # (4) k_s
-               [0.1 * parameters[5], 10 * parameters[5]],     # (5) kc_s
-               [0.1 * parameters[6], 10 * parameters[6]],     # (6) k_l
-               [0.1 * parameters[7], 10 * parameters[7]],     # (7) k_tlr
-               [0.1 * parameters[8], 10 * parameters[8]],     # (8) k_m
-               [0.1 * parameters[9], 10 * parameters[9]],     # (9) deg_mrna
-               [0.1 * parameters[10], 10 * parameters[10]], ]  # (10) deg_tlr
+    'bounds': [[lower_range * parameters[0], upper_range * parameters[0]],     # (0) k_ts
+               [lower_range * parameters[1], upper_range * \
+                   parameters[1]],     # (1) k_tl
+               [lower_range * parameters[2], upper_range * \
+                   parameters[2]],     # (2) k_mat
+               [lower_range * parameters[3], upper_range * \
+                   parameters[3]],     # (3) k_cat
+               [lower_range * parameters[4], upper_range * \
+                   parameters[4]],     # (4) k_s
+               [lower_range * parameters[5], upper_range * \
+                   parameters[5]],     # (5) kc_s
+               [lower_range * parameters[6], upper_range * \
+                   parameters[6]],     # (6) k_l
+               [lower_range * parameters[7], upper_range * \
+                   parameters[7]],     # (7) k_tlr
+               [lower_range * parameters[8], upper_range * \
+                   parameters[8]],     # (8) k_m
+               [lower_range * parameters[9], upper_range * \
+                   parameters[9]],     # (9) deg_mrna
+               [lower_range * parameters[10], upper_range * parameters[10]], ]  # (10) deg_tlr
 }
 
 # Eukaryotic problem definition
@@ -83,8 +95,8 @@ dt = 0.01  # Timestep [s]
 
 # Doing Morris sensitivity analysis
 (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_prokaryotic_problem, trajectories,
-                                                                 run_simulations_no_aptamer, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
+                                                                 run_simulations_no_aptamer, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels, seed=12)
 
 # Saving the data
 morris_datawriter(no_aptamer_prokaryotic_problem, "modelling\data\morris_no_aptamer",
-                  "2", time, mu, mu_star, sigma, mu_star_conf_level)
+                  "4", time, mu, mu_star, sigma, mu_star_conf_level)
