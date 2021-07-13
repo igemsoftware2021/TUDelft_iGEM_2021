@@ -147,7 +147,7 @@ rule database_biosensor_assay:
     conda:
         "envs/biosensor_assay.yaml"
     script:
-        "scripts/database_bionsensor_assay.py"
+        "scripts/database_biosensor_assay.py"
 
 rule plotting:
     input:
@@ -158,4 +158,4 @@ rule plotting:
     conda:
         "envs/plotting.yaml"
     script:
-        "/scripts/plotting.py"
+        "scripts/plotting.py"
