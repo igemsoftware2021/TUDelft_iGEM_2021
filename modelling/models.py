@@ -4,6 +4,97 @@ import csv
 
 
 @njit(cache=True, nogil=True)
+def model_yfp_expression(parameters, dna_i, dt=0.1, t_tot=7200):
+    """Function does a simulation of YFP expression.
+
+    Parameters:
+    ----------
+    parameters: np.ndarray
+        Array containing the model parameters (float): transcription rate, translation rate, 
+        maturation rate, catalytic rate of the enzyme, Michaelis constant transcription, 
+        scaling factor transcription resources, Michaelis constant translation, Michaelis 
+        constant translation resources, Michaelis constant enzymatic reaction, degradation 
+        rate mRNA, degredation rate transcription resources.
+    constants: np.ndarray
+        Array containing the model constants (float): height of the microfluidic paper, 
+        extinction coefficient CPRG, extinction coefficient CPR, blank intensity 
+        measurement CPRG, blank intensity measurement CPR.
+    initial_conditions: np.ndarray
+        Array containing the initial conditions: gene concentration, substrate concentration.
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+
+    Returns
+    ----------
+    time: np.ndarray
+        Array containing all timepoints of the simulation.
+    b_y: np.ndarray 
+        Array containing the blue over yellow light intensity ratio at each timepoint.
+    """
+    # "Unpacking" the array with parameters into individual parameters
+    k_ts = parameters[0]
+    k_tl = parameters[1]
+    k_mat = parameters[2]
+    k_s = parameters[3]
+    kc_s = parameters[4]
+    k_l = parameters[5]
+    k_tlr = parameters[6]
+    deg_mrna = parameters[7]
+    deg_tlr = parameters[8]
+
+    # Determine the timepoints of the simulation
+    n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
+    time = np.linspace(0, t_tot, n)  # Array with all timepoints
+
+    # Arrays for the concentration of each species
+    # Concentration of the beta-galactosidase gene [μM]
+    dna = np.zeros(n, dtype=np.float64)
+    # Concentration of mRNA [μM]
+    mrna = np.zeros(n, dtype=np.float64)
+    # Concentration of degraded mRNA [μM] (this does not denote a physical concentraion within the system, but merely tracks the concentration of mRNA that has been degraded)
+    dmrna = np.zeros(n, dtype=np.float64)
+    # Prefactor that accounts for finite transcription resources and initiation rate [-]
+    tsr = np.zeros(n, dtype=np.float64)
+    # Prefactor that accounts for finite translation resources and initiation rate[-]
+    tlr = np.zeros(n, dtype=np.float64)
+    # Concentration of monomeric subunits of beta-galactosidase
+    yfp = np.zeros(n, dtype=np.float64)
+    # Concentration of beta-galactosidase (enzyme)
+    yfp_mat = np.zeros(n, dtype=np.float64)
+
+    # "Unpacking" the array with initial conditions into individual initial conditions
+    dna[0] = dna_i
+    tsr[0] = 1
+    tlr[0] = 1
+
+    # A loop with the differential equations
+    for ii in range(time.shape[0]-1):
+        # Differential of each species w.r.t time
+        dna_dt = 0  # could remove this one, zero anyway
+        mrna_dt = k_ts * tsr[ii] * dna[ii] / \
+            (k_s + dna[ii]) - deg_mrna * mrna[ii]
+        dmrna_dt = deg_mrna * mrna[ii]
+        tsr_dt = - kc_s * tsr[ii] * dna[ii] / (k_s + dna[ii])
+        tlr_dt = - deg_tlr * tlr[ii] / (k_tlr + tlr[ii])
+        yfp_dt = k_tl * tlr[ii] * \
+            mrna[ii] / (k_l + mrna[ii]) - \
+            0.25 * k_mat * yfp[ii]
+        yfp_mat_dt = 0.25 * k_mat * yfp[ii]
+
+        # Computing the concentration of each species for the next step
+        dna[ii + 1] = dna[ii] + dna_dt * dt
+        mrna[ii + 1] = mrna[ii] + mrna_dt * dt
+        dmrna[ii + 1] = dmrna[ii] + dmrna_dt * dt
+        tsr[ii + 1] = tsr[ii] + tsr_dt * dt
+        tlr[ii + 1] = tlr[ii] + tlr_dt * dt
+        yfp[ii + 1] = yfp[ii] + yfp_dt * dt
+        yfp_mat[ii + 1] = yfp_mat[ii] + yfp_mat_dt * dt
+    return time, yfp_mat
+
+
+@njit(cache=True, nogil=True)
 def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
     """Function does a simulation of the kinetics of the AptaVita system without aptamers.
 
