@@ -32,8 +32,11 @@ for i in range(0, total_frames, sample_rate):
     for c in contours:
         peri = cv2.arcLength(c, True)
         approx = cv2.approxPolyDP(c, 0.02*peri, True)
-        if len(approx) == 4:
-            cv2.drawContours(image, c, -1, (128,255,0), 3)
+        (x, y, w, h) = cv2.boundingRect(approx)
+        ar = w / float(h)
+        area = cv2.contourArea(c)
+        if len(approx) == 4 and ar>=0.95 and ar<=1.05 and area > 500:
+            cv2.drawContours(image, c, -1, (128,255,0), 2)
             cntrrect.append(approx)
     # print(cntrrect)        
 
