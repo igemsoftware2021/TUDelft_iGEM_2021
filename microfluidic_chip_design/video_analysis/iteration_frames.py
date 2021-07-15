@@ -24,17 +24,29 @@ for i in range(0, total_frames, sample_rate):
     # find rectangles in image
     # first find the edges to find the lines
     # edges = cv2.Canny(bi, threshold1=30, threshold2=100)
-    contours = cv2.findContours(bi, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)[0]
+    contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
     # cv2.drawContours(image, contours,-1,(128,255,0),3)
     # print(contours)
     # Loop over contours to find the rectangles
     cntrrect = []
+    cntrwell = []
     for c in contours:
         peri = cv2.arcLength(c, True)
-        approx = cv2.approxPolyDP(c, 0.04*peri, True)
-        if len(approx) == 4:
-            cv2.drawContours(image, c, -1, (128,255,0), 3)
-            cntrrect.append(approx)
+        approx = cv2.approxPolyDP(c, 0.02*peri, True)
+        # approx2 = cv2.approxPolyDP(c, 0.02*peri, False)
+        (x, y, w, h) = cv2.boundingRect(approx)
+        ar = w / float(h)
+        area = cv2.contourArea(c)
+
+        # DETECT SQUARES
+        if len(approx) == 4 and ar>=0.95 and ar<=1.05 and area > 500:
+            cv2.drawContours(image, c, -1, (128,255,0), 2)
+            cntrrect.append(c)
+
+        # DETECT CIRCLES (WELLS)
+        # elif len(approx) > 5 and area > 250:
+        #     cv2.drawContours(image, c, -1, (128,255,0), 2)
+        #     cntrwell.append(c)
     # print(cntrrect)        
 
     # lines = cv2.HoughLinesP(edges, 1, np.pi/180, 60, np.array([]), 50, 5)
