@@ -151,7 +151,7 @@ dmypy.json
 test_LoulotteW
 
 # Boyd's stuff
-sponsor_scraping
+/microfluidic_chip_design/video_analysis/test_boyd.py
 
 # Minke's stuff
 test_microfluidic_minke
