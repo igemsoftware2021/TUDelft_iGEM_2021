@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 
 #define video file name
-filename = './microfluidic_chip_design/video_analysis/wells_geenwhatsapp.MOV'
+filename = './microfluidic_chip_design/video_analysis/rechte_wells.MOV'
 cap = cv2.VideoCapture(filename)     #load the video
 
 total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -31,6 +31,7 @@ contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
 cntrrect = []
 cntrcircle = []
 cntrchannel = []
+cntrwell = []
 for c in contours:
     peri = cv2.arcLength(c, True)
     approx = cv2.approxPolyDP(c, 0.02*peri, True)
@@ -45,18 +46,20 @@ for c in contours:
         cntrrect.append(approx)
 
 # DETECT CIRCLES (WELLS)
-circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2, 20, param1=150, param2=0.9, minRadius=10, maxRadius=0)  
-circles = np.around(circles).astype("int")
-for i in circles[0,:]:
-    # draw the outer circle
-    cv2.circle(image, (i[0],i[1]),i[2],(0,0,255),2)
-    # draw the center of the circle
-    cv2.circle(image, (i[0],i[1]),2,(0,0,255),3)
+# circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2, 20, param1=150, param2=0.9, minRadius=10, maxRadius=0)  
+# circles = np.around(circles).astype("int")
+# for i in circles[0,:]:
+#     # draw the outer circle
+#     cv2.circle(image, (i[0],i[1]),i[2],(0,0,255),2)
+#     # draw the center of the circle
+#     cv2.circle(image, (i[0],i[1]),2,(0,0,255),3)
 
 output = cv2.connectedComponentsWithStats(bi, connectivity=8, ltype=cv2.CV_32S)
 (numLabels, labels, stats, centroids) = output
 # output = image.copy()
 # find height and width of all connected components
+cntrmidleft = []
+cntrmidright = []
 for j in range(2, numLabels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
     X = stats[j, cv2.CC_STAT_LEFT]
     Y = stats[j, cv2.CC_STAT_TOP] 
@@ -67,8 +70,17 @@ for j in range(2, numLabels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
     if W > 500:
         cv2.circle(image, (int(cX), int(cY)), 4, (0,0,255), -1)
         cv2.rectangle(image, (X,Y), (X+W, Y+H), (0,0,255), 3)
-        cntrchannel.append(centroids[j])
+        #rect = cv2.minAreaRect()
+        cntrchannel.append((int(cX),int(cY)))
+        cntrwell.append((X,Y))
+        Ymid = Y + H/2
+        cntrmidleft.append((X,int(Ymid)))
+        cntrmidright.append(((X+W),int(Ymid)))
 
+
+for k in range(0, len(cntrchannel)):
+    cv2.line(image, cntrmidleft[k], cntrchannel[k], (255, 0, 0), 2)
+    cv2.line(image, cntrmidright[k], cntrchannel[k], (255, 0, 0), 2)
 
 
 # show image
