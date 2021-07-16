@@ -79,8 +79,20 @@ for j in range(2, numLabels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
 
 
 for k in range(0, len(cntrchannel)):
-    cv2.line(image, cntrmidleft[k], cntrchannel[k], (255, 0, 0), 2)
-    cv2.line(image, cntrmidright[k], cntrchannel[k], (255, 0, 0), 2)
+    left = cv2.line(image, cntrmidleft[k], cntrchannel[k], (255, 0, 0), 2)
+    right = cv2.line(image, cntrmidright[k], cntrchannel[k], (255, 0, 0), 2)
+
+    # Draw lines in binary image
+    # bileft = cv2.line(bi, cntrmidleft[k], cntrchannel[k], (255, 0, 0), 2)
+    # biright = cv2.line(bi, cntrmidright[k], cntrchannel[k], (255, 0, 0), 2)
+colorcodes = []
+for v in left.shape:
+
+    if bi[left[0:1][v],0] == 255:
+        colorcodes.append[(left[0:1][v])]
+
+
+
 
 
 # show image
@@ -103,6 +115,11 @@ if cv2.waitKey(0) & 0xFF == ord('q'): #press q to quit
 
 #     # create binary image
 #     _, bi2 = cv2.threshold(blur2, 120, 255, cv2.THRESH_BINARY)
+
+#     bi2[left, 0]
+
+
+
 
 
 
