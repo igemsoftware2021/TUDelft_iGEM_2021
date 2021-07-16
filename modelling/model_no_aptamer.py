@@ -61,7 +61,7 @@ parameter_names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
 fig, ax = plt.subplots()
 line, = plt.plot(time, data, lw=2)
 ax.set_xlabel('Time (s)')
-ax.set_ylabel("Product concentration uM")
+ax.set_ylabel("mRNA concentration uM")
 
 axcolor = 'lightgoldenrodyellow'
 ax.margins(x=0)
