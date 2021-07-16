@@ -24,12 +24,13 @@ _, bi = cv2.threshold(blur, 120, 255, cv2.THRESH_BINARY)
 # find rectangles in image
 # first find the edges to find the lines
 # edges = cv2.Canny(bi, threshold1=30, threshold2=100)
-contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)[0]
+contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
 # cv2.drawContours(image, contours,-1,(128,255,0),3)
 # print(contours)
 # Loop over contours to find the rectangles
 cntrrect = []
 cntrcircle = []
+cntrchannel = []
 for c in contours:
     peri = cv2.arcLength(c, True)
     approx = cv2.approxPolyDP(c, 0.02*peri, True)
@@ -44,13 +45,31 @@ for c in contours:
         cntrrect.append(approx)
 
 # DETECT CIRCLES (WELLS)
-circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT, 1.2, 100, param1=50, param2=30, minRadius=10, maxRadius=150)  
+circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2, 20, param1=150, param2=0.9, minRadius=10, maxRadius=0)  
 circles = np.around(circles).astype("int")
 for i in circles[0,:]:
     # draw the outer circle
     cv2.circle(image, (i[0],i[1]),i[2],(0,0,255),2)
     # draw the center of the circle
     cv2.circle(image, (i[0],i[1]),2,(0,0,255),3)
+
+output = cv2.connectedComponentsWithStats(bi, connectivity=8, ltype=cv2.CV_32S)
+(numLabels, labels, stats, centroids) = output
+# output = image.copy()
+# find height and width of all connected components
+for j in range(2, numLabels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
+    X = stats[j, cv2.CC_STAT_LEFT]
+    Y = stats[j, cv2.CC_STAT_TOP] 
+    W = stats[j, cv2.CC_STAT_WIDTH] 
+    H = stats[j, cv2.CC_STAT_HEIGHT]  
+    area2  = stats[j, cv2.CC_STAT_AREA]
+    (cX,cY) = centroids[j]
+    if W > 500:
+        cv2.circle(image, (int(cX), int(cY)), 4, (0,0,255), -1)
+        cv2.rectangle(image, (X,Y), (X+W, Y+H), (0,0,255), 3)
+        cntrchannel.append(centroids[j])
+
+
 
 # show image
 cv2.imshow('Frame', image)
