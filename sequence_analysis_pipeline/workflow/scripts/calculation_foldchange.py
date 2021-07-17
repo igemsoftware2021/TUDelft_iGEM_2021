@@ -1,4 +1,4 @@
-import sqlite3
+import numpy as np
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceCleanSequences
 import calc_helpers
@@ -61,23 +61,10 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
 # 2 - Find median value
 # sort the list with temporary fold change values
-fc_list.sort()
-
-print(len(fc_list))
-
-# take the median value
-length = int(len(fc_list))
-if (length % 2) == 0:  # even number of sequences
-    ind = int(length / 2)
-    median = (fc_list[ind] + fc_list[ind+1]) / 2
-
-else:
-    ind = int(round(length/2))
-    median = fc_list[ind]
-
+median_k = np.median(fc_list, overwrite_input=True)
 
 # 3 - Calculate new k with median fold-change value
-k_new = 1 / median
+k_new = 1 / median_k
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
     db.query(f"UPDATE {TABLE_NAME} SET k_factor={k_new}")

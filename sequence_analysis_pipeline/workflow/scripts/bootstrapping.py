@@ -2,31 +2,33 @@ import numpy as np
 import calc_helpers
 
 
-def bootstrap_cleavage_fraction_with_replacement(data, r_clvd_ref, r_unclvd_ref, num_samples=1000):
+# def bootstrap_cleavage_fraction_with_replacement(data, r_clvd_ref, r_unclvd_ref, num_samples=1000):
 
-    n = data.shape[0]
-    # Create a mask which indexes to bootstrap with replacement
-    random_mask = np.random.randint(0, high=n, size=(
-        num_samples, n), dtype=np.int32)    # high value is exclusive
+#     n = data.shape[0]
+#     # Create a mask which indexes to bootstrap with replacement
+#     random_mask = np.random.randint(0, high=n, size=(
+#         num_samples, n), dtype=np.int32)    # high value is exclusive
 
-    bootstrap_samples = data[random_mask]
-    # Get number of prefixes
-    r_clvd_s = np.count_nonzero(bootstrap_samples == 1, axis=1)
-    r_unclvd_s = np.count_nonzero(bootstrap_samples == 0, axis=1)
+#     bootstrap_samples = data[random_mask]
+#     # Get number of prefixes
+#     r_clvd_s = np.count_nonzero(bootstrap_samples == 1, axis=1)
+#     r_unclvd_s = np.count_nonzero(bootstrap_samples == 0, axis=1)
 
-    cs = calc_helpers.calc_cleavage_fraction(
-        r_clvd_s, r_clvd_ref, r_unclvd_s, r_unclvd_ref)
+#     print(r_clvd_s)
 
-    # Calculate estimated mean
-    cs_mean = np.mean(cs)
+#     cs = calc_helpers.calc_cleavage_fraction(
+#         r_clvd_s, r_clvd_ref, r_unclvd_s, r_unclvd_ref)
 
-    # Calculate standard deviation of the bootstrapped cleavage fractions
-    cs_sd = calc_helpers.calc_sample_standard_deviation(cs)
+#     # Calculate estimated mean
+#     cs_mean = np.mean(cs)
 
-    return cs, cs_mean, cs_sd
+#     # Calculate standard deviation of the bootstrapped cleavage fractions
+#     cs_sd = calc_helpers.calc_sample_standard_deviation(cs)
+
+#     return cs, cs_mean, cs_sd
 
 
-def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1) -> tuple:
+def bootstrap_fold_change_with_replacement(r_clvd_s_neg, r_unclvd_s_neg, r_clvd_s_pos, r_unclvd_s_pos, r_clvd_ref_neg, r_unclvd_ref_neg, r_clvd_ref_pos, r_unclvd_ref_pos, k=1, num_samples=1000) -> tuple:
     # TODO update doc string
     """
     Function does bootstrapping for cleavage fraction and fold change on the data.
@@ -51,20 +53,55 @@ def bootstrap_fold_change_with_replacement(cs_neg, cs_pos, k=1) -> tuple:
     fold_change_95_perc: (float) upper 95% limit for the fold change.\n
     """
 
-    if cs_neg.shape != cs_pos.shape:
-        raise ValueError(
-            "Shape of cs_neg is not the same as shape cs_pos, check if the function bootstrap_fold_change_with_replacement has the correct input values.")
+    # Create an array with all the read counts
+    # A number is linked to the following read:
+    # 0: r_clvd_s_neg
+    # 1: r_unclvd_s_neg
+    # 2: r_clvd_s_pos
+    # 3: r_unclvd_s_pos
+    sample_data = np.zeros(
+        r_clvd_s_neg + r_unclvd_s_neg + r_clvd_s_pos + r_unclvd_s_pos, dtype=np.int8)
+    # Fill the array with an amount of r_seq_clvd_neg ones.
+    sample_data[r_clvd_s_neg:(r_clvd_s_neg + r_unclvd_s_neg)] = 1
+    sample_data[(r_clvd_s_neg + r_unclvd_s_neg):(r_clvd_s_neg + r_unclvd_s_neg + r_clvd_s_pos)] = 2
+    sample_data[-r_unclvd_s_pos:] = 3
 
-    num_samples = cs_neg.shape[0]
+    n = sample_data.shape[0]
+    # Create a mask that has random idx to bootstrap with replacement
+    random_idx = np.random.randint(0, high=n, size=(
+        num_samples, n), dtype=np.int32)    # high value is exclusive
+
+    bootstrap_samples = sample_data[random_idx]
+
+    # Get read_counts for every prefix and condition
+    sample_r_clvd_s_neg = np.count_nonzero(bootstrap_samples == 0, axis=1)
+    sample_r_unclvd_s_neg = np.count_nonzero(bootstrap_samples == 1, axis=1)
+    sample_r_clvd_s_pos = np.count_nonzero(bootstrap_samples == 2, axis=1)
+    sample_r_unclvd_s_pos = np.count_nonzero(bootstrap_samples == 3, axis=1)
+
+    cs_neg = calc_helpers.calc_cleavage_fraction(
+        sample_r_clvd_s_neg, r_clvd_ref_neg, sample_r_unclvd_s_neg, r_unclvd_ref_neg)
+
+    # Calculate estimated mean
+    cs_neg_mean = np.mean(cs_neg)
+
+    # Calculate standard deviation of the bootstrapped cleavage fractions
+    cs_neg_se = calc_helpers.calc_sample_standard_deviation(cs_neg)
+
+    cs_pos = calc_helpers.calc_cleavage_fraction(
+        sample_r_clvd_s_pos, r_clvd_ref_pos, sample_r_unclvd_s_pos, r_unclvd_ref_pos)
+
+    # Calculate estimated mean
+    cs_pos_mean = np.mean(cs_pos)
+
+    # Calculate standard deviation of the bootstrapped cleavage fractions
+    cs_pos_se = calc_helpers.calc_sample_standard_deviation(cs_pos)
 
     fold_changes = calc_helpers.calc_fold_change(cs_pos, cs_neg, k=k)
 
     fold_change_mean = np.mean(fold_changes)
 
-    fold_change_sd = calc_helpers.calc_sample_standard_deviation(
+    fold_change_se = calc_helpers.calc_sample_standard_deviation(
         fold_changes)
 
-    # fold change standard error
-    fold_change_se = fold_change_sd / np.sqrt(num_samples)
-
-    return fold_change_mean, fold_change_sd, fold_change_se
+    return cs_neg_mean, cs_neg_se, cs_pos_mean, cs_pos_se, fold_changes, fold_change_mean, fold_change_se

@@ -246,9 +246,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     possible_sensor INTEGER,
                     k_factor REAL,
                     cleavage_fraction_estimated_mean REAL,
-                    cleavage_fraction_standard_deviation REAL,
+                    cleavage_fraction_standard_error REAL,
                     fold_change_estimated_mean REAL,
-                    fold_change_standard_deviation REAL,
                     fold_change_standard_error REAL
                     )""")
 

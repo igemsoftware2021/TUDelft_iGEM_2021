@@ -5,69 +5,114 @@ ligand_positive:
         cleaved:
             sequence: AGATCTTTTCCGTATATCTCGCCAG
             name: A
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         uncleaved:
             sequence: AGATGGGAAACAAACAAA
             name: W
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         other:
             sequence: AGATACAAAACAAAAC
             name: Z
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
     suffixes:
         cleaved:
             sequence: AAAAAGAAATT
-            name: X
+            name: XL
+            i_error: 1
+            d_error: 0
+            s_error: 1
             max_error: 1
         uncleaved:
             sequence: AAAAAGAAATT
-            name: X
+            name: XL
+            i_error: 1
+            d_error: 0
+            s_error: 1
             max_error: 1
 ligand_negative:
     prefixes:
         cleaved:
             sequence: CTTTTCCGTATATCTCGCCAG
             name: A
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         uncleaved:
             sequence: GGGAAACAAACAAA
             name: W
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         other:
             sequence: ACAAAACAAAAC
             name: Z
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
     suffixes:
         cleaved:
             sequence: AAAAAGAAAT
-            name: X
+            name: XN
+            i_error: 1
+            d_error: 0
+            s_error: 1
             max_error: 1
         uncleaved:
             sequence: AAAAAGAAAT
-            name: X
+            name: XN
+            i_error: 1
+            d_error: 0
+            s_error: 1
             max_error: 1
 references:
     prefixes:
         cleaved:
             sequence: CTTTTCCGTATATCTCGCCAG
             name: A
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         uncleaved:
             sequence: GGGAAACAAACAAA
             name: W
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         other:
             sequence: ACAAAACAAAAC
             name: Z
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
     suffixes:
         cleaved:
             sequence: AAAAAGAAAT
             name: X
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
         uncleaved:
             sequence: AAAAAGAAAT
             name: X
+            i_error: 1
+            d_error: 1
+            s_error: 1
             max_error: 1
 info_patterns:
     driver_round: "(?<=D)([0-9]+)"

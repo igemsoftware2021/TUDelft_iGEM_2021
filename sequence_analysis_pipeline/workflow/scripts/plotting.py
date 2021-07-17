@@ -16,14 +16,14 @@ print(sequences_info[0])
 
 fold_change_array = np.array(
     [sequence_info[1] for sequence_info in uniq_sequences_info], dtype=np.float64)
-fold_change_se_array = np.array(
+fold_change_sd_array = np.array(
     [sequence_info[2] for sequence_info in uniq_sequences_info], dtype=np.float64)
 
-min_se = np.amin(fold_change_se_array)
+min_se = np.amin(fold_change_sd_array)
 
 print(min_se)
 
-fold_change_se_array_updated = fold_change_se_array
+fold_change_se_array_updated = fold_change_sd_array
 print(fold_change_se_array_updated)
 
 fig, ax = plt.subplots()

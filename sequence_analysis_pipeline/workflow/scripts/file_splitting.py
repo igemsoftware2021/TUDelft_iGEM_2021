@@ -12,20 +12,30 @@ config_file_path = Path(__file__).resolve(
 
 ligand_pos_prefix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
     config_file_path, pattern="prefix", ligand_present=True)
+ligand_pos_suffix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
+    config_file_path, pattern="suffix", ligand_present=True)
+
 ligand_neg_prefix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
     config_file_path, pattern="prefix", ligand_present=False)
+ligand_neg_suffix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
+    config_file_path, pattern="suffix", ligand_present=False)
 
 with open(seq_input_file, 'r') as rf:
     lines = rf.readlines()
     with open(seq_pos_ligand_file, "w") as pf, open(seq_neg_ligand_file, "w") as nf:
         for line in tqdm(lines):
             read_count, sequence = line.strip().split()
-            pattern_seq, pattern_name, mutated_pattern = seq_helpers.determine_pattern(
+            prefix_seq, pattern_name_prefix = seq_helpers.determine_pattern(
                 sequence, ligand_pos_prefix_patterns)
-            if pattern_name is not None:
+            suffix_seq, pattern_name_suffix = seq_helpers.determine_pattern(
+                sequence, ligand_pos_suffix_patterns)
+
+            if pattern_name_prefix is not None and pattern_name_suffix is not None:
                 pf.write(read_count + " " + sequence + "\n")
             else:
-                pattern_seq, pattern_name, mutated_pattern = seq_helpers.determine_pattern(
+                prefix_seq, pattern_name_prefix = seq_helpers.determine_pattern(
                     sequence, ligand_neg_prefix_patterns)
-                if pattern_name is not None:
+                suffix_seq, pattern_name_suffix = seq_helpers.determine_pattern(
+                    sequence, ligand_neg_suffix_patterns)
+                if pattern_name_prefix is not None and pattern_name_suffix is not None:
                     nf.write(read_count + " " + sequence + "\n")

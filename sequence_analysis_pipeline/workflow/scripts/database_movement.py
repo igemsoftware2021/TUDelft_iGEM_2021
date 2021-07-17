@@ -58,15 +58,15 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         for rowid in rowids:
             total_read_count += id_read_count_dict[rowid]
 
-            # Retrieve the sequence info of a certain sequence
-            sequence_info = db.query(
-                f"SELECT * FROM raw_sequences WHERE id={rowids[0]}", fetchall=True)
+        # Retrieve the sequence info of a certain sequence
+        sequence_info = db.query(
+            f"SELECT * FROM raw_sequences WHERE id={rowids[0]}", fetchall=True)
 
-            clean_sequence_info = {"read_count": total_read_count, "cleaned_sequence": sequence_info[0][3], "cleaved_prefix": sequence_info[0][5], "selection": sequence_info[0][8], "ligand_present": sequence_info[0][10],
-                                   "prefix_name": sequence_info[0][6], "reference_name": sequence_info[0][7], "driver_round": sequence_info[0][9]}
+        clean_sequence_info = {"read_count": total_read_count, "cleaned_sequence": sequence_info[0][3], "cleaved_prefix": sequence_info[0][5], "selection": sequence_info[0][8], "ligand_present": sequence_info[0][10],
+                               "prefix_name": sequence_info[0][6], "reference_name": sequence_info[0][7], "driver_round": sequence_info[0][9]}
 
-            # insert the information into the new table
-            db.insert_movement_sequence_info(TABLE_NAME, clean_sequence_info)
+        # insert the information into the new table
+        db.insert_movement_sequence_info(TABLE_NAME, clean_sequence_info)
 
 
 # OLD: this did work but it only accomplished a speed of 6 sequences a second, which is waaaay too slow.

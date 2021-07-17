@@ -75,9 +75,12 @@ def retrieve_compiled_patterns(yaml_file: str, pattern: str = "prefix", ligand_p
             for cleave_state in cleave_states:
                 sequence = yaml_info[ligand_key][pattern_key][cleave_state]["sequence"]
                 sequence_name = yaml_info[ligand_key][pattern_key][cleave_state]["name"]
+                i_error = yaml_info[ligand_key][pattern_key][cleave_state]["i_error"]
+                d_error = yaml_info[ligand_key][pattern_key][cleave_state]["d_error"]
+                s_error = yaml_info[ligand_key][pattern_key][cleave_state]["s_error"]
                 max_error = yaml_info[ligand_key][pattern_key][cleave_state]["max_error"]
                 compiled_patterns[regex.compile(
-                    fr"(?e)({sequence}){{e<={max_error}}}")] = sequence_name
+                    fr"(?e)({sequence}){{i<={i_error},d<={d_error},s<={s_error},e<={max_error}}}")] = sequence_name
 
         except yaml.YAMLError as exc:
             print(exc)
