@@ -89,30 +89,30 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         k_factor = rowid_k_factor_dict[rowid_seq_clvd_pos]
 
         # Now determine the fold change things
-        cs_neg_mean, cs_neg_sd, cs_pos_mean, cs_pos_sd, fold_changes, fold_change_mean, fold_change_se = bootstrapping.bootstrap_fold_change_with_replacement(
+        cs_neg_mean, cs_neg_se, cs_pos_mean, cs_pos_se, fold_changes, fold_change_mean, fold_change_se = bootstrapping.bootstrap_fold_change_with_replacement(
             r_seq_clvd_neg, r_seq_unclvd_neg, r_seq_clvd_pos, r_seq_unclvd_pos, r_ref_clvd_neg, r_ref_unclvd_neg, r_ref_clvd_pos, r_ref_unclvd_pos, k=k_factor, num_samples=1000)
 
         # Update the sequence info in the database for condition ligand not present
         db.update_column_value(
             TABLE_NAME, rowid_seq_unclvd_neg, "cleavage_fraction_estimated_mean", cs_neg_mean)
         db.update_column_value(
-            TABLE_NAME, rowid_seq_unclvd_neg, "cleavage_fraction_standard_deviation", cs_neg_sd)
+            TABLE_NAME, rowid_seq_unclvd_neg, "cleavage_fraction_standard_error", cs_neg_se)
 
         db.update_column_value(
             TABLE_NAME, rowid_seq_clvd_neg, "cleavage_fraction_estimated_mean", cs_neg_mean)
         db.update_column_value(
-            TABLE_NAME, rowid_seq_clvd_neg, "cleavage_fraction_standard_deviation", cs_neg_sd)
+            TABLE_NAME, rowid_seq_clvd_neg, "cleavage_fraction_standard_error", cs_neg_se)
 
         # Update the sequence info in the database for condition ligand present
         db.update_column_value(
             TABLE_NAME, rowid_seq_unclvd_pos, "cleavage_fraction_estimated_mean", cs_pos_mean)
         db.update_column_value(
-            TABLE_NAME, rowid_seq_unclvd_pos, "cleavage_fraction_standard_deviation", cs_pos_sd)
+            TABLE_NAME, rowid_seq_unclvd_pos, "cleavage_fraction_standard_error", cs_pos_se)
 
         db.update_column_value(
             TABLE_NAME, rowid_seq_clvd_pos, "cleavage_fraction_estimated_mean", cs_pos_mean)
         db.update_column_value(
-            TABLE_NAME, rowid_seq_clvd_pos, "cleavage_fraction_standard_deviation", cs_pos_sd)
+            TABLE_NAME, rowid_seq_clvd_pos, "cleavage_fraction_standard_error", cs_pos_se)
 
         # First update for ligand condition not present
         db.update_column_value(
