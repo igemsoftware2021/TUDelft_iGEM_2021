@@ -27,12 +27,12 @@ deg_tlr = 7.5*10**-5
 parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                        k_tlr, k_m, deg_mrna, deg_tlr])  # Array containing above parameters
 
-t_tot = 3600  # total time [s]
+t_tot = 3 * 3600  # total time [s]
 dt = 0.01  # timestep [s]
 
 # Initial concentrations
 dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
-s_i = 1   # Initial substrate concentration
+s_i = 1000   # Initial substrate concentration [μM]
 # Array containing above constants
 initial_conditions = np.array([dna_i, s_i])
 

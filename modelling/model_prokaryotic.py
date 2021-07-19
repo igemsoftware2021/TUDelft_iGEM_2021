@@ -32,13 +32,13 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
 t_tot = 3600  # total time [s]
 dt = 0.01  # timestep [s]
 
-t_tot = 3600  # total time [s]
+t_tot = 7200  # total time [s]
 dt = 0.01  # timestep [s]
 
 # Initial concentrations
 dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
-s_i = 1   # Initial substrate concentration
-vit_i = 50*10**-3  # Initial vitamin concentration [μM]
+s_i = 250   # Initial substrate concentration [μM]
+vit_i = 50*10**-3  # 0**-3  # Initial vitamin concentration [μM]
 # Array containing above constants
 initial_conditions = np.array([dna_i, s_i, vit_i])
 
@@ -57,9 +57,10 @@ constants = np.array([h, eps_cprg, eps_cpr])
 
 # Create parameter dictionairy
 parameter_names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-                           "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "vit_i", "dna_i"]
+                           "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "vit_i", "dna_i", "s_i"]
 parameters = np.append(parameters, vit_i)
 parameters = np.append(parameters, dna_i)
+parameters = np.append(parameters, s_i)
 
 # Create the figure and the line
 fig, ax = plt.subplots()
@@ -229,6 +230,14 @@ def update_dna_i(val):
     fig.canvas.draw_idle()
 
 
+def update_s_i(val):
+    initial_conditions[1] = parameter_sliders[16].val
+    time, data = model_prokaryotic(parameters,
+                                   constants, initial_conditions, dt=dt, t_tot=t_tot)
+    line.set_ydata(data)
+    fig.canvas.draw_idle()
+
+
 # register the update function with each slider
 
 parameter_sliders[0].on_changed(update_k_ts)
@@ -247,5 +256,6 @@ parameter_sliders[12].on_changed(update_k_off)
 parameter_sliders[13].on_changed(update_k_c)
 parameter_sliders[14].on_changed(update_vit_i)
 parameter_sliders[15].on_changed(update_dna_i)
+parameter_sliders[16].on_changed(update_s_i)
 
 plt.show()

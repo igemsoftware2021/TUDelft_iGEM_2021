@@ -86,11 +86,11 @@ constants = np.array([h, eps_cprg, eps_cpr])
 
 # Initial concentrations
 dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
-s_i = 1   # Initial substrate concentration
+s_i = 1000  # Initial substrate concentration
 initial_conditions = np.array([dna_i, s_i])
 
 # Defining timescale of the model
-t_tot = 3600  # Total time [s]
+t_tot = 3 * 3600  # Total time [s]
 dt = 0.01  # Timestep [s]
 
 # Doing Morris sensitivity analysis
@@ -99,4 +99,4 @@ dt = 0.01  # Timestep [s]
 
 # Saving the data
 morris_datawriter(no_aptamer_prokaryotic_problem, "modelling\data\morris_no_aptamer",
-                  "4", time, mu, mu_star, sigma, mu_star_conf_level)
+                  "6", time, mu, mu_star, sigma, mu_star_conf_level)
