@@ -10,17 +10,14 @@ def create_sample_and_probabilities(id_read_count: dict):
         total += value
 
     # The ids in the database start at 1
-    sample = np.arange(1, len(dict.keys()), dtype=np.int32)
-    probabilities = np.zeros(len(dict.keys()), dtype=np.float64)
+    sample = np.zeros(len(id_read_count.keys()), dtype=np.int32)
+    probabilities = np.zeros(len(id_read_count.keys()), dtype=np.float64)
 
     i = 0
     for key, value in id_read_count.items():
-        if key == i+1:
-            probabilities[i] = value/total
-        else:
-            raise ValueError(
-                "Check ids in the database, something is going wrong. key should be equal to i+1")
-
+        sample[i] = key
+        probabilities[i] = value/total
+        i += 1
     return sample, probabilities
 
 
@@ -105,7 +102,7 @@ sample, probabilities = create_sample_and_probabilities(rowid_read_count_dict)
 
 for i in tqdm(range(NUM_SAMPLES)):
     bootstrap_sample = np.random.choice(
-        sample, size=total_read_counts, dtype=np.int32)
+        sample, size=total_read_counts, replace=True, p=probabilities)
 
     unique, counts = np.unique(bootstrap_sample, return_counts=True)
     seq_counts = dict(zip(unique, counts))
@@ -159,7 +156,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         rowid_seq_unclvd_pos = info_seq_rowid_dict[(sequence, 0, 1)]
         rowid_seq_clvd_pos = info_seq_rowid_dict[(sequence, 1, 1)]
 
-        cs_neg = cleavage_fractions_dict[(sequence, 0)]
+        cs_neg = np.array(cleavage_fractions_dict[(sequence, 0)])
 
         # Calculate estimated mean
         cs_neg_mean = np.mean(cs_neg)
@@ -167,7 +164,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         # Calculate standard deviation of the bootstrapped cleavage fractions
         cs_neg_se = calc_helpers.calc_sample_standard_deviation(cs_neg)
 
-        cs_pos = cleavage_fractions_dict[(sequence, 1)]
+        cs_pos = np.array(cleavage_fractions_dict[(sequence, 1)])
 
         # Calculate estimated mean
         cs_pos_mean = np.mean(cs_pos)
@@ -175,7 +172,7 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
         # Calculate standard deviation of the bootstrapped cleavage fractions
         cs_pos_se = calc_helpers.calc_sample_standard_deviation(cs_pos)
 
-        fold_changes = fold_changes_dict[sequence]
+        fold_changes = np.array(fold_changes_dict[sequence])
 
         fold_change_mean = np.mean(fold_changes)
 

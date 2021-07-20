@@ -11,7 +11,7 @@ def calc_sample_standard_deviation(samples):
     n = samples.shape[0]
     sample_mean = np.mean(samples)
     sample_standard_deviation = np.sqrt(
-        np.sum((samples - sample_mean)**2)/(n-1))
+        np.sum(((samples - sample_mean)**2))/(n-1))
     return sample_standard_deviation
 
 

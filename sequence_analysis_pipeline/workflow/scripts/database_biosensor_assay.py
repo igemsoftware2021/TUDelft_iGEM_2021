@@ -2,8 +2,8 @@
 import scipy.stats
 from database_interface import DatabaseInterfaceCleanSequences
 
-# database_path = "./results/databases/T1_D80_database.db"
-database_path = snakemake.input[0]
+database_path = "./results/databases/T1_D80_database.db"
+# database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 
@@ -25,9 +25,9 @@ for sequence_info in uniq_sequences_info:
         seq_fold_change_se = sequence_info[2]
         z_score = (seq_fold_change - expected_fold_change) / seq_fold_change_se
         p_value = scipy.stats.norm.sf(abs(z_score))  # one-sided
+        count += 1
+        print(sequence_info[0], seq_fold_change, p_value)
+        # if p_value < alpha:
         # count += 1
         # print(sequence_info[0], seq_fold_change, p_value)
-        if p_value < alpha:
-            count += 1
-            print(sequence_info[0], seq_fold_change, p_value)
 print(count)
