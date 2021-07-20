@@ -136,7 +136,7 @@ rule database_bootstrapping:
     conda:
         "envs/database.yaml"
     script:
-        "scripts/database_bootstrapping.py"
+        "scripts/database_bootstrapping_v2.py"
 
 rule database_biosensor_assay:
     input:
