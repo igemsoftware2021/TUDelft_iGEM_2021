@@ -9,7 +9,7 @@ Questions to: igem@tudelft.nl
 Download VirtualBox and install a Linux virtual machine. The pipeline was created and tested on __Ubuntu 20.04__.
 Step by step instructions for the installation of the VirtualBox and Ubuntu: https://itsfoss.com/install-linux-in-virtualbox/.
 
-Now follow the steps for __Linux/MacOS__ in the VirtualBox.
+Once you have installed the Linux virtual machine follow the steps for __Linux/MacOS__ in the VirtualBox.
 
 ### Linux/MacOS
 The pipeline was created and tested on __Ubuntu 20.04__. Here are the steps one need to take:
@@ -40,10 +40,24 @@ Configure the workflow to your needs by editing the `config.yaml` and the sample
 
 ### Run the software
 1. Open the `sequence_analysis_pipeline` folder.
-2. Open the terminal, write
+2. Activate your conda snakemake environment via
 ```
 conda activate *yoursnakemake_environmentname*
-``` and press return.
+```
+Test your configuration by performing a dry run via
+```
+snakemake -n
+```
+_Optional_: The first time you will run the pipeline it is smart to create the needed conda environments beforehand. Let snakemake create the needed environments via
+```
+snakemake --cores 1 --use-conda --conda-create-envs-only
+```
+Execute the workflow locally via
+```
+snakemake --cores $N --use-conda
+```
+using $N cores.
+
 3. Before we can run the pipeline, snakemake needs to create the needed conda environments. To do this run the following command in the terminal: `snakemake --cores 1 --use-conda --conda-create-envs-only`. Now wait for the environments to be downloaded.
 4. Now run the pipeline by using the following command `snakemake --cores $N --use-conda`, where __N__ is the number of cores you let the pipeline use.
 
