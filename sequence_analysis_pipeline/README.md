@@ -41,7 +41,9 @@ Configure the workflow to your needs by editing the `config.yaml` and the sample
 ### Run the software
 1. Open the `sequence_analysis_pipeline` folder.
 2. Open the terminal, write
-```conda activate *yoursnakemake_environmentname*``` and press return.
+```
+conda activate *yoursnakemake_environmentname*
+``` and press return.
 3. Before we can run the pipeline, snakemake needs to create the needed conda environments. To do this run the following command in the terminal: `snakemake --cores 1 --use-conda --conda-create-envs-only`. Now wait for the environments to be downloaded.
 4. Now run the pipeline by using the following command `snakemake --cores $N --use-conda`, where __N__ is the number of cores you let the pipeline use.
 
