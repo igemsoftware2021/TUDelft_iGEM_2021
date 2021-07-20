@@ -115,6 +115,6 @@ references:
             s_error: 1
             max_error: 1
 info_patterns:
-    driver_round: "(?<=D)([0-9]+)"
     selection: "(T[0-9]+)"
+    driver_round: "(?<=D)([0-9]+)"
     ligand_present: "(?<=L)([0-1]+)"

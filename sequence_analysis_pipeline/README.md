@@ -21,7 +21,11 @@ The pipeline was created and tested on __Ubuntu 20.04__. Here are the steps one 
 4. Now follow the installation steps from snakemake, make sure to do the __full__ installation. The link to the installation steps: https://snakemake.readthedocs.io/en/stable/getting_started/installation.html.
 5. Congratulations you now have succesfully installed snakemake! We recommand that you follow the short snakemake tutorial on the site of snakemake. This will help you understand how snakemake works and how our pipeline is built. Here is the link to the tutorial: https://snakemake.readthedocs.io/en/stable/tutorial/tutorial.html.
 
-## Running the pipeline
+## Usage
+### Step 1: Install workflow
+If you simply want to use this workflow, download and extract the latest release. If you intend to modify and further develop this workflow, fork this repository.
+### Step 2: Configure the workflow
+Configure the workflow to your needs by editing the `config.yaml` and the sample 
 
 ### Prepare the data
 1. Create a folder called `NGS` in the `data` folder in the `sequence_analysis_pipeline` folder.
@@ -36,9 +40,10 @@ The pipeline was created and tested on __Ubuntu 20.04__. Here are the steps one 
 
 ### Run the software
 1. Open the `sequence_analysis_pipeline` folder.
-2. Open the terminal, write `conda activate *yoursnakemake_environmentname*` and press return.
+2. Open the terminal, write
+```conda activate *yoursnakemake_environmentname*``` and press return.
 3. Before we can run the pipeline, snakemake needs to create the needed conda environments. To do this run the following command in the terminal: `snakemake --cores 1 --use-conda --conda-create-envs-only`. Now wait for the environments to be downloaded.
-4. Now run the pipeline by using the following command `snakemake --cores N --use-conda`, where __N__ is the number of cores you let the pipeline use.
+4. Now run the pipeline by using the following command `snakemake --cores $N --use-conda`, where __N__ is the number of cores you let the pipeline use.
 
 ## References
 # TODO tell something about how we used these papers
