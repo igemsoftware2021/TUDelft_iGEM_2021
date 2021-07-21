@@ -46,21 +46,22 @@ for c in contours:
         cntrrect.append(approx)
 
 # DETECT CIRCLES (WELLS)
-# circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2, 20, param1=150, param2=0.9, minRadius=10, maxRadius=0)  
-# circles = np.around(circles).astype("int")
-# for i in circles[0,:]:
-#     # draw the outer circle
-#     cv2.circle(image, (i[0],i[1]),i[2],(0,0,255),2)
-#     # draw the center of the circle
-#     cv2.circle(image, (i[0],i[1]),2,(0,0,255),3)
+circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2, 5, param1=150, param2=0.9, minRadius=10, maxRadius=0)  
+circles = np.around(circles).astype("int")
+for i in circles[0,:]:
+    # draw the outer circle
+    cv2.circle(image, (i[0],i[1]),i[2],(0,0,255),2)
+    # draw the center of the circle
+    cv2.circle(image, (i[0],i[1]),2,(0,0,255),3)
 
 output = cv2.connectedComponentsWithStats(bi, connectivity=8, ltype=cv2.CV_32S)
-(numLabels, labels, stats, centroids) = output
+(num_labels, labels, stats, centroids) = output
 # output = image.copy()
 # find height and width of all connected components
 cntrmidleft = []
 cntrmidright = []
-for j in range(2, numLabels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
+label_store = []
+for j in range(2, num_labels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
     X = stats[j, cv2.CC_STAT_LEFT]
     Y = stats[j, cv2.CC_STAT_TOP] 
     W = stats[j, cv2.CC_STAT_WIDTH] 
@@ -76,8 +77,9 @@ for j in range(2, numLabels): # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
         Ymid = Y + H/2
         cntrmidleft.append((X,int(Ymid)))
         cntrmidright.append(((X+W),int(Ymid)))
+        label_store.append(j)
 
-
+print(label_store)
 for k in range(0, len(cntrchannel)):
     left = cv2.line(image, cntrmidleft[k], cntrchannel[k], (255, 0, 0), 2)
     right = cv2.line(image, cntrmidright[k], cntrchannel[k], (255, 0, 0), 2)
@@ -86,10 +88,10 @@ for k in range(0, len(cntrchannel)):
     # bileft = cv2.line(bi, cntrmidleft[k], cntrchannel[k], (255, 0, 0), 2)
     # biright = cv2.line(bi, cntrmidright[k], cntrchannel[k], (255, 0, 0), 2)
 colorcodes = []
-for v in left.shape:
+# for v in left.shape:
 
-    if bi[left[0:1][v],0] == 255:
-        colorcodes.append[(left[0:1][v])]
+#     if bi[left[0:1][v],0] == 255:
+#         colorcodes.append[(left[0:1][v])]
 
 
 
