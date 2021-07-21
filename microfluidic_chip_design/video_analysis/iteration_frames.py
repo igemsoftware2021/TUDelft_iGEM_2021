@@ -1,5 +1,7 @@
 import cv2
 import numpy as np
+import matplotlib.pyplot as plt
+
 
 # define video file name
 filename = './microfluidic_chip_design/video_analysis/rechte_wells.MOV'
@@ -74,7 +76,7 @@ for j in range(2, num_labels):  # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROU
     if W > 500:
         cv2.circle(image, (int(cX), int(cY)), 4, (0, 0, 255), -1)
         cv2.rectangle(image, (X, Y), (X+W, Y+H), (0, 0, 255), 3)
-        #rect = cv2.minAreaRect()
+        # rect = cv2.minAreaRect()
         cntrchannel.append((int(cX), int(cY)))
         cntrwell.append((X, Y))
         Ymid = Y + H/2
@@ -134,8 +136,9 @@ def angle_between(v1, v2):
 
 
 label_switch_point_dict = {}
+# label_angles_dict = {}
 # Vector range to create vectors
-vec_range = 11
+vec_range = 7
 
 # Now check where the circles are
 for label in label_store:
@@ -145,6 +148,9 @@ for label in label_store:
 
     # Create an array and fill it with the value False
     switch_point = np.full(contour.shape[0], False, dtype=bool)
+
+    # Create an array to store the angle values
+    angles = np.zeros(contour.shape[0], dtype=np.float32)
 
     # Start with vec_range, because you want to start at the first value from contour
     for i in range(vec_range, contour.shape[0]+vec_range):
@@ -165,15 +171,32 @@ for label in label_store:
 
         angle = angle_between(vector_1, vector_2) * (180.0/np.pi)
 
-        if angle < 160:
+        # angles[i-vec_range] = angle
+
+        if angle < 170:
             switch_point[i-vec_range] = True
 
     label_switch_point_dict[label] = switch_point
+    # label_angles_dict[label] = angles
 
 
 for label in label_store:
     contour = label_contour_dict[label]
     switch_point = label_switch_point_dict[label]
+
+    for i in range(contour.shape[0]):
+        # switch_point contains only True and False, so if True
+        if switch_point[i]:
+            x, y = contour[i][0]
+            cimage[y, x] = [0, 0, 255]
+
+
+# Improve the contours go over every contour with switch point and if there is a switch point
+for label in label_store:
+    contour = label_contour_dict[label]
+    switch_point = label_switch_point_dict[label]
+
+    switch_point_filtered = np.full(switch_point.shape[0], False, dtype=bool)
 
     for i in range(contour.shape[0]):
         # switch_point contains only True and False, so if True
@@ -222,3 +245,11 @@ if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
 #     _, bi2 = cv2.threshold(blur2, 120, 255, cv2.THRESH_BINARY)
 
 #     bi2[left, 0]
+
+# fig, ax = plt.subplots()
+# for label in label_store:
+#     angles = label_angles_dict[label]
+#     ax.scatter(np.full(angles.shape[0], label, dtype=np.int32), angles)
+
+# fig.show()
+# plt.show()
