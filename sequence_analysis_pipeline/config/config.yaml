@@ -16,13 +16,6 @@ ligand_positive:
             d_error: 1
             s_error: 1
             max_error: 1
-        other:
-            sequence: AGATACAAAACAAAAC
-            name: Z
-            i_error: 1
-            d_error: 1
-            s_error: 1
-            max_error: 1
     suffixes:
         cleaved:
             sequence: AAAAAGAAATT
@@ -54,13 +47,6 @@ ligand_negative:
             d_error: 1
             s_error: 1
             max_error: 1
-        other:
-            sequence: ACAAAACAAAAC
-            name: Z
-            i_error: 1
-            d_error: 1
-            s_error: 1
-            max_error: 1
     suffixes:
         cleaved:
             sequence: AAAAAGAAAT
@@ -88,13 +74,6 @@ references:
         uncleaved:
             sequence: GGGAAACAAACAAA
             name: W
-            i_error: 1
-            d_error: 1
-            s_error: 1
-            max_error: 1
-        other:
-            sequence: ACAAAACAAAAC
-            name: Z
             i_error: 1
             d_error: 1
             s_error: 1
