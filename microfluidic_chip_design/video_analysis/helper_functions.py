@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 
+
 def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500):
     """
     Paramaters
@@ -18,13 +19,14 @@ def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=1
     # turn RGB(?) image grey
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
-    # blur the gray image 
+    # blur the gray image
     blur = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
 
     # create binary image
-    _, bi = cv2.threshold(blur, threshold_min, threshold_max, cv2.THRESH_BINARY)
-    
-    # find contours in image 
+    _, bi = cv2.threshold(blur, threshold_min,
+                          threshold_max, cv2.THRESH_BINARY)
+
+    # find contours in image
     contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
 
     # create empty list for storing the contours
@@ -42,8 +44,8 @@ def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=1
         if len(approx) == 4 and ar >= 0.95 and ar <= 1.05 and area > min_area:
             cv2.drawContours(image, c, -1, (0, 255, 0), 2)
             reccontour.append(c)
-    
-    #calculate the perimeter of the 4 detected squares and divide by 4 to obtain the width
+
+    # calculate the perimeter of the 4 detected squares and divide by 4 to obtain the width
     width_square = np.zeros(len(reccontour))
     for i in range(len(reccontour)):
         square = reccontour[i]
@@ -52,13 +54,42 @@ def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=1
 
     # Calculate the average width and the conversion factor, multiply pixel distance by conversion facctor
     # to obtain the length in mm
-    width_av = np.mean(width_square) #pixel
-    conversion_factor = length_squares / width_av #mm/pixel
+    width_av = np.mean(width_square)  # pixel
+    conversion_factor = length_squares / width_av  # mm/pixel
 
     return conversion_factor
 
 
-def find_connected_components_contours(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300):
+def update_labels(labels, label_store, label_contour_dict):
+    """
+    Function that updates the labels array and the label store function,
+    labels could now be [30,31,32,33,60,61,62,63].
+    After the function it will be [1,2,3,4,5,6,7,8]
+
+    """
+
+    labels_updated = np.zeros(labels.shape, dtype=np.int16)
+    label_store_updated = []
+    label_contour_dict_updated = {}
+
+    new_label = 1
+    for label in label_store:
+        # Create a mask for the image
+        mask_label = (labels == label)
+        # Update the labels array
+        labels_updated[mask_label] = new_label
+
+        label_store_updated.append(new_label)
+
+        contour = label_contour_dict.get(label)
+        label_contour_dict_updated[new_label] = contour
+
+        new_label += 1
+
+    return labels_updated, label_store_updated, label_contour_dict_updated
+
+
+def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300):
     """
     Paramaters
     ----------
@@ -115,34 +146,8 @@ def find_connected_components_contours(image, kernel_size=3, threshold_min=120, 
 
         label_contour_dict[label] = contours[0]
 
-    return labels, label_store, label_contour_dict
-
-
-def update_labels(labels, label_store, label_contour_dict):
-    """
-    Function that updates the labels array and the label store function,
-    labels could now be [30,31,32,33,60,61,62,63].
-    After the function it will be [1,2,3,4,5,6,7,8]
-
-    """
-
-    labels_updated = np.zeros(labels.shape, dtype=np.int16)
-    label_store_updated = []
-    label_contour_dict_updated = {}
-
-    new_label = 1
-    for label in label_store:
-        # Create a mask for the image
-        mask_label = (labels == label)
-        # Update the labels array
-        labels_updated[mask_label] = new_label
-
-        label_store_updated.append(new_label)
-
-        contour = label_contour_dict.get(label)
-        label_contour_dict_updated[new_label] = contour
-
-        new_label += 1
+    labels_updated, label_store_updated, label_contour_dict_updated = update_labels(
+        labels, label_store, label_contour_dict)
 
     return labels_updated, label_store_updated, label_contour_dict_updated
 
@@ -168,17 +173,7 @@ def angle_between(v1, v2):
 
 
 def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300, vector_range=10, max_angle=170):
-    # turn RGB into gray image
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
-
-    # Blur the gray image
-    gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
-
-    # create binary image of the blurred image
-    _, binary = cv2.threshold(
-        gray, threshold_min, threshold_max, cv2.THRESH_BINARY)
-
-    labels, label_store, label_contour_dict = find_connected_components_contours(
+    labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
         image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
     # Dictionary where the key is the label number and the value is the array filled
@@ -186,7 +181,7 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
     label_switch_point_dict = {}
 
     # Now check where the circles are
-    for label in label_store:
+    for label in label_contour_dict.keys():
         contour = label_contour_dict[label]
         contour_adapted = np.concatenate(
             (contour[-vector_range:, :, :], contour, contour[:vector_range, :, :]), axis=0)
@@ -237,3 +232,26 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
                                param1=100, param2=30, minRadius=15, maxRadius=500)
 
     return circles
+
+
+def determine_channels(image):
+
+    # Structure:
+    # {label #num: {channel #num: line_array, 2: line_array, 3: line_array, ...}, label #num: {...}}
+    #
+    #
+
+    circles = circle_finder(image)
+
+    circles_pos = [(x, y) for x, y, r in circles[0, :]]
+    # Set of all circle positions
+    circles_pos_set = set(circles_pos)
+
+    different_labels = np.unique(labels)
+
+    for label in different_labels:
+        # Retrieve the indeces of
+        # labels where labels == label
+        label_indices = (labels == label).nonzero()
+
+        # Check if label indices contain a subset of the circle positions

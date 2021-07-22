@@ -26,9 +26,8 @@ for i in circles[0, :]:
     # draw the center of the circle
     cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 1)
 
-for circle in circles[0, :]:
 
-    # show image
+# show image
 cv2.imshow('Frame', image)
 if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
     cv2.destroyAllWindows()
