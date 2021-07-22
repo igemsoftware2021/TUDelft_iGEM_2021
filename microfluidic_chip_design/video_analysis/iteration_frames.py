@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 
 # define video file name
@@ -33,6 +33,7 @@ contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
 # print(contours)
 # Loop over contours to find the rectangles
 cntrrect = []
+reccontour = []
 cntrcircle = []
 cntrchannel = []
 cntrwell = []
@@ -48,6 +49,20 @@ for c in contours:
     if len(approx) == 4 and ar >= 0.95 and ar <= 1.05 and area > 500:
         cv2.drawContours(image, c, -1, (0, 255, 0), 2)
         cntrrect.append(approx)
+        reccontour.append(c)
+
+#calculate the perimeter of the 4 detected squares and divide by 4 to obtain the width
+width_square = np.zeros(len(reccontour))
+for i in range(len(reccontour)):
+    square = reccontour[i]
+    peri_i = cv2.arcLength(square, True)
+    width_square[i] = peri_i / 4
+
+# Calculate the average width and the conversion factor, multiply pixel distance by conversion facctor
+# to obtain the length in mm
+width_av = np.mean(width_square) #pixel
+LENGTH_SQUARES = 3.5             #mm
+conversion_factor = LENGTH_SQUARES / width_av #mm/pixel
 
 print(type(bi))
 
@@ -215,38 +230,6 @@ for i in circles[0, :]:
     # draw the center of the circle
     cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 1)
 
-
-# Go over contour and determine distance between points opposite to each other
-# First go over all the columns, then go over all the rows
-for label in label_store:
-    contour = label_contour_dict[label]
-    switch_point = label_switch_point_dict[label]
-
-    # Dictionary where key value is column number (x) and value is
-    # a list of row values of the switch points (y)
-    column_row_dict = {}
-    # Opposite of column_row_dict
-    row_column_dict = {}
-
-    for i in range(contour.shape[0]):
-        x, y = contour[i][0]
-        # Update the column_row_dict
-        temp_list = column_row_dict.get(x, [])
-        temp_list.append(y)
-        column_row_dict[x] = temp_list
-
-        # Update the row_column_dict
-        temp_list = row_column_dict.get(y, [])
-        temp_list.append(x)
-        column_row_dict[y] = temp_list
-
-    min_distance = 100000
-    for key, value in column_row_dict.items():
-        # Only calculate distance if there are 2 points in a column
-        if len(value) == 2:
-            distance = abs(value[1] - value[0])
-            if distance < min_distance:
-                pass
 
 
 # show image
