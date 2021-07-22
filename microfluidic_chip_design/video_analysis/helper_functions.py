@@ -1,6 +1,62 @@
 import cv2
 import numpy as np
 
+def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500):
+    """
+    Paramaters
+    ----------
+    image: ....
+    length_squares (float): real size in mm of the squares in paper chip
+    kernel_size (int): size of the Gaussian kernel size
+
+
+    Returns
+    -------
+    conversion_factor: (float) in mm / pixel which can be used to calculate real distance in 
+        milimeters from pixel distance
+    """
+    # turn RGB(?) image grey
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+    # blur the gray image 
+    blur = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
+
+    # create binary image
+    _, bi = cv2.threshold(blur, threshold_min, threshold_max, cv2.THRESH_BINARY)
+    
+    # find contours in image 
+    contours = cv2.findContours(bi, cv2.RETR_TREE, cv2.CHAIN_APPROX_NONE)[0]
+
+    # create empty list for storing the contours
+    reccontour = []
+
+    # loop over contours to find the squares
+    for c in contours:
+        peri = cv2.arcLength(c, True)
+        approx = cv2.approxPolyDP(c, 0.02*peri, True)
+        (x, y, w, h) = cv2.boundingRect(approx)
+        ar = w / float(h)
+        area = cv2.contourArea(c)
+
+        # DETECT SQUARES
+        if len(approx) == 4 and ar >= 0.95 and ar <= 1.05 and area > min_area:
+            cv2.drawContours(image, c, -1, (0, 255, 0), 2)
+            reccontour.append(c)
+    
+    #calculate the perimeter of the 4 detected squares and divide by 4 to obtain the width
+    width_square = np.zeros(len(reccontour))
+    for i in range(len(reccontour)):
+        square = reccontour[i]
+        peri_i = cv2.arcLength(square, True)
+        width_square[i] = peri_i / 4
+
+    # Calculate the average width and the conversion factor, multiply pixel distance by conversion facctor
+    # to obtain the length in mm
+    width_av = np.mean(width_square) #pixel
+    conversion_factor = length_squares / width_av #mm/pixel
+
+    return conversion_factor
+
 
 def find_connected_components_contours(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300):
     """
