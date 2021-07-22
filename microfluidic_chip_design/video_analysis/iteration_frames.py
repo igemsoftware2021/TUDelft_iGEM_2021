@@ -98,7 +98,7 @@ colorcodes = []
 
 
 # show image
-cv2.imshow('Frame', image)
+cv2.imshow('Frame', bi)
 if cv2.waitKey(0) & 0xFF == ord('q'): #press q to quit
     cv2.destroyAllWindows()
 
