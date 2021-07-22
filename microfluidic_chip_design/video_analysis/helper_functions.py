@@ -13,7 +13,7 @@ def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=1
 
     Returns
     -------
-    conversion_factor: (float) in mm / pixel which can be used to calculate real distance in 
+    conversion_factor: (float) in mm / pixel which can be used to calculate real distance in
         milimeters from pixel distance
     """
     # turn RGB(?) image grey
@@ -52,7 +52,7 @@ def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=1
         peri_i = cv2.arcLength(square, True)
         width_square[i] = peri_i / 4
 
-    # Calculate the average width and the conversion factor, multiply pixel distance by conversion facctor
+    # Calculate the average width and the conversion factor, multiply pixel distance by conversion factor
     # to obtain the length in mm
     width_av = np.mean(width_square)  # pixel
     conversion_factor = length_squares / width_av  # mm/pixel
@@ -89,7 +89,7 @@ def update_labels(labels, label_store, label_contour_dict):
     return labels_updated, label_store_updated, label_contour_dict_updated
 
 
-def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300):
+def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500):
     """
     Paramaters
     ----------
@@ -119,8 +119,12 @@ def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120
 
     label_store = []
     for i in range(2, num_labels):  # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
+        W = stats[i, cv2.CC_STAT_WIDTH]
+        H = stats[i, cv2.CC_STAT_HEIGHT]
         area = stats[i, cv2.CC_STAT_AREA]
-        if area > min_area:
+
+        # H/W is to filter out the squares around the microfluidic parts
+        if area > min_area and (H/W > 1.2 or H/W < 0.8):
             label_store.append(i)
 
     # Dictionary where the key is the label number and the value is the contour array
@@ -172,7 +176,7 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300, vector_range=10, max_angle=170):
+def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=10, max_angle=170):
     labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
         image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
@@ -231,6 +235,8 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
     circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 20,
                                param1=100, param2=30, minRadius=15, maxRadius=500)
 
+    circles = np.around(circles).astype("int")
+
     return circles
 
 
@@ -241,17 +247,47 @@ def determine_channels(image):
     #
     #
 
+    labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
+        image)
+
     circles = circle_finder(image)
+
+    black_image = np.zeros(image.shape, dtype=np.uint8)
 
     circles_pos = [(x, y) for x, y, r in circles[0, :]]
     # Set of all circle positions
     circles_pos_set = set(circles_pos)
 
+    # Retrieve all the unique label values from the array labels
     different_labels = np.unique(labels)
+    # Remove the label 0 from the list, because that is just background
+    different_labels = different_labels[1:]
+
+    print(different_labels)
 
     for label in different_labels:
         # Retrieve the indeces of
         # labels where labels == label
         label_indices = (labels == label).nonzero()
 
-        # Check if label indices contain a subset of the circle positions
+        label_pos_set = set([(x, y)
+                             for x, y in zip(label_indices[1], label_indices[0])])
+
+        # Retrieve the circle positions in the certain label component
+        label_circles = list(label_pos_set.intersection(circles_pos_set))
+
+        for i in range(len(label_circles)):
+            for j in range(i, len(label_circles)):
+
+                if i != j:
+                    cblack_image = np.copy(black_image)
+
+                    circle_pos_1 = label_circles[i]
+                    circle_pos_2 = label_circles[j]
+                    cv2.line(cblack_image, circle_pos_1,
+                             circle_pos_2, 255, thickness=1)
+
+                    # # show image
+                    # cv2.imshow('Frame', cblack_image)
+                    # if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+                    #     cv2.destroyAllWindows()

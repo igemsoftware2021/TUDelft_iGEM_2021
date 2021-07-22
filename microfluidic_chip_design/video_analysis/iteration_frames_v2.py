@@ -16,8 +16,9 @@ sample_rate = 1
 # Detection at frame 2
 cap.set(cv2.CAP_PROP_POS_FRAMES, 2)
 _, image = cap.read()
-
-conversion_factor = helper_functions.find_conversion_factor(image, length_squares=3.5) #mm/pixel
+cimage = np.copy(image)
+conversion_factor = helper_functions.find_conversion_factor(
+    image, length_squares=3.5)  # mm/pixel
 circles = helper_functions.circle_finder(image)
 circles = np.around(circles).astype("int")
 
@@ -27,6 +28,19 @@ for i in circles[0, :]:
     # draw the center of the circle
     cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 1)
 
+
+temp = helper_functions.determine_channels(image)
+
+labels, label_store, label_contour_dict = helper_functions.find_fluidic_components_and_contours(
+    cimage)
+
+for label in label_contour_dict.keys():
+    cv2.drawContours(cimage, label_contour_dict[label], -1, (0, 255, 0), 2)
+
+# show image
+cv2.imshow('Cimage', cimage)
+if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+    cv2.destroyAllWindows()
 
 # show image
 cv2.imshow('Frame', image)
