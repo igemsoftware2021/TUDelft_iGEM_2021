@@ -15,6 +15,7 @@ sample_rate = 1
 cap.set(cv2.CAP_PROP_POS_FRAMES, 2)
 _, image = cap.read()
 
+conversion_factor = helper_functions.find_conversion_factor(image, length_squares=3.5) #mm/pixel
 circles = helper_functions.circle_finder(image)
 circles = np.around(circles).astype("int")
 
