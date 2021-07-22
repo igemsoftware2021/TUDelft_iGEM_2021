@@ -66,7 +66,7 @@ parameters = np.append(parameters, s_i)
 fig, ax = plt.subplots()
 line, = plt.plot(time, data, lw=2)
 ax.set_xlabel('Time (s)')
-ax.set_ylabel("Product concentration uM")
+ax.set_ylabel("Product concentration mM")
 
 axcolor = 'lightgoldenrodyellow'
 ax.margins(x=0)

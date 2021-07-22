@@ -205,7 +205,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     blue = eps_cpr * p * h
     yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
-    return time, p
+    return time, e
 
 
 @njit(cache=True, nogil=True)
