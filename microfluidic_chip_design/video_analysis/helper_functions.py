@@ -82,28 +82,23 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def circle_finder(image, min_area=300, vector_range=10):
+def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=300, vector_range=10, max_angle=170):
     # turn RGB into gray image
     gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
     # Blur the gray image
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
+    gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
 
     # create binary image of the blurred image
-    _, binary = cv2.threshold(gray, 120, 255, cv2.THRESH_BINARY)
+    _, binary = cv2.threshold(
+        gray, threshold_min, threshold_max, cv2.THRESH_BINARY)
 
     labels, label_store, label_contour_dict = find_connected_components_contours(
-        image)
+        image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
     # Dictionary where the key is the label number and the value is the array filled
     # with True and False
     label_switch_point_dict = {}
-
-    for label in label_store:
-        contours, hierarchy = cv2.findContours(
-            binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
-
-        label_contour_dict[label] = contours[0]
 
     # Now check where the circles are
     for label in label_store:
@@ -113,9 +108,6 @@ def circle_finder(image, min_area=300, vector_range=10):
 
         # Create an array and fill it with the value False
         switch_point = np.full(contour.shape[0], False, dtype=bool)
-
-        # Create an array to store the angle values
-        angles = np.zeros(contour.shape[0], dtype=np.float32)
 
         # Start with vector_range, because you want to start at the first value from contour
         for i in range(vector_range, contour.shape[0]+vector_range):
@@ -136,9 +128,7 @@ def circle_finder(image, min_area=300, vector_range=10):
 
             angle = angle_between(vector_1, vector_2) * (180.0/np.pi)
 
-            # angles[i-vector_range] = angle
-
-            if angle < 170:
+            if angle < max_angle:
                 switch_point[i-vector_range] = True
 
         label_switch_point_dict[label] = switch_point
@@ -159,6 +149,6 @@ def circle_finder(image, min_area=300, vector_range=10):
                 switch_point_image[y, x] = 255
 
     circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 20,
-                               param1=50, param2=30, minRadius=10, maxRadius=500)
+                               param1=100, param2=30, minRadius=15, maxRadius=500)
 
     return circles
