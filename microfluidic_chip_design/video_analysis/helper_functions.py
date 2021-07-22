@@ -62,6 +62,35 @@ def find_connected_components_contours(image, kernel_size=3, threshold_min=120, 
     return labels, label_store, label_contour_dict
 
 
+def update_labels(labels, label_store, label_contour_dict):
+    """
+    Function that updates the labels array and the label store function,
+    labels could now be [30,31,32,33,60,61,62,63].
+    After the function it will be [1,2,3,4,5,6,7,8]
+
+    """
+
+    labels_updated = np.zeros(labels.shape, dtype=np.int16)
+    label_store_updated = []
+    label_contour_dict_updated = {}
+
+    new_label = 1
+    for label in label_store:
+        # Create a mask for the image
+        mask_label = (labels == label)
+        # Update the labels array
+        labels_updated[mask_label] = new_label
+
+        label_store_updated.append(new_label)
+
+        contour = label_contour_dict.get(label)
+        label_contour_dict_updated[new_label] = contour
+
+        new_label += 1
+
+    return labels_updated, label_store_updated, label_contour_dict_updated
+
+
 def unit_vector(vector):
     """ Returns the unit vector of the vector.  """
     return vector / np.linalg.norm(vector)
