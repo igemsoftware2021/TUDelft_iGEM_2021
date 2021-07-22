@@ -23,7 +23,7 @@ k_m = 50               # (8) Michaelis constant of beta-galactosidase [μM]
 deg_mrna = 1.3*10**-5  # (9) Degradation rate of mRNA [1/s]
 # (10) Degradation rate of translation resources [1/s]
 deg_tlr = 7.5*10**-5
-k_on = 1*10**-2       # (11)  Association rate of vitamin and umRNA [1/s]
+k_on = 1*10**-2       # (11)  Association rate of vitamin and umRNA [1/µMs]
 k_off = 1*10**-2      # (12)  Dissociation rate of vitamin and umRNA [1/s]
 k_c = 1/60        # (13)  Cleaving rate of umRNA [s^-1]
 parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
