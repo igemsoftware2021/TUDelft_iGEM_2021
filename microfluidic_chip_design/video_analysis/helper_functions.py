@@ -176,7 +176,7 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=10, max_angle=170):
+def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=8, max_angle=170):
     labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
         image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
@@ -232,62 +232,97 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
                 x, y = contour[i][0]
                 switch_point_image[y, x] = 255
 
+    # # show image
+    # cv2.imshow('switch_point_image', switch_point_image)
+    # if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+    #     cv2.destroyAllWindows()
+
     circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 20,
-                               param1=100, param2=30, minRadius=15, maxRadius=500)
+                               param1=100, param2=25, minRadius=10, maxRadius=200)
 
     circles = np.around(circles).astype("int")
 
     return circles
 
 
-def determine_channels(image):
+def determine_fluidic_part_structure(image, kernel_size=3, threshold_min=120, threshold_max=255):
 
     # Structure:
-    # {label #num: {channel #num: line_array, 2: line_array, 3: line_array, ...}, label #num: {...}}
+    # {label #num: {channel #num: indices of the line, 2: indices of the line, 3: indices of the line, ...}, label #num: {...}}
     #
-    #
+
+    # turn RGB into gray image
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+
+    # Blur the gray image
+    gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
+
+    # create binary image of the blurred image
+    _, binary = cv2.threshold(
+        gray, threshold_min, threshold_max, cv2.THRESH_BINARY)
 
     labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
         image)
 
     circles = circle_finder(image)
 
-    black_image = np.zeros(image.shape, dtype=np.uint8)
+    black_image = np.zeros(binary.shape, dtype=np.uint8)
 
+    fluidic_part_structure = {}
+
+    # Store the (x, y) position of every circle first in a list
     circles_pos = [(x, y) for x, y, r in circles[0, :]]
-    # Set of all circle positions
+    # Change to list to a set, this is for easy comparison later
     circles_pos_set = set(circles_pos)
 
     # Retrieve all the unique label values from the array labels
     different_labels = np.unique(labels)
-    # Remove the label 0 from the list, because that is just background
+    # Remove the label 0 from the list, because that is just
+    # the label for the background
     different_labels = different_labels[1:]
 
-    print(different_labels)
-
     for label in different_labels:
-        # Retrieve the indeces of
-        # labels where labels == label
+
+        fluidic_part_structure[label] = dict()
+
+        # This part is to determine which circles are in the
+        # component of a certain label
+
+        # Retrieve the indices of labels where labels == label
         label_indices = (labels == label).nonzero()
 
+        # Store all the (x, y) coordinates for a certain label in a set
         label_pos_set = set([(x, y)
                              for x, y in zip(label_indices[1], label_indices[0])])
 
-        # Retrieve the circle positions in the certain label component
+        # Retrieve the circle positions that are in a certain component
         label_circles = list(label_pos_set.intersection(circles_pos_set))
 
+        count = 1
         for i in range(len(label_circles)):
             for j in range(i, len(label_circles)):
 
                 if i != j:
                     cblack_image = np.copy(black_image)
+                    cbinary = np.copy(binary)
 
                     circle_pos_1 = label_circles[i]
                     circle_pos_2 = label_circles[j]
                     cv2.line(cblack_image, circle_pos_1,
                              circle_pos_2, 255, thickness=1)
 
+                    cv2.line(cbinary, circle_pos_1,
+                             circle_pos_2, 0, thickness=1)
+
+                    line_mask = (cblack_image == 255)
+
+                    if np.all(binary[line_mask] == 255):
+                        fluidic_part_structure[label][count] = (
+                            cblack_image == 255).nonzero()
+                        count += 1
+
                     # # show image
-                    # cv2.imshow('Frame', cblack_image)
+                    # cv2.imshow('Frame', cbinary)
                     # if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
                     #     cv2.destroyAllWindows()
+    return fluidic_part_structure
