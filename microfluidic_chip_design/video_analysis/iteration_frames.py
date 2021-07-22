@@ -215,6 +215,7 @@ for i in circles[0, :]:
     # draw the center of the circle
     cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 1)
 
+
 # Go over contour and determine distance between points opposite to each other
 # First go over all the columns, then go over all the rows
 for label in label_store:
