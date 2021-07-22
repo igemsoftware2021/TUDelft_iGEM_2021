@@ -49,15 +49,17 @@ for c in contours:
         cv2.drawContours(image, c, -1, (0, 255, 0), 2)
         cntrrect.append(approx)
 
+print(type(bi))
+
 # DETECT CIRCLES (WELLS)
-circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2,
-                           5, param1=150, param2=0.9, minRadius=10, maxRadius=0)
-circles = np.around(circles).astype("int")
-for i in circles[0, :]:
-    # draw the outer circle
-    cv2.circle(image, (i[0], i[1]), i[2], (0, 0, 255), 2)
-    # draw the center of the circle
-    cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 3)
+# circles = cv2.HoughCircles(bi, cv2.HOUGH_GRADIENT_ALT, 1.2,
+#                            5, param1=150, param2=0.9, minRadius=10, maxRadius=0)
+# circles = np.around(circles).astype("int")
+# for i in circles[0, :]:
+#     # draw the outer circle
+#     cv2.circle(image, (i[0], i[1]), i[2], (0, 0, 255), 2)
+#     # draw the center of the circle
+#     cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 3)
 
 output = cv2.connectedComponentsWithStats(bi, connectivity=8, ltype=cv2.CV_32S)
 (num_labels, labels, stats, centroids) = output
@@ -138,7 +140,7 @@ def angle_between(v1, v2):
 label_switch_point_dict = {}
 # label_angles_dict = {}
 # Vector range to create vectors
-vec_range = 7
+vec_range = 10
 
 # Now check where the circles are
 for label in label_store:
@@ -179,7 +181,8 @@ for label in label_store:
     label_switch_point_dict[label] = switch_point
     # label_angles_dict[label] = angles
 
-
+switch_point_image = np.zeros(
+    (image.shape[0], image.shape[1], 3), dtype=np.uint8)
 for label in label_store:
     contour = label_contour_dict[label]
     switch_point = label_switch_point_dict[label]
@@ -189,20 +192,61 @@ for label in label_store:
         if switch_point[i]:
             x, y = contour[i][0]
             cimage[y, x] = [0, 0, 255]
+            switch_point_image[y, x, :] = [255, 255, 255]
+
+# turn RGB(?) image grey
+switch_point_image = cv2.cvtColor(switch_point_image, cv2.COLOR_RGB2GRAY)
+print(type(switch_point_image))
+plt.imshow(switch_point_image)
+plt.show()
+# show image
+cv2.imshow('Frame', switch_point_image)
+if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+    cv2.destroyAllWindows()
 
 
-# Improve the contours go over every contour with switch point and if there is a switch point
+circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 20,
+                           param1=50, param2=30, minRadius=10, maxRadius=500)
+
+circles = np.around(circles).astype("int")
+for i in circles[0, :]:
+    # draw the outer circle
+    cv2.circle(image, (i[0], i[1]), i[2], (0, 0, 255), 1)
+    # draw the center of the circle
+    cv2.circle(image, (i[0], i[1]), 2, (0, 0, 255), 1)
+
+# Go over contour and determine distance between points opposite to each other
+# First go over all the columns, then go over all the rows
 for label in label_store:
     contour = label_contour_dict[label]
     switch_point = label_switch_point_dict[label]
 
-    switch_point_filtered = np.full(switch_point.shape[0], False, dtype=bool)
+    # Dictionary where key value is column number (x) and value is
+    # a list of row values of the switch points (y)
+    column_row_dict = {}
+    # Opposite of column_row_dict
+    row_column_dict = {}
 
     for i in range(contour.shape[0]):
-        # switch_point contains only True and False, so if True
-        if switch_point[i]:
-            x, y = contour[i][0]
-            cimage[y, x] = [0, 0, 255]
+        x, y = contour[i][0]
+        # Update the column_row_dict
+        temp_list = column_row_dict.get(x, [])
+        temp_list.append(y)
+        column_row_dict[x] = temp_list
+
+        # Update the row_column_dict
+        temp_list = row_column_dict.get(y, [])
+        temp_list.append(x)
+        column_row_dict[y] = temp_list
+
+    min_distance = 100000
+    for key, value in column_row_dict.items():
+        # Only calculate distance if there are 2 points in a column
+        if len(value) == 2:
+            distance = abs(value[1] - value[0])
+            if distance < min_distance:
+                pass
+
 
 # show image
 cv2.imshow('Switch points', cimage)
