@@ -180,7 +180,11 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def circle_finder(image, kernel_size=5, threshold_min=120, threshold_max=255, min_area=500, vector_range=11, max_angle=170):
+def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=9, max_angle=173):
+    cv2.imshow('Image_function', image)
+    if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+        cv2.destroyAllWindows()
+
     labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
         image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
@@ -222,13 +226,36 @@ def circle_finder(image, kernel_size=5, threshold_min=120, threshold_max=255, mi
         label_switch_point_dict[label] = switch_point
 
     # Clean up the switch point array
+    # You look backward and forward from a certain switch_point that is True
+    # and see how many switch points behind and infront are also True.
+    # If a certain threshold value is reached than you keep storing it as
+    # a switch point, otherwise set the value on False
+    thres_value = 0.75*vector_range
+    for label in label_switch_point_dict.keys():
+        switch_point = label_switch_point_dict[label]
+        switch_point_adapted = np.concatenate(
+            (switch_point[-vector_range:], switch_point, switch_point[:vector_range]), axis=0)
+
+        clean_switch_point = np.full(switch_point.shape[0], False, dtype=bool)
+        for i in range(vector_range, switch_point.shape[0]+vector_range):
+            # If the switch point already has a True value
+            if switch_point_adapted[i]:
+                before_part = switch_point_adapted[(i-vector_range):i]
+                after_part = switch_point_adapted[i:(i+vector_range)]
+                # Booleans are treated as 0 and 1 in arithmic operations, hence we can use .sum()
+                if (before_part.sum() < thres_value and after_part.sum() > thres_value) or (before_part.sum() > thres_value and after_part.sum() < thres_value):
+                    clean_switch_point[i-vector_range] = False
+                else:
+                    clean_switch_point[i-vector_range] = True
+
+        label_switch_point_dict[label] = clean_switch_point
 
     # An image where all the points are black except for
     # the switch points, which will be white
     switch_point_image = np.zeros(
         (image.shape[0], image.shape[1]), dtype=np.uint8)
 
-    for label in label_store:
+    for label in label_contour_dict.keys():
         contour = label_contour_dict[label]
         switch_point = label_switch_point_dict[label]
 
@@ -238,13 +265,14 @@ def circle_finder(image, kernel_size=5, threshold_min=120, threshold_max=255, mi
                 x, y = contour[i][0]
                 switch_point_image[y, x] = 255
 
-    # show image
-    cv2.imshow('switch_point_image', switch_point_image)
-    if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
-        cv2.destroyAllWindows()
+    # # show image
+    # cv2.imshow('switch_point_image', switch_point_image)
+    # if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+    #     cv2.destroyAllWindows()
 
-    circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 10,
-                               param1=100, param2=15, minRadius=10, maxRadius=100)
+    # Please DO NOT mess with these settings
+    circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 15,
+                               param1=100, param2=12.5, minRadius=5, maxRadius=75)
 
     circles = np.around(circles).astype("int")
 
@@ -309,7 +337,9 @@ def determine_fluidic_part_structure(image, kernel_size=3, threshold_min=120, th
             for j in range(i, len(label_circles)):
 
                 if i != j:
+                    # Create a copy of the completely black image
                     cblack_image = np.copy(black_image)
+                    # Create a copy of the binary image
                     cbinary = np.copy(binary)
 
                     circle_pos_1 = label_circles[i]

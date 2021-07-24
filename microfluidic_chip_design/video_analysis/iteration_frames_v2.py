@@ -4,7 +4,7 @@ import helper_functions
 
 # Define video file name
 # filename = './microfluidic_chip_design/video_analysis/rechte_wells.MOV'
-filename = './microfluidic_chip_design/video_analysis/IMG_1714.MOV'
+filename = './microfluidic_chip_design/video_analysis/IMG_1715.MOV'
 cap = cv2.VideoCapture(filename)  # load the video
 
 # Retrieve the total number of videos
@@ -17,6 +17,8 @@ sample_rate = 1
 # Detection at frame 2
 cap.set(cv2.CAP_PROP_POS_FRAMES, 2)
 _, image = cap.read()
+
+dimage = np.copy(image)
 
 # show image
 cv2.imshow('Frame', image)
@@ -47,7 +49,11 @@ cv2.imshow('Cimage', cimage)
 if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
     cv2.destroyAllWindows()
 
-circles = helper_functions.circle_finder(image)
+# show image
+cv2.imshow('Image_iteration', dimage)
+if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+    cv2.destroyAllWindows()
+circles = helper_functions.circle_finder(dimage)
 circles = np.around(circles).astype("int")
 
 for i in circles[0, :]:
@@ -56,8 +62,8 @@ for i in circles[0, :]:
     # draw the center of the circle
     cv2.circle(image, (i[0], i[1]), 1, (0, 0, 255), 1)
 
-temp = helper_functions.determine_fluidic_part_structure(cimage)
-
+temp = helper_functions.determine_fluidic_part_structure(dimage)
+print(temp)
 # show image
 cv2.imshow('Cimage', cimage)
 if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
