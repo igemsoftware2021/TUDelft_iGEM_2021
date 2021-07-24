@@ -152,6 +152,10 @@ test_LoulotteW
 
 # Boyd's stuff
 /microfluidic_chip_design/video_analysis/test_boyd.py
+microfluidic_chip_design/video_analysis/IMG_1712.MOV
+microfluidic_chip_design/video_analysis/IMG_1713.MOV
+microfluidic_chip_design/video_analysis/IMG_1714.MOV
+microfluidic_chip_design/video_analysis/IMG_1715.MOV
 
 # Minke's stuff
 test_microfluidic_minke

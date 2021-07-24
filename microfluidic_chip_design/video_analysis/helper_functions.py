@@ -121,10 +121,14 @@ def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120
     for i in range(2, num_labels):  # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
         W = stats[i, cv2.CC_STAT_WIDTH]
         H = stats[i, cv2.CC_STAT_HEIGHT]
-        area = stats[i, cv2.CC_STAT_AREA]
+        area = stats[i, cv2.CC_STAT_AREA]  # Number of pixels of component
+
+        # component_ratio is the ratio of all the pixels within the bounding box
+        # of a connected component that actually belong to a connected component
+        component_ratio = area / (W*H)
 
         # H/W is to filter out the squares around the microfluidic parts
-        if area > min_area and (H/W > 1.2 or H/W < 0.8):
+        if area > min_area and component_ratio < 0.9:
             label_store.append(i)
 
     # Dictionary where the key is the label number and the value is the contour array
@@ -176,7 +180,7 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=8, max_angle=170):
+def circle_finder(image, kernel_size=5, threshold_min=120, threshold_max=255, min_area=500, vector_range=11, max_angle=170):
     labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
         image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
@@ -217,6 +221,8 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
 
         label_switch_point_dict[label] = switch_point
 
+    # Clean up the switch point array
+
     # An image where all the points are black except for
     # the switch points, which will be white
     switch_point_image = np.zeros(
@@ -232,13 +238,13 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
                 x, y = contour[i][0]
                 switch_point_image[y, x] = 255
 
-    # # show image
-    # cv2.imshow('switch_point_image', switch_point_image)
-    # if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
-    #     cv2.destroyAllWindows()
+    # show image
+    cv2.imshow('switch_point_image', switch_point_image)
+    if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
+        cv2.destroyAllWindows()
 
-    circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 20,
-                               param1=100, param2=25, minRadius=10, maxRadius=200)
+    circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 10,
+                               param1=100, param2=15, minRadius=10, maxRadius=100)
 
     circles = np.around(circles).astype("int")
 
