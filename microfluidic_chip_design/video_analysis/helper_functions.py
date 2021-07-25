@@ -60,7 +60,7 @@ def find_conversion_factor(image, length_squares, kernel_size=3, threshold_min=1
     return conversion_factor
 
 
-def update_labels(labels, label_store, label_contour_dict):
+def update_labels(labels, label_contour_dict):
     """
     Function that updates the labels array and the label store function,
     labels could now be [30,31,32,33,60,61,62,63].
@@ -69,24 +69,21 @@ def update_labels(labels, label_store, label_contour_dict):
     """
 
     labels_updated = np.zeros(labels.shape, dtype=np.int16)
-    label_store_updated = []
     label_contour_dict_updated = {}
 
     new_label = 1
-    for label in label_store:
+    for label in label_contour_dict.keys():
         # Create a mask for the image
         mask_label = (labels == label)
         # Update the labels array
         labels_updated[mask_label] = new_label
-
-        label_store_updated.append(new_label)
 
         contour = label_contour_dict.get(label)
         label_contour_dict_updated[new_label] = contour
 
         new_label += 1
 
-    return labels_updated, label_store_updated, label_contour_dict_updated
+    return labels_updated, label_contour_dict_updated
 
 
 def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500):
@@ -104,18 +101,18 @@ def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120
     label_contour_dict: (dict) key is a label value and value is a array of the contour points
     """
     # turn RGB into gray image
-    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
 
     # Blur the gray image
-    gray = cv2.GaussianBlur(gray, (kernel_size, kernel_size), 0)
+    image = cv2.GaussianBlur(image, (kernel_size, kernel_size), 0)
 
-    # create binary image of the blurred image
-    _, binary = cv2.threshold(
-        gray, threshold_min, threshold_max, cv2.THRESH_BINARY)
+    # Create binary image of the blurred image
+    _, image = cv2.threshold(
+        image, threshold_min, threshold_max, cv2.THRESH_BINARY)
 
     # Find the connected components
     num_labels, labels, stats, centroids = cv2.connectedComponentsWithStats(
-        binary, connectivity=8, ltype=cv2.CV_32S)
+        image, connectivity=8, ltype=cv2.CV_32S)
 
     label_store = []
     for i in range(2, num_labels):  # START FROM 2, CAUSE INDEX 0 AND 1 ARE BACKGROUND
@@ -140,7 +137,7 @@ def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120
     # Loop over the label values of the wells with channels
     for label in label_store:
         # Copy the binary image
-        cbinary = np.copy(binary)
+        cbinary = np.copy(image)
 
         # Create a mask for the image
         mask_label = (labels == label)
@@ -154,10 +151,11 @@ def find_fluidic_components_and_contours(image, kernel_size=3, threshold_min=120
 
         label_contour_dict[label] = contours[0]
 
-    labels_updated, label_store_updated, label_contour_dict_updated = update_labels(
-        labels, label_store, label_contour_dict)
+    # Update the label numbers
+    labels_updated, label_contour_dict_updated = update_labels(
+        labels, label_contour_dict)
 
-    return labels_updated, label_store_updated, label_contour_dict_updated
+    return labels_updated, label_contour_dict_updated
 
 
 def unit_vector(vector):
@@ -180,12 +178,9 @@ def angle_between(v1, v2):
     return np.arccos(np.clip(np.dot(v1_u, v2_u), -1.0, 1.0))
 
 
-def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=9, max_angle=173):
-    cv2.imshow('Image_function', image)
-    if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
-        cv2.destroyAllWindows()
+def circle_pos_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, min_area=500, vector_range=9, max_angle=170):
 
-    labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
+    labels, label_contour_dict = find_fluidic_components_and_contours(
         image, kernel_size=kernel_size, threshold_min=threshold_min, threshold_max=threshold_max, min_area=min_area)
 
     # Dictionary where the key is the label number and the value is the array filled
@@ -218,6 +213,7 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
             # Vector from middle point to after point
             vector_2 = np.array([a_x - m_x, a_y - m_y], dtype=np.float32)
 
+            # Calculate the angle between the two vectors in degrees
             angle = angle_between(vector_1, vector_2) * (180.0/np.pi)
 
             if angle < max_angle:
@@ -273,7 +269,7 @@ def circle_finder(image, kernel_size=3, threshold_min=120, threshold_max=255, mi
     # Please DO NOT mess with these settings
     circles = cv2.HoughCircles(switch_point_image, cv2.HOUGH_GRADIENT, 1, 15,
                                param1=100, param2=12.5, minRadius=5, maxRadius=75)
-
+    # Change the (x, y, r) float values to integer values
     circles = np.around(circles).astype("int")
 
     return circles
@@ -295,10 +291,10 @@ def determine_fluidic_part_structure(image, kernel_size=3, threshold_min=120, th
     _, binary = cv2.threshold(
         gray, threshold_min, threshold_max, cv2.THRESH_BINARY)
 
-    labels, label_store, label_contour_dict = find_fluidic_components_and_contours(
+    labels, label_contour_dict = find_fluidic_components_and_contours(
         image)
 
-    circles = circle_finder(image)
+    circles = circle_pos_finder(image)
 
     black_image = np.zeros(binary.shape, dtype=np.uint8)
 
@@ -361,4 +357,4 @@ def determine_fluidic_part_structure(image, kernel_size=3, threshold_min=120, th
                     # cv2.imshow('Frame', cbinary)
                     # if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
                     #     cv2.destroyAllWindows()
-    return fluidic_part_structure
+    return label_contour_dict, fluidic_part_structure

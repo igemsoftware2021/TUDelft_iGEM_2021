@@ -38,7 +38,7 @@ cimage = np.copy(image)
 conversion_factor = helper_functions.find_conversion_factor(
     image, length_squares=3.5)  # mm/pixel
 
-labels, label_store, label_contour_dict = helper_functions.find_fluidic_components_and_contours(
+labels,  label_contour_dict = helper_functions.find_fluidic_components_and_contours(
     cimage)
 
 for label in label_contour_dict.keys():
@@ -53,7 +53,7 @@ if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
 cv2.imshow('Image_iteration', dimage)
 if cv2.waitKey(0) & 0xFF == ord('q'):  # press q to quit
     cv2.destroyAllWindows()
-circles = helper_functions.circle_finder(dimage)
+circles = helper_functions.circle_pos_finder(dimage)
 circles = np.around(circles).astype("int")
 
 for i in circles[0, :]:
