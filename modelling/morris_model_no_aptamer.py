@@ -78,7 +78,7 @@ no_aptamer_eukaryotic_problem = {
 
 # Constants
 # (#) denotes the position in the constants array
-h = 8*10**-5 * 1  # (0) Height of the paper [cm]
+h = 0.020  # (0) Height of the paper [cm]
 eps_cprg = 0.294  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = 0.539   # (2) Exctinction coefficient of CPR at a wavelength of ???
 # Array containing above constants

@@ -31,7 +31,7 @@ prokaryotic_problem = {
 }
 
 # Constants
-h = 8*10**-5  # (0) Height of the paper [cm]
+h = 0.020  # (0) Height of the paper [cm]
 eps_cprg = 1  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = 1   # (2) Exctinction coefficient of CPR at a wavelength of ???
 constants = np.array([h, eps_cprg, eps_cpr])
