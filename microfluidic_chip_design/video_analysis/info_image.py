@@ -38,8 +38,8 @@ for label in label_contour_dict.keys():
 for label in structure_dict.keys():
     for num in structure_dict[label].keys():
         dim = structure_dict[label][num][0].shape[0]
-        x_middle = structure_dict[label][num][1][dim//2]
-        y_middle = structure_dict[label][num][0][dim//2]
+        x_middle = structure_dict[label][num][1][0]
+        y_middle = structure_dict[label][num][0][0]
 
         color = np.random.randint(0, 256, size=3, dtype=np.int32)
         # Change the int32 values to Python int values, otherwise
