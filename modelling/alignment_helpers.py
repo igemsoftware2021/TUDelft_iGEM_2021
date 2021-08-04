@@ -21,7 +21,8 @@ def finite_difference(x, y):
     -------
     (np.array) all the computed finite differences.
     """
-    delta_x = x[1] - x[0]
+    delta_x = x[1] - \
+        x[0]  # TODO mogelijkheid van verschillende delta x binnen deze functie?
     # Calculate the forward difference for the first few points
     temp_forward = np.concatenate((
         np.array([0, 0], dtype=np.float64), y[:4]), axis=0)
@@ -56,7 +57,7 @@ def find_platau_index(x, y, tol=1e-8, n=11):
             return i
 
 
-def graph_alignment(x, y, tol=1e-8, running_average_flag=False, n=11):
+def graph_alignment(x, y, tol=1e-8, n=11):
     """
     Function aligns all the graphs
 

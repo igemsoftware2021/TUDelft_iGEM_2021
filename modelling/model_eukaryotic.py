@@ -30,7 +30,7 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
 
 # Constants
 # (#) denotes the position in the constants array
-h = 8*10**-5 * 1  # (0) Height of the paper [cm]
+h = 0.020  # (0) Height of the paper [cm]
 eps_cprg = tbd  # (1) Exctinction coefficient of CPRG at a wavelength of ???
 eps_cpr = tbd   # (2) Exctinction coefficient of CPR at a wavelength of ???
 # Array containing above constants
