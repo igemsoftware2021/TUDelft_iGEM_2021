@@ -248,7 +248,8 @@ class DatabaseInterfaceCleanSequences(DatabaseInterface):
                     cleavage_fraction_estimated_mean REAL,
                     cleavage_fraction_standard_error REAL,
                     fold_change_estimated_mean REAL,
-                    fold_change_standard_error REAL
+                    fold_change_standard_error REAL,
+                    p_value REAL
                     )""")
 
     def insert_movement_sequence_info(self, table: str, sequence_info: dict):
