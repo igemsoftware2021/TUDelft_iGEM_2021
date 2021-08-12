@@ -2,6 +2,7 @@ import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
 import time
+from scipy.interpolate import interp1d
 
 
 def running_average(a, n=11, mode="same"):
@@ -21,25 +22,16 @@ def finite_difference(x, y):
     -------
     (np.array) all the computed finite differences.
     """
-    delta_x = x[1] - \
-        x[0]  # TODO mogelijkheid van verschillende delta x binnen deze functie?
-    # Calculate the forward difference for the first few points
-    temp_forward = np.concatenate((
-        np.array([0, 0], dtype=np.float64), y[:4]), axis=0)
-    dydx_forward = np.convolve(
-        temp_forward, np.array([-1, 4, -3, 0, 0], dtype=np.float64)/(2*delta_x), mode="valid")
-    # Calculate the central difference for all the middle data points
-    dydx_central = np.convolve(y, np.array(
-        [-1, 8, 0, -8, 1], dtype=np.float64)/(12*delta_x), mode="valid")
 
-    # Calculate the backward difference for the last few data points
-    temp_backward = np.concatenate(
-        (y[-4:], np.array([0, 0], dtype=np.float64)), axis=0)
-    dydx_backward = np.convolve(temp_backward, np.array(
-        [0, 0, 3, -4, 1], dtype=np.float64)/(2*delta_x), mode="valid")
+    # Calculate the central difference dydx
+    delta_y = np.convolve(y, np.array(
+        [1, 0, -1], dtype=np.float64), mode="valid")
+    # Calculate the delta x for each datapoint, because the time between measurements can change.
+    delta_x = np.convolve(x, np.array(
+        [1, 0, -1], dtype=np.float64), mode="valid")
+    dydx = np.divide(delta_y, delta_x)
 
-    # Combine the computed finite differences and return them
-    return np.concatenate((dydx_forward, dydx_central, dydx_backward), axis=0)
+    return dydx
 
 
 def find_platau_index(x, y, tol=1e-8, n=11):
@@ -54,50 +46,82 @@ def find_platau_index(x, y, tol=1e-8, n=11):
 
     for i in range(start_idx, dydx_average.shape[0]):
         if dydx_average[i] < tol:
+            return i + 2  # this is not the right one because the array got smaller, +2 ?
+
+
+def find_start_index(x, y, tol=1e-8, n=11):
+
+    # Calculate the dydx for the graph
+    dydx = finite_difference(x, y)
+
+    # Calculate the running average for the found dydx
+    dydx_average = running_average(dydx, n=n)
+
+    start_idx = dydx_average.shape[0]//2
+
+    for i in range(0, start_idx):
+        if x[i] > 0.3:
             return i
 
 
-def graph_alignment(x, y, tol=1e-8, n=11):
-    """
-    Function aligns all the graphs
-
-    x: np.ndarray of shape (rows, columns), where every column is a different line
-    """
-    if len(x.shape) != 2 or len(y.shape) != 2:
-        raise ValueError("Array x and array y should be two dimensional")
+def graph_alignment_2(x, y, tol=1e-8, n=11, stop=3600, num=14400, delta_x=0.1):
 
     num_cols = y.shape[1]
 
-    indices = np.zeros(num_cols, dtype=np.int32)
-    # Store all the x values for the plateau points
-    x_plat_values = np.zeros(num_cols, dtype=np.float64)
+    # Arrays with the indices of the start and the plateau points
+    indices_start = np.zeros(num_cols, dtype=np.int32)
+    indices_plat = np.zeros(num_cols, dtype=np.int32)
 
+    # Arrays with all the x values for start and the plateau points, and the time interval between those
+    x_plat_values = np.zeros(num_cols, dtype=np.float64)
+    x_start_values = np.zeros(num_cols, dtype=np.float64)
+    x_start_to_plat = np.zeros(num_cols, dtype=np.float64)
+
+    f = []  # List with interpolated functions
     for i in range(num_cols):
+        # TODO at the ends boundary effects check if this is not a problem
+        y[:, i] = running_average(y[:, i], n=n, mode="same")
+        f_i = interp1d(x[:, i], y[:, i])
+
+        x_i_interp1d = np.linspace(0, stop, num)
+        y_i_interp1d = f_i(x_i_interp1d)
+
+        # Calculate the start indices
+        idx = find_start_index(
+            x_i_interp1d, y_i_interp1d, tol=tol, n=n)
+        indices_start[i] = idx
+        x_start_values[i] = x[idx, i]
+
+        # Calculate the plateau indices
         idx = find_platau_index(
-            x[:, i], y[:, i], tol=tol, n=n)
-        indices[i] = idx
+            x_i_interp1d, y_i_interp1d, tol=tol, n=n)
+        indices_plat[i] = idx
         x_plat_values[i] = x[idx, i]
 
-    idx_max_x_plat_value = np.argmax(x_plat_values, axis=0)
-    max_x_plat_value = y[indices[idx_max_x_plat_value], idx_max_x_plat_value]
+        # Calculate the time between start and plateau
+        x_start_to_plat = x_plat_values[i] - x_start_values[i]
+        f.append(f_i)
 
-    print(idx_max_x_plat_value)
+    min_x_start_to_plat = np.amin(x_start_to_plat, axis=0)
 
-    x_shifted = x[:, idx_max_x_plat_value]
-    y_shifted = np.zeros(y.shape, dtype=np.float64)
-
-    # Find for every column what index is closest to the
-    # found x platau value
+    # Determine boundaries for the x domain
+    x_boundaries = np.array(2, num_cols, dtype=np.float64)
     for i in range(num_cols):
-        absolute_val_array = np.abs(y[:, i] - max_x_plat_value)
-        idx = np.argmin(absolute_val_array)
-        # The number of indices you need to shift
-        idx_shift = idx_max_x_plat_value - idx
-        if idx_shift == 0:
-            y_shifted[:, i] = y[:, i]
-        else:
-            temp = y[:-idx_shift, i]
-            y_shifted[idx_shift:, i] = y[:-idx_shift, i]
+        x_boundaries[1, i] = x_plat_values[i] - min_x_start_to_plat
+        x_boundaries[2, i] = x_plat_values[i]
+
+    x_shifted = []
+    y_shifted = []
+
+    for i in range(num_cols):
+        num_x_i = (x_boundaries[2, i] - x_boundaries[1, i]) / delta_x
+        x_i_domain = np.linspace(x_boundaries[1, i], x_boundaries[2, i], num_x)
+        x_i_shifted = x_i_domain - x_plat_values[i]
+        y_i_shifted = f[i](x_i_domain)
+
+        # Appending shifted graphs to the lists
+        x_shifted.append(x_i_shifted)
+        y_shifted.append(y_i_shifted)
 
     return x_shifted, y_shifted
 
