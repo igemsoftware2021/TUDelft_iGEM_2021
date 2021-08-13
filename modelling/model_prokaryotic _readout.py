@@ -28,7 +28,7 @@ parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
 t_tot = 7200  # total time [s]
 dt = 0.01  # timestep [s]
 
-sample_size = 10  # Amount of samples to be calibrated with
+num_graph = 10  # Amount of samples to be calibrated with
 
 # Empty array to store A(t) values for later
 n = int(np.ceil(t_tot/dt)) + 1  # Number of timesteps of the simulation [-]
@@ -46,42 +46,45 @@ eps_cpr = 0.539
 
 # Array containing above constants
 constants = np.array([h, eps_cprg, eps_cpr])
-
-time_array = np.zeros((n, sample_size), dtype=np.float64)
-absorbance_array = np.zeros((n, sample_size), dtype=np.float64)
+sample_size = 20
+time_array = np.zeros((int(np.ceil(n/sample_size)),
+                      num_graph), dtype=np.float64)
+absorbance_array = np.zeros(
+    (int(np.ceil(n/sample_size)), num_graph), dtype=np.float64)
 # Create the figure and the line
 fig1, ax1 = plt.subplots()
 count = 0
 # For loop to create reference curves for now.
 # vit concentration [µM]
-for i in np.linspace(5*10**-3, 5000*10**-3, sample_size):
+for i in np.linspace(5*10**-3, 5000*10**-3, num_graph):
 
     # Initial concentration of the beta-galactosidase gene [μM]
     dna_i = 5*10**-3
-    s_i = 250         # Initial substrate concentration [μM]
+    s_i = 150         # Initial substrate concentration [μM]
 
     initial_conditions = np.array([dna_i, s_i, i])
 
     # Running the model
     (time, absorbance) = model_prokaryotic_readout(parameters,
                                                    constants, initial_conditions, dt=dt, t_tot=t_tot)
-
+    absorbance = absorbance[::sample_size]
+    time = time[::sample_size]
     time_array[:, count] = time
     absorbance_array[:, count] = absorbance
     count += 1
 
     ax1.plot(time, absorbance)
 
-
+delta_x = np.logspace(0.001)
 ax1.set_ylabel("Absorbance A [-]")
 ax1.set_xlabel("Time t [s]")
-
-x_shifted, y_shifted = alignment_helpers.graph_alignment(
-    time_array, absorbance_array)
+print(time_array.shape)
+x_shifted, y_shifted, a_rmsd = alignment_helpers.graph_alignment(
+    time_array, absorbance_array, delta_x=0.01, tol=1e-2)
 
 fig2, ax2 = plt.subplots()
-for i in range(y_shifted.shape[1]):
-    ax2.plot(x_shifted, y_shifted[:, i])
+for i in range(len(y_shifted)):
+    ax2.plot(x_shifted, y_shifted[i])
 
 fig1.show()
 fig2.show()
@@ -93,3 +96,8 @@ plt.show()
 # df_data = pd.DataFrame(data)
 # filepath = "calibration.xlsx"
 # df_data.to_excel(filepath, index=False)
+
+
+plt.figure(10)
+plt.imshow(a_rmsd)
+plt.show()
