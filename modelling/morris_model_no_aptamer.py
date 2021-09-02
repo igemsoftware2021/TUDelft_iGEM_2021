@@ -6,7 +6,7 @@ import numpy as np
 # Defining the properties of the Morris sensitivity analysis
 trajectories = 15
 num_levels = 4
-num_parameters = 11
+num_parameters = 12
 
 # Parameters for prokaryotic system
 # (#) denotes the position in the parameters array
@@ -31,11 +31,29 @@ lower_range = 0.1
 upper_range = 10
 
 
+# Constants UNUSED ONLY LOOK AT CONCENTRATION CPR
+# (#) denotes the position in the constants array
+h = 0.020  # (0) Height of the paper [cm]
+eps_cprg = 0.294  # (1) Exctinction coefficient of CPRG at a wavelength of ???
+eps_cpr = 0.539   # (2) Exctinction coefficient of CPR at a wavelength of ???
+# Array containing above constants
+constants = np.array([h, eps_cprg, eps_cpr])
+
+# Initial concentrations
+dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
+s_i = 1000  # Initial substrate concentration
+initial_conditions = np.array([dna_i, s_i])
+
+# Defining timescale of the model
+t_tot = 1.5 * 3.600  # Total time [s]
+dt = 0.01  # Timestep [s]
+
+
 # Problem definition for prokaryotic system
 no_aptamer_prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-              "k_tlr", "k_m", "deg_mrna", "deg_tlr"],
+              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "dna_i"],
     'bounds': [[lower_range * parameters[0], upper_range * parameters[0]],     # (0) k_ts
                [lower_range * parameters[1], upper_range * \
                    parameters[1]],     # (1) k_tl
@@ -55,10 +73,12 @@ no_aptamer_prokaryotic_problem = {
                    parameters[8]],     # (8) k_m
                [lower_range * parameters[9], upper_range * \
                    parameters[9]],     # (9) deg_mrna
-               [lower_range * parameters[10], upper_range * parameters[10]], ]  # (10) deg_tlr
+               [lower_range * parameters[10], upper_range * \
+                   parameters[10]],  # (10) deg_tlr
+               [lower_range * dna_i, upper_range * dna_i]]  # (11) dna_i
 }
 
-# Eukaryotic problem definition
+# Eukaryotic problem definition (ignore this never used it)
 no_aptamer_eukaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
@@ -73,25 +93,10 @@ no_aptamer_eukaryotic_problem = {
                [-1, 1],  # (7) k_tlr
                [-1, 1],  # (8) k_m
                [-1, 1],  # (9) deg_mrna
-               [-1, 1], ]  # (10) deg_tlr
+               [-1, 1],  # (10) deg_tlr
+               [-1, 1]]  # (11) dna_i
 }
 
-# Constants
-# (#) denotes the position in the constants array
-h = 0.020  # (0) Height of the paper [cm]
-eps_cprg = 0.294  # (1) Exctinction coefficient of CPRG at a wavelength of ???
-eps_cpr = 0.539   # (2) Exctinction coefficient of CPR at a wavelength of ???
-# Array containing above constants
-constants = np.array([h, eps_cprg, eps_cpr])
-
-# Initial concentrations
-dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
-s_i = 1000  # Initial substrate concentration
-initial_conditions = np.array([dna_i, s_i])
-
-# Defining timescale of the model
-t_tot = 3 * 3600  # Total time [s]
-dt = 0.01  # Timestep [s]
 
 # Doing Morris sensitivity analysis
 (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(no_aptamer_prokaryotic_problem, trajectories,
@@ -99,4 +104,4 @@ dt = 0.01  # Timestep [s]
 
 # Saving the data
 morris_datawriter(no_aptamer_prokaryotic_problem, "modelling\data\morris_no_aptamer",
-                  "6", time, mu, mu_star, sigma, mu_star_conf_level)
+                  "TEST", time, mu, mu_star, sigma, mu_star_conf_level)
