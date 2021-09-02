@@ -65,7 +65,7 @@ ax1.set_xlabel("Time (s)"), ax1.set_ylabel("mu* (uM)")
 plt.show()
 
 fig1.savefig("modelling\data\morris_no_aptamer\\" +
-             name_fig ".svg", format="svg", dpi=1200)
+             name_fig + ".svg", format="svg", dpi=1200)
 
 
 # Compare from 2 runs
