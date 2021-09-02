@@ -45,12 +45,11 @@ time, data = model_no_aptamer(parameters,
 
 # Plot every parameter of a single run
 
-filenumber = "TEST"
-tag = "_"
+filenumber = "TAG VAN DE DATAFILE"
 names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
          "k_tlr", "k_m", "deg_mrna", "deg_tlr", "dna_i"]
 path = "modelling\data\morris_no_aptamer"
-
+name_fig = "FIGUURNAAM"
 
 fig1, ax1 = plt.subplots()
 time = morris_datareader("time", "mu", path, filenumber)
@@ -64,8 +63,9 @@ ax1.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 ax1.legend(names, bbox_to_anchor=(1, 0.5), loc='center left',)
 ax1.set_xlabel("Time (s)"), ax1.set_ylabel("mu* (uM)")
 plt.show()
+
 fig1.savefig("modelling\data\morris_no_aptamer\\" +
-             "all_6_mu_star" ".svg", format="svg", dpi=1200)
+             name_fig ".svg", format="svg", dpi=1200)
 
 
 # Compare from 2 runs
@@ -98,7 +98,7 @@ fig1.savefig("modelling\data\morris_no_aptamer\\" +
 #     ax1.set_title(name)
 #     ax1.set_ylim([0, 1])
 #     ax1.legend()
-#     ax1.set_xlabel("Time (s)"), ax1.set_ylabel("Product (mM)")
+#     ax1.set_xlabel("Time (s)")
 #     fig1.savefig("modelling\data\morris_no_aptamer\\" + name +
 #                  "_combined_" + filenumber_1 + "_" + filenumber_2 + ".svg", format="svg", dpi=1200)
 # plt.show()
@@ -127,7 +127,7 @@ fig1.savefig("modelling\data\morris_no_aptamer\\" +
 #     # ax1.plot(time, sigma, label="sigma", color="#667817")
 #     ax1.legend()
 #     ax1.set_title(name)
-#     ax1.set_xlabel("Time (s)"), ax1.set_ylabel("Product (mM)")
+#     ax1.set_xlabel("Time (s)")
 #     fig1.savefig("modelling\data\morris_no_aptamer\\" + name +
 #                  "_" + filenumber + tag + ".svg", format="svg", dpi=1200)
 
