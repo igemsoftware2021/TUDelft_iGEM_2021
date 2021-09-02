@@ -80,12 +80,12 @@ ax1.set_xlabel("Time t [s]")
 print(time_array.shape)
 
 delta_x = np.array([0.01])
-#a_rsmd = np.zeros(len(delta_x), dtype=np.float64)
+a_rsmd = np.zeros(len(delta_x), dtype=np.float64)
 for i in range(len(delta_x)):
     x_shifted, y_shifted, a_rmsd_i = alignment_helpers.graph_alignment(
-        time_array, absorbance_array, delta_x=delta_x[i], tol=1e-2)
-    #a_rsmd[i] = a_rmsd_i[-1][0]
-#a_rsmd = abs(a_rsmd-a_rsmd[-0])
+        time_array, absorbance_array, delta_x=delta_x[i], tol=1e-8)
+    a_rsmd[i] = a_rmsd_i[-1][0]
+a_rsmd = abs(a_rsmd-a_rsmd[-0])
 # plt.figure(10)
 #plt.loglog(delta_x, a_rsmd)
 
