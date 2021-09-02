@@ -45,10 +45,10 @@ time, data = model_no_aptamer(parameters,
 
 # Plot every parameter of a single run
 
-filenumber = "6"
+filenumber = "TEST"
 tag = "_"
 names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-         "k_tlr", "k_m", "deg_mrna", "deg_tlr"]
+         "k_tlr", "k_m", "deg_mrna", "deg_tlr", "dna_i"]
 path = "modelling\data\morris_no_aptamer"
 
 
@@ -62,7 +62,7 @@ for name in names:
 box = ax1.get_position()
 ax1.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 ax1.legend(names, bbox_to_anchor=(1, 0.5), loc='center left',)
-ax1.set_xlabel("Time (s)"), ax1.set_ylabel("Product (mM)")
+ax1.set_xlabel("Time (s)"), ax1.set_ylabel("mu* (uM)")
 plt.show()
 fig1.savefig("modelling\data\morris_no_aptamer\\" +
              "all_6_mu_star" ".svg", format="svg", dpi=1200)
