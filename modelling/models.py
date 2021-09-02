@@ -205,7 +205,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     blue = eps_cpr * p * h
     yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
-    return time, e
+    return time, p
 
 
 @njit(cache=True, nogil=True)
@@ -476,7 +476,6 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
     return time, b_y
 
 
-
 @njit(cache=True, nogil=True)
 def model_prokaryotic_readout(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
     """Function does a simulation of the kinetics of the prokaryotic AptaVita system for different vitamin concentrations.
@@ -575,7 +574,7 @@ def model_prokaryotic_readout(parameters, constants, initial_conditions, dt=0.1,
     tsr[0] = 1
     tlr[0] = 1
     vit[0] = initial_conditions[2]
-    
+
     # A loop with the differential equations
     for step in range(time.shape[0]-1):
         # Differential of each species w.r.t time
