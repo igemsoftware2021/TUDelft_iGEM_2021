@@ -75,12 +75,19 @@ for i in np.linspace(5*10**-3, 5000*10**-3, num_graph):
 
     ax1.plot(time, absorbance)
 
-delta_x = np.logspace(0.001)
 ax1.set_ylabel("Absorbance A [-]")
 ax1.set_xlabel("Time t [s]")
 print(time_array.shape)
-x_shifted, y_shifted, a_rmsd = alignment_helpers.graph_alignment(
-    time_array, absorbance_array, delta_x=0.01, tol=1e-2)
+
+delta_x = np.array([0.01])
+#a_rsmd = np.zeros(len(delta_x), dtype=np.float64)
+for i in range(len(delta_x)):
+    x_shifted, y_shifted, a_rmsd_i = alignment_helpers.graph_alignment(
+        time_array, absorbance_array, delta_x=delta_x[i], tol=1e-2)
+    #a_rsmd[i] = a_rmsd_i[-1][0]
+#a_rsmd = abs(a_rsmd-a_rsmd[-0])
+# plt.figure(10)
+#plt.loglog(delta_x, a_rsmd)
 
 fig2, ax2 = plt.subplots()
 for i in range(len(y_shifted)):
@@ -97,7 +104,6 @@ plt.show()
 # filepath = "calibration.xlsx"
 # df_data.to_excel(filepath, index=False)
 
-
-plt.figure(10)
-plt.imshow(a_rmsd)
+plt.figure(12)
+plt.imshow(a_rmsd_i)
 plt.show()

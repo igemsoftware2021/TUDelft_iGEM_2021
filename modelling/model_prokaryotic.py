@@ -38,7 +38,7 @@ dt = 0.01  # timestep [s]
 # Initial concentrations
 dna_i = 5*10**-3  # Initial concentration of the beta-galactosidase gene [μM]
 s_i = 1000   # Initial substrate concentration [μM]
-vit_i = 50*10**-3  # 0**-3  # Initial vitamin concentration [μM]
+vit_i = 500  # 0**-3  # Initial vitamin concentration [μM]
 # Array containing above constants
 initial_conditions = np.array([dna_i, s_i, vit_i])
 
