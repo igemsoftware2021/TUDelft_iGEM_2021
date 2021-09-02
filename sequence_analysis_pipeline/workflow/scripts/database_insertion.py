@@ -2,7 +2,7 @@ from pathlib import Path
 import yaml
 import regex
 from tqdm import tqdm
-from database_interface import DatabaseInterfaceRawSequences
+from database_interface import DatabaseInterfaceSequences
 import seq_helpers
 import yaml_read_helpers
 
@@ -49,16 +49,34 @@ driver_round_pattern, selection_pattern, ligand_present_pattern = yaml_read_help
 minimum_number_reads = yaml_read_helpers.retrieve_minimum_reads(
     config_file_path)
 
-# The name of the database table is a constant, because it is the same for all the operations.
-TABLE_NAME = "raw_sequences"
+# The table where we store all the initial data
+TABLE_RAW_SEQ = "raw_sequences"
+
+# The table that links an integer to a sequence
+TABLE_ID_SEQ = "id_sequence"
 
 # Create the database
-with DatabaseInterfaceRawSequences(path=database_path) as db:
+with DatabaseInterfaceSequences(path=database_path) as db:
 
-    if not db.table_exists(TABLE_NAME):
-        db.create_table(TABLE_NAME)
+    if not db.table_exists(TABLE_RAW_SEQ):
+        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_RAW_SEQ} (
+                    id INTEGER PRIMARY KEY,
+                    read_count INTEGER,
+                    original_sequence TEXT,
+                    sequence TEXT,
+                    sequence_id INTEGER,
+                    barcode TEXT,
+                    cleaved_prefix INTEGER,
+                    prefix_name TEXT,
+                    reference_name TEXT,
+                    selection TEXT,
+                    driver_round INTEGER,
+                    ligand_present INTEGER
+                    )"""
+                 )
     else:
-        print("Table already exists, check if files are already processed.")
+        print(
+            f"Table: {TABLE_RAW_SEQ} already exists, check if files are already processed.")
         while True:
             user_input = input(
                 "Do you want to continue filling the database? (Y/n)\t")
@@ -68,7 +86,25 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
             elif user_input.lower().startswith('n'):
                 exit()
 
-with DatabaseInterfaceRawSequences(path=database_path) as db:
+    if not db.table_exists(TABLE_ID_SEQ):
+        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_ID_SEQ} (
+                    id INTEGER PRIMARY KEY,
+                    sequence TEXT,
+                    )"""
+                 )
+    else:
+        print(
+            f"Table: {TABLE_ID_SEQ} already exists, check if files are already processed.")
+        while True:
+            user_input = input(
+                "Do you want to continue filling the database? (Y/n)\t")
+            if user_input.lower().startswith('y'):
+                print("Database filling up...")
+                break
+            elif user_input.lower().startswith('n'):
+                exit()
+
+with DatabaseInterfaceSequences(path=database_path) as db:
     print("Insertion of the sequences in the database...")
     for inputfile in inputfiles:
         print(f"Now inserting the sequences from {inputfile}")
@@ -119,8 +155,10 @@ with DatabaseInterfaceRawSequences(path=database_path) as db:
                     sequence_info["barcode"] = seq_helpers.retrieve_barcode(
                         sequence, prefix_seq)
 
-                    sequence_info["cleaned_sequence"] = seq_helpers.clean_sequence(
+                    sequence_info["sequence"] = seq_helpers.clean_sequence(
                         sequence, prefix_seq, suffix_seq)
+
+                    sequence_id = db.
 
                     # Determine whether the cleaned sequence is a cleaned reference sequence
                     sequence_info["reference_name"] = seq_helpers.reference_seq(

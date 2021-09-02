@@ -18,7 +18,7 @@ class DatabaseInterface:
             self.conn = sqlite3.connect(path)
             self.cursor = self.conn.cursor()
         except sqlite3.Error:
-            raise Exception("Error connecting to the database")
+            raise Exception("Error connecting to the database, check path")
 
     def close(self):
         """Function closes the database connection if there is one."""
@@ -132,6 +132,30 @@ class DatabaseInterface:
             self.cursor.execute(sql, parameters)
         if fetchall:
             return self.cursor.fetchall()
+
+
+class DataBaseInterfaceSequences(DatabaseInterface):
+    def __init__(self, path=None):
+        super.__init__(path)
+
+    def retrieve_info_sequence(self, table: str, sequence: str):
+        """
+        Function to get sequences. \n
+        args:\n
+        table: (str) name of the table\n
+        cleaved_prefix: (float) value to insert in the cleaved_prefix column, default = 1\n
+        ligand_present: (float) value to insert in the ligand_present column, default = 1\n
+        1 = yes
+        0 = no
+        """
+        self.cursor.execute(
+            f"SELECT * FROM {table} WHERE sequence={sequence}")
+        return self.cursor.fetchall()
+
+    def retrieve_info_sequence_id(self, table: str, sequence_id: int):
+        self.cursor.execute(
+            f"SELECT * FROM {table} WHERE sequence_id={sequence_id}")
+        return self.cursor.fetchall()
 
 
 class DatabaseInterfaceRawSequences(DatabaseInterface):
