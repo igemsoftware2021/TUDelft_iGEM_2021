@@ -2,8 +2,8 @@
 import scipy.stats
 from database_interface import DatabaseInterfaceCleanSequences
 
-database_path = "./results/databases/T1_D80_database.db"
-# database_path = snakemake.input[0]
+# database_path = "./results/databases/T1_D80_database.db"
+database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 

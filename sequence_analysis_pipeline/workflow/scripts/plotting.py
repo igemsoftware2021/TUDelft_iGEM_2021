@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceCleanSequences
 
-database_path = "./results/databases/T1_D80_database.db"
-# database_path = snakemake.input[0]
+# database_path = "./results/databases/T1_D80_database.db"
+database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 
@@ -11,6 +11,8 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
     sequences_info = db.query(
         f"SELECT cleaned_sequence, fold_change, fold_change_standard_error, p_value FROM {TABLE_NAME} WHERE fold_change IS NOT NULL", fetchall=True)
     uniq_sequences_info = list(set(sequences_info))
+
+print(len(uniq_sequences_info))
 
 print(sequences_info[0])
 
@@ -29,14 +31,19 @@ print(min_se)
 fold_change_se_array_updated = fold_change_sd_array
 print(fold_change_se_array_updated)
 
+fold_change_log2_array = np.log2(fold_change_array)
+fold_change_log_array = np.log(fold_change_array)
 fold_change_log10_array = np.log10(fold_change_array)
+fold_change_sd_log_array = np.log(fold_change_sd_array)
 # fold_change_sd_log10_array = np.log10(fold_change_sd_array)
+p_value_minus_log_array = - np.log(p_value_array)
 p_value_minus_log10_array = - np.log10(p_value_array)
 
 fig, ax = plt.subplots()
-ax.scatter(fold_change_array, fold_change_sd_array, s=2, alpha=1)
+# ax.scatter(fold_change_array, fold_change_sd_array, s=2, alpha=1)
+ax.scatter(fold_change_array, p_value_minus_log_array, s=2, alpha=1)
 ax.grid()
-# ax.set_ylim([0.0, 0.02])
+ax.set_ylim([0.0, 50])
 ax.set_xscale('log')
 # ax.set_yscale('log')
 # fig.savefig("fold_change_vs_fold_change_se.pdf", dpi=300)

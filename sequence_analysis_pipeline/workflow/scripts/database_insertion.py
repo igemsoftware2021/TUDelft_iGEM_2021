@@ -8,7 +8,7 @@ import yaml_read_helpers
 
 # Find the path to the config file
 config_file_path = Path(__file__).resolve(
-).parents[2] / "config" / "config.yaml"
+).parents[2] / "config" / "config_zero.yaml"
 
 # Find the path to the references file
 ngs_references_path = Path(
