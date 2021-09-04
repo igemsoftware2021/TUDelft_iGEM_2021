@@ -80,14 +80,14 @@ references:
             max_error: 0
     suffixes:
         cleaved:
-            sequence: AAAAAGAAAT
+            sequence: AAAAAGAAA
             name: X
             i_error: 0
             d_error: 0
             s_error: 0
             max_error: 0
         uncleaved:
-            sequence: AAAAAGAAAT
+            sequence: AAAAAGAAA
             name: X
             i_error: 0
             d_error: 0

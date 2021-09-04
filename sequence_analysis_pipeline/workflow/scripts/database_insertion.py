@@ -15,14 +15,17 @@ ngs_references_path = Path(
     __file__).resolve().parents[2] / "data" / "ngs_references.csv"
 
 # Store the input filenames in a variable. The inputfile names are given by snakemake.
-# inputfiles = [
-# 'sequence_analysis_pipeline/data/NGS/T1_D80_L0_read_count.txt']
-inputfiles = [snakemake.input[0], snakemake.input[1]]
+inputfiles = [
+    Path(__file__).resolve().parents[2] / "results" /
+    "read_counts" / "T1_D80_L0_read_count.txt",
+    Path(__file__).resolve().parents[2] / "results" / "read_counts" / "T1_D80_L1_read_count.txt"]
+# inputfiles = [snakemake.input[0], snakemake.input[1]]
 
 # Store the output filename in a variable. The outputfile name is given by snakemake.
 # database_path = ":memory:"
-# database_path = "sequence_analysis_pipeline/data/NGS/T1_D80_database.db"
-database_path = snakemake.output[0]
+database_path = Path(__file__).resolve(
+).parents[2] / "results" / "databases" / "T1_D80_database.db"
+# database_path = snakemake.output[0]
 
 # Prep the reference sequences
 reference_prefix_patterns = yaml_read_helpers.retrieve_compiled_reference_patterns(
@@ -55,11 +58,12 @@ TABLE_RAW_SEQ = "raw_sequences"
 # The table that links an integer to a sequence
 TABLE_ID_SEQ = "id_sequence"
 
+print(database_path)
 # Create the database
 with DatabaseInterfaceSequences(path=database_path) as db:
 
     if not db.table_exists(TABLE_RAW_SEQ):
-        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_RAW_SEQ} (
+        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_RAW_SEQ}(
                     id INTEGER PRIMARY KEY,
                     read_count INTEGER,
                     original_sequence TEXT,
@@ -72,11 +76,10 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                     selection TEXT,
                     driver_round INTEGER,
                     ligand_present INTEGER
-                    )"""
-                 )
+                    )""")
     else:
         print(
-            f"Table: {TABLE_RAW_SEQ} already exists, check if files are already processed.")
+            f"Table: '{TABLE_RAW_SEQ}' already exists, check if files are already processed.")
         while True:
             user_input = input(
                 "Do you want to continue filling the database? (Y/n)\t")
@@ -87,14 +90,16 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                 exit()
 
     if not db.table_exists(TABLE_ID_SEQ):
-        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_ID_SEQ} (
+        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_ID_SEQ}(
                     id INTEGER PRIMARY KEY,
                     sequence TEXT,
-                    )"""
-                 )
+                    negative_cs INTEGER,
+                    positive_cs INTEGER,
+                    fold_change INTEGER
+                    )""")
     else:
         print(
-            f"Table: {TABLE_ID_SEQ} already exists, check if files are already processed.")
+            f"Table: '{TABLE_ID_SEQ}' already exists, check if files are already processed.")
         while True:
             user_input = input(
                 "Do you want to continue filling the database? (Y/n)\t")
@@ -107,6 +112,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 with DatabaseInterfaceSequences(path=database_path) as db:
     print("Insertion of the sequences in the database...")
     for inputfile in inputfiles:
+        inputfile = str(inputfile)
         print(f"Now inserting the sequences from {inputfile}")
 
         # Retrieve the round of DRIVER, which selection it is and whether the ligand
@@ -158,13 +164,33 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                     sequence_info["sequence"] = seq_helpers.clean_sequence(
                         sequence, prefix_seq, suffix_seq)
 
-                    sequence_id = db.
+                    if sequence_info["sequence"] is not None:
+                        # Determine whether the cleaned sequence is a cleaned reference sequence
+                        sequence_info["reference_name"] = seq_helpers.reference_seq(
+                            sequence_info["sequence"], clean_ngs_reference_patterns)
 
-                    # Determine whether the cleaned sequence is a cleaned reference sequence
-                    sequence_info["reference_name"] = seq_helpers.reference_seq(
-                        sequence_info["cleaned_sequence"], clean_ngs_reference_patterns)
+                        # This part is to determine the unique sequence id for a certain sequence
+                        id_sequence_info = db.retrieve_info_sequence(
+                            table=TABLE_ID_SEQ, sequence=sequence_info["sequence"])
 
-                    db.insert_sequence_info(TABLE_NAME, sequence_info)
+                        # print(id_sequence_info)
+
+                        if len(id_sequence_info) == 0:
+                            db.query(f"""INSERT INTO {TABLE_ID_SEQ} (sequence, negative_cs, positive_cs, fold_change)
+                                VALUES (:sequence, :negative_cs, :positive_cs, :fold_change)""", parameters={
+                                "sequence": sequence_info["sequence"], "negative_cs": 0, "positive_cs": 0, "fold_change": 0})
+                            sequence_id = db.cursor.lastrowid
+                        else:
+                            sequence_id = id_sequence_info[0][0]
+
+                        sequence_info["sequence_id"] = sequence_id
+
+                        db.query(f"""INSERT INTO {TABLE_RAW_SEQ} (read_count, original_sequence, sequence, sequence_id,
+                                barcode, cleaved_prefix, prefix_name, reference_name,
+                                selection, driver_round, ligand_present) VALUES (
+                                :read_count, :original_sequence, :sequence, :sequence_id,
+                                :barcode, :cleaved_prefix, :prefix_name, :reference_name,
+                                :selection, :driver_round, :ligand_present)""", parameters=sequence_info)
 
 
 # with DatabaseInterfaceRawSequences(path=database_path) as db:

@@ -1,46 +1,50 @@
-from database_interface import DatabaseInterfaceCleanSequences
+from database_interface import DatabaseInterfaceSequences
 from tqdm import tqdm
 
 # database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
-database_path = snakemake.input[0]
-# database_path = "results/databases/T1_D80_database.db"
+# database_path = snakemake.input[0]
+database_path = "results/databases/T1_D80_database.db"
 
-# Store in this variable all tuples of ("cleaned_sequence", "cleaved_prefix", "ligand_present") that have already been checked
-sequence_info_checked = set()
+# The table where we store all the initial data
+TABLE_RAW_SEQ = "raw_sequences"
+
+# The table that links an integer to a sequence
+TABLE_ID_SEQ = "id_sequence"
+
+# The table with the added read counts of sequences
+TABLE_CLEAN_SEQ = "clean_sequences"
+
 
 # Fetch data for raw_sequences
-with DatabaseInterfaceCleanSequences(path=database_path) as db:
-    # Fetchall all rows only columns (id, cleaned_sequence, prefix_name, ligand_present)
-    rows_info_seq = db.get(table="raw_sequences", columns=[
-        "id", "cleaned_sequence", "cleaved_prefix", "ligand_present"])
+with DatabaseInterfaceSequences(path=database_path) as db:
 
-    # Fetchall all rows only columns (id, read_count)
-    rows_id_and_read_count = db.get(table="raw_sequences", columns=[
-        "id", "read_count"])
+    # Create the table: 'clean_sequences'
 
-# Create dictionary where (sequence, cleaved_prefix, ligand_present) is the key
-# and the value is a list of all the rowids corresponding to this
-info_seq_rowid_dict = {}
-for row_info in rows_info_seq:
-    key_tuple = (row_info[1], row_info[2], row_info[3])
-    rowids = info_seq_rowid_dict.get(key_tuple, [])
-    rowids.append(row_info[0])
-    info_seq_rowid_dict[key_tuple] = rowids
-
-# Dictionary where key is the rowid, and the value is the read count
-id_read_count_dict = {row_info[0]: row_info[1]
-                      for row_info in rows_id_and_read_count}
-
-
-TABLE_NAME = "clean_sequences"
-
-# Create table
-with DatabaseInterfaceCleanSequences(path=database_path) as db:
-
-    if not db.table_exists(TABLE_NAME):
-        db.create_table(TABLE_NAME)
+    if not db.table_exists(TABLE_CLEAN_SEQ):
+        db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_CLEAN_SEQ}(
+                    id INTEGER PRIMARY KEY,
+                    read_count INTEGER,
+                    sequence TEXT,
+                    sequence_id INTEGER,
+                    cleaved_prefix INTEGER,
+                    prefix_name TEXT,
+                    reference_name TEXT,
+                    selection TEXT,
+                    driver_round INTEGER,
+                    ligand_present INTEGER,
+                    cleavage_fraction REAL,
+                    fold_change REAL,
+                    possible_sensor INTEGER,
+                    k_factor REAL,
+                    cleavage_fraction_estimated_mean REAL,
+                    cleavage_fraction_standard_error REAL,
+                    fold_change_estimated_mean REAL,
+                    fold_change_standard_error REAL,
+                    p_value REAL
+                    )""")
     else:
-        print("Table already exists, check if files are already processed.")
+        print(
+            f"Table: '{TABLE_CLEAN_SEQ}' already exists, check if files are already processed.")
         while True:
             user_input = input(
                 "Do you want to continue filling the database? (Y/n)\t")
@@ -50,38 +54,29 @@ with DatabaseInterfaceCleanSequences(path=database_path) as db:
             elif user_input.lower().startswith('n'):
                 exit()
 
-# This has a speed of approximately 9000 sequences per second
-with DatabaseInterfaceCleanSequences(path=database_path) as db:
-    for key in tqdm(info_seq_rowid_dict):
-        total_read_count = 0
-        rowids = info_seq_rowid_dict[key]
-        for rowid in rowids:
-            total_read_count += id_read_count_dict[rowid]
+    # Retrieve all unique sequences
+    id_sequence_rows = db.get(table=TABLE_ID_SEQ, columns=["id", "sequence"])
 
-        # Retrieve the sequence info of a certain sequence
-        sequence_info = db.query(
-            f"SELECT * FROM raw_sequences WHERE id={rowids[0]}", fetchall=True)
+    for id_sequence_row in tqdm(id_sequence_rows):
+        id_value = id_sequence_row[0]
+        for cleaved_bool_val in [True, False]:
+            for ligand_bool_val in [True, False]:
 
-        clean_sequence_info = {"read_count": total_read_count, "cleaned_sequence": sequence_info[0][3], "cleaved_prefix": sequence_info[0][5], "selection": sequence_info[0][8], "ligand_present": sequence_info[0][10],
-                               "prefix_name": sequence_info[0][6], "reference_name": sequence_info[0][7], "driver_round": sequence_info[0][9]}
+                sequence_rows = db.retrieve_info_sequence_id(
+                    table=TABLE_RAW_SEQ, sequence_id=id_value, cleaved_prefix=cleaved_bool_val, ligand_present=ligand_bool_val)
 
-        # insert the information into the new table
-        db.insert_movement_sequence_info(TABLE_NAME, clean_sequence_info)
+                if len(sequence_rows) != 0:
 
+                    total_read_count = 0
+                    for row in sequence_rows:
+                        total_read_count += row[1]
 
-# OLD: this did work but it only accomplished a speed of 6 sequences a second, which is waaaay too slow.
-# with DatabaseInterfaceCleanSequences(path=database_path) as db:
-#     for i in tqdm(range(len(unique_rows))):
-#         # get for every unique sequence all the read_counts
-#         sequence_all = db.get_info_sequence(
-#             "raw_sequences", unique_rows[i][0], unique_rows[i][1], unique_rows[i][2])
+                    sequence_info = {"read_count": total_read_count, "sequence": sequence_rows[0][3], "sequence_id": id_value, "cleaved_prefix": sequence_rows[0][6], "selection": sequence_rows[0][9], "ligand_present": sequence_rows[0][11],
+                                     "prefix_name": sequence_rows[0][7], "reference_name": sequence_rows[0][8], "driver_round": sequence_rows[0][10]}
 
-#         read_counts_new = sum([p[1] for p in sequence_all])
-
-#         clean_sequence_info = {"read_count": read_counts_new, "cleaned_sequence": sequence_all[0][3], "cleaved_prefix": sequence_all[0][5], "selection": sequence_all[0][8], "ligand_present": sequence_all[0][10],
-#                                "prefix_name": sequence_all[0][6], "reference_name": sequence_all[0][7], "driver_round": sequence_all[0][9], "cleavage_fraction": "NULL", "fold_change": "NULL", "possible_sensor": 0,
-#                                "k_factor": "NULL", "cleavage_fraction_estimated_mean": "NULL", "cleavage_fraction_standard_deviation": "NULL", "fold_change_estimated_mean": "NULL", "fold_change_standard_deviation": "NULL",
-#                                "fold_change_standard_error": "NULL"}
-
-#         # insert the information into the new table
-#         db.insert_sequence_info(TABLE_NAME, clean_sequence_info)
+                db.query(f"""INSERT INTO {TABLE_CLEAN_SEQ}(read_count, sequence, sequence_id,
+                                    cleaved_prefix, prefix_name, reference_name,
+                                    selection, driver_round, ligand_present) VALUES (
+                                    :read_count, :sequence, :sequence_id,
+                                    :cleaved_prefix, :prefix_name, :reference_name,
+                                    :selection, :driver_round, :ligand_present)""", parameters=sequence_info)

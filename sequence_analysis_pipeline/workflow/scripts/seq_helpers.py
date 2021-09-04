@@ -66,7 +66,7 @@ def reference_seq(sequence: str, ngs_references_dict: dict):
             # True
             return ngs_references_dict[reference_seq]
     # False
-    return "NULL"
+    return None
 
 
 def determine_pattern(sequence: str, patterns_info: dict) -> Tuple[str, str, int]:
@@ -120,7 +120,7 @@ def retrieve_barcode(sequence: str, prefix: str) -> str:
         prefix_match = regex.search(prefix, sequence)
         return sequence[:prefix_match.start()]
     else:
-        return "NULL"
+        return None
 
 
 def clean_sequence(sequence: str, prefix: str, suffix: str) -> str:
@@ -128,6 +128,6 @@ def clean_sequence(sequence: str, prefix: str, suffix: str) -> str:
         prefix_match = regex.search(prefix, sequence)
         suffix_match = regex.search(suffix, sequence)
         if not bool(suffix_match):
-            return "NULL"
+            return None
         return sequence[prefix_match.end():suffix_match.start()]
-    return "NULL"
+    return None
