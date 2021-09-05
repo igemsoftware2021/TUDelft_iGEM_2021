@@ -8,7 +8,7 @@ import yaml_read_helpers
 
 # Find the path to the config file
 config_file_path = Path(__file__).resolve(
-).parents[2] / "config" / "config_zero.yaml"
+).parents[2] / "config" / "config.yaml"
 
 # Find the path to the references file
 ngs_references_path = Path(
@@ -94,9 +94,9 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                     id INTEGER PRIMARY KEY,
                     sequence TEXT,
                     reference_name TEXT,
-                    negative_cs INTEGER,
-                    positive_cs INTEGER,
-                    fold_change INTEGER
+                    negative_cs REAL,
+                    positive_cs REAL,
+                    fold_change REAL
                     )""")
     else:
         print(
@@ -170,6 +170,9 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                         sequence_info["reference_name"] = seq_helpers.reference_seq(
                             sequence_info["sequence"], clean_ngs_reference_patterns)
 
+                        if sequence_info["reference_name"] is not None:
+                            print('yeahhhh', sequence_info["reference_name"])
+
                         # This part is to determine the unique sequence id for a certain sequence
                         id_sequence_info = db.retrieve_info_sequence(
                             table=TABLE_ID_SEQ, sequence=sequence_info["sequence"])
@@ -177,9 +180,8 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                         # print(id_sequence_info)
 
                         if len(id_sequence_info) == 0:
-                            db.query(f"""INSERT INTO {TABLE_ID_SEQ} (sequence, negative_cs, positive_cs, fold_change)
-                                VALUES (:sequence, :negative_cs, :positive_cs, :fold_change)""", parameters={
-                                "sequence": sequence_info["sequence"], "negative_cs": 0, "positive_cs": 0, "fold_change": 0})
+                            db.query(f"""INSERT INTO {TABLE_ID_SEQ} (sequence) VALUES (:sequence)""", parameters={
+                                "sequence": sequence_info["sequence"]})
                             sequence_id = db.cursor.lastrowid  # rowid in sequence table
 
                             if sequence_info["reference_name"] is not None:

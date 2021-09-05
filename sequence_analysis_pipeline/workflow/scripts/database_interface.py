@@ -108,6 +108,10 @@ class DatabaseInterface:
                 f"SELECT * FROM {table} LIMIT {limit} OFFSET {offset}")
         return self.cursor.fetchall()
 
+    def get_info_rowid(self, table: str, rowid: int = None) -> list:
+        self.cursor.execute(f"SELECT * FROM {table} WHERE id={rowid}")
+        return self.cursor.fetchall()
+
     def update_column_value(self, table: str, rowid: int, column_name: str, value):
         """
         Function updates a value from a specific column at row number rowid.\n
@@ -117,8 +121,12 @@ class DatabaseInterface:
         column_name: (str) name of the column to update\n
         value: value to insert in the column\n
         """
-        self.query(
-            f"UPDATE {table} SET {column_name}={value} WHERE id={rowid}")
+        if isinstance(value, str):
+            self.query(
+                f"""UPDATE {table} SET {column_name}="{value}" WHERE id={rowid}""")
+        else:
+            self.query(
+                f"""UPDATE {table} SET {column_name}={value} WHERE id={rowid}""")
 
     def query(self, sql: str, parameters=None, fetchall=False):
         """Function to query any SQL statement."""

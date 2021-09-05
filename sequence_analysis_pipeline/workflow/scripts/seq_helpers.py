@@ -60,7 +60,7 @@ def create_ngs_references_patterns(ngs_references_dict: dict) -> dict:
 
 def reference_seq(sequence: str, ngs_references_dict: dict):
     """Function returns the name of the reference sequence or the string 'NULL'"""
-    for reference_seq in ngs_references_dict:
+    for reference_seq in ngs_references_dict.keys():
         match = reference_seq.search(sequence)
         if match:
             # True
