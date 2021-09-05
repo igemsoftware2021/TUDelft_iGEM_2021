@@ -93,6 +93,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
         db.query(f"""CREATE TABLE IF NOT EXISTS {TABLE_ID_SEQ}(
                     id INTEGER PRIMARY KEY,
                     sequence TEXT,
+                    reference_name TEXT,
                     negative_cs INTEGER,
                     positive_cs INTEGER,
                     fold_change INTEGER
@@ -179,7 +180,11 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                             db.query(f"""INSERT INTO {TABLE_ID_SEQ} (sequence, negative_cs, positive_cs, fold_change)
                                 VALUES (:sequence, :negative_cs, :positive_cs, :fold_change)""", parameters={
                                 "sequence": sequence_info["sequence"], "negative_cs": 0, "positive_cs": 0, "fold_change": 0})
-                            sequence_id = db.cursor.lastrowid
+                            sequence_id = db.cursor.lastrowid  # rowid in sequence table
+
+                            if sequence_info["reference_name"] is not None:
+                                db.update_column_value(
+                                    TABLE_ID_SEQ, rowid=sequence_id, column_name="reference_name", value=sequence_info["reference_name"])
                         else:
                             sequence_id = id_sequence_info[0][0]
 
