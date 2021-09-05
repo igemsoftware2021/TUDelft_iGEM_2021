@@ -9,6 +9,10 @@ database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 
+
+# TODO first check whether it is even possible for a sequence to have a cleavage fraction
+
+
 with DatabaseInterfaceCleanSequences(path=database_path) as db:
 
     # Get all the reference sequence info for certain conditions
