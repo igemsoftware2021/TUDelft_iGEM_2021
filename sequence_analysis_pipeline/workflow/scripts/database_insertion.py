@@ -138,9 +138,15 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
                 read_count, sequence = line.strip().split()
                 if int(read_count) >= minimum_number_reads:
+
                     # Create a dictionary and store all general information for an unique sequence
                     sequence_info = {"driver_round": driver_round,
                                      "selection": selection, "ligand_present": ligand_present}
+                    sequence_info["reference_name"] = seq_helpers.reference_seq(
+                        sequence, clean_ngs_reference_patterns)
+
+                    if sequence_info["reference_name"] is not None:
+                        print('yeahhhh', sequence_info["reference_name"])
 
                     sequence_info["read_count"] = int(read_count)
                     sequence_info["original_sequence"] = sequence
