@@ -54,7 +54,8 @@ def create_ngs_references_patterns(ngs_references_dict: dict) -> dict:
     every time we want to check for a reference sequence."""
     patterns_dict = {}
     for seq in ngs_references_dict:
-        patterns_dict[regex.compile(seq)] = ngs_references_dict[seq]
+        patterns_dict[regex.compile(
+            fr"(?e)({seq}){{e<=1}}")] = ngs_references_dict[seq]
     return patterns_dict
 
 

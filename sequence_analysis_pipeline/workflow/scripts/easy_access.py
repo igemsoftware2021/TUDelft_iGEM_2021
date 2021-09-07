@@ -1,13 +1,13 @@
-from database_interface import DatabaseInterfaceCleanSequences
+from database_interface import DatabaseInterfaceSequences
 
 database_path = "./results/databases/T1_D80_database.db"
 # database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 
-with DatabaseInterfaceCleanSequences(path=database_path) as db:
-    sequences_info = db.query(
-        f"SELECT cleaned_sequence FROM {TABLE_NAME} WHERE fold_change IS NOT NULL", fetchall=True)
-    uniq_sequences_info = list(set(sequences_info))
+with DatabaseInterfaceSequences(path=database_path) as db:
+    results = db.query(
+        f"SELECT id, read_count, sequence_id, sequence, cleaved_prefix, ligand_present FROM {TABLE_NAME} WHERE reference_name IS NOT NULL", fetchall=True)
 
-print(len(uniq_sequences_info))
+    for result in results:
+        print(result)

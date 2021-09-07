@@ -58,25 +58,29 @@ with DatabaseInterfaceSequences(path=database_path) as db:
     id_sequence_rows = db.get(table=TABLE_ID_SEQ, columns=["id", "sequence"])
 
     for id_sequence_row in tqdm(id_sequence_rows):
-        id_value = id_sequence_row[0]
+        seq_id = id_sequence_row[0]
+
         for cleaved_bool_val in [True, False]:
             for ligand_bool_val in [True, False]:
 
-                sequence_rows = db.retrieve_info_sequence_id(
-                    table=TABLE_RAW_SEQ, sequence_id=id_value, cleaved_prefix=cleaved_bool_val, ligand_present=ligand_bool_val)
+                # # Check if read counts were already combined for a sequence id
+                # if len(db.retrieve_info_sequence_id(
+                #         table=TABLE_CLEAN_SEQ, sequence_id=id_value, cleaved_prefix=cleaved_bool_val, ligand_present=ligand_bool_val)) == 0:
 
+                sequence_rows = db.retrieve_info_sequence_id(
+                    table=TABLE_RAW_SEQ, sequence_id=seq_id, cleaved_prefix=cleaved_bool_val, ligand_present=ligand_bool_val)
                 if len(sequence_rows) != 0:
 
                     total_read_count = 0
                     for row in sequence_rows:
                         total_read_count += row[1]
 
-                    sequence_info = {"read_count": total_read_count, "sequence": sequence_rows[0][3], "sequence_id": id_value, "cleaved_prefix": sequence_rows[0][6], "selection": sequence_rows[0][9], "ligand_present": sequence_rows[0][11],
+                    sequence_info = {"read_count": total_read_count, "sequence": sequence_rows[0][3], "sequence_id": seq_id, "cleaved_prefix": sequence_rows[0][6], "selection": sequence_rows[0][9], "ligand_present": sequence_rows[0][11],
                                      "prefix_name": sequence_rows[0][7], "reference_name": sequence_rows[0][8], "driver_round": sequence_rows[0][10]}
 
-                db.query(f"""INSERT INTO {TABLE_CLEAN_SEQ}(read_count, sequence, sequence_id,
-                                    cleaved_prefix, prefix_name, reference_name,
-                                    selection, driver_round, ligand_present) VALUES (
-                                    :read_count, :sequence, :sequence_id,
-                                    :cleaved_prefix, :prefix_name, :reference_name,
-                                    :selection, :driver_round, :ligand_present)""", parameters=sequence_info)
+                    db.query(f"""INSERT INTO {TABLE_CLEAN_SEQ}(read_count, sequence, sequence_id,
+                                        cleaved_prefix, prefix_name, reference_name,
+                                        selection, driver_round, ligand_present) VALUES (
+                                        :read_count, :sequence, :sequence_id,
+                                        :cleaved_prefix, :prefix_name, :reference_name,
+                                        :selection, :driver_round, :ligand_present)""", parameters=sequence_info)

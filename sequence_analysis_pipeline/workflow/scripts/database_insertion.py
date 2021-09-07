@@ -45,6 +45,9 @@ ready_ngs_references = seq_helpers.clean_ngs_reference_sequences(
 clean_ngs_reference_patterns = seq_helpers.create_ngs_references_patterns(
     ready_ngs_references)
 
+
+print(clean_ngs_reference_patterns)
+
 # Retrieve the compiled info patterns from the config file
 driver_round_pattern, selection_pattern, ligand_present_pattern = yaml_read_helpers.retrieve_compiled_info_patterns(
     config_file_path)
@@ -142,11 +145,11 @@ with DatabaseInterfaceSequences(path=database_path) as db:
                     # Create a dictionary and store all general information for an unique sequence
                     sequence_info = {"driver_round": driver_round,
                                      "selection": selection, "ligand_present": ligand_present}
-                    sequence_info["reference_name"] = seq_helpers.reference_seq(
-                        sequence, clean_ngs_reference_patterns)
+                    # sequence_info["reference_name"] = seq_helpers.reference_seq(
+                    #     sequence, clean_ngs_reference_patterns)
 
-                    if sequence_info["reference_name"] is not None:
-                        print('yeahhhh', sequence_info["reference_name"])
+                    # if sequence_info["reference_name"] is not None:
+                    #     print('yeahhhh', sequence_info["reference_name"])
 
                     sequence_info["read_count"] = int(read_count)
                     sequence_info["original_sequence"] = sequence
