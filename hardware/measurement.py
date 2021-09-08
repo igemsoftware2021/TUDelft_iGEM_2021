@@ -1,9 +1,11 @@
-from hardware.helpers import determine_intensity_all_channels
 import time
 import multiprocessing
 import numpy as np
 import pigpio
-import helpers
+from helpers import initialize_light_pins, initialize_heating_pin
+from helpers import i2c_multiplexer_select_channel, i2c_activate_als_all_sensors
+from helpers import i2c_write_to_all_sensors, temperature_controller
+from helpers import determine_intensity_over_time, pre_heater
 
 ###############################################################################
 # Set-up
@@ -62,8 +64,8 @@ if not pi.connected:
     # TODO display error
 
 # Initialize pins
-helpers.initialize_light_pins(pi, pins_light)
-helpers.initialize_heating_pin(pi, pin_heating, pwm_freq)
+initialize_light_pins(pi, pins_light)
+initialize_heating_pin(pi, pin_heating, pwm_freq)
 
 
 # Initialize SPI connection
@@ -71,15 +73,15 @@ adc_handle = pi.spi_open(spi_channel, spi_baud, spi_flags)
 
 # Initialize I2C connection
 i2c_multiplexer_handle = pi.i2c_open(i2c_bus, i2c_multiplexer_adress)
-helpers.i2c_multiplexer_select_channel(pi,
-                                       i2c_multiplexer_handle, i2c_sensor_1_channel)  # Switch to a sensor channel
+i2c_multiplexer_select_channel(pi,
+                               i2c_multiplexer_handle, i2c_sensor_1_channel)  # Switch to a sensor channel
 i2c_sensor_handle = APDS9930(i2c_bus)  # Create 1 sensor handle
 
 # Activate ALS, and set gain and integration time
-helpers.i2c_activate_als_all_sensors(
+i2c_activate_als_all_sensors(
     pi, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels)
-helpers.i2c_write_to_all_sensors(i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels,
-                                 APDS9930_ATIME, i2c_sensor_int_time)
+i2c_write_to_all_sensors(i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels,
+                         APDS9930_ATIME, i2c_sensor_int_time)
 # helpers.i2c_change_gain_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, gain)
 
 # TODO test gain
@@ -90,18 +92,18 @@ helpers.i2c_write_to_all_sensors(i2c_multiplexer_handle, i2c_sensor_handle, i2c_
 print("Would you like to pre-heat the box? (True or False)")
 pre_heating = input()
 if pre_heating == True:
-    helpers.pre_heater(pi, adc_handle, spi_channel, pin_heating,
-                       pid_parameters, v_ref, gain)
+    pre_heater(pi, adc_handle, spi_channel, pin_heating,
+               pid_parameters, v_ref, gain)
     print("Pre-heating has finished.")
 
 
 print("Would you like to run a test? (True or False)")
 test = input()
 if test == True:
-    p_heating = multiprocessing.Process(target=helpers.temperature_controller, args=(pi,
-                                                                                     adc_handle, spi_channel, total_time, pin_heating, pid_parameters, v_ref, gain))
-    p_light = multiprocessing.Process(target=helpers.determine_intensity_over_time, args=(pi,
-                                                                                          pins_light, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels, total_time))
+    p_heating = multiprocessing.Process(target=temperature_controller, args=(pi,
+                                                                             adc_handle, spi_channel, total_time, pin_heating, pid_parameters, v_ref, gain))
+    p_light = multiprocessing.Process(target=determine_intensity_over_time, args=(pi,
+                                                                                  pins_light, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels, total_time))
     p_heating.start()
     p_light.start()
     p_heating.join()
