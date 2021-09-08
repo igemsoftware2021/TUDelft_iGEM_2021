@@ -19,7 +19,7 @@ def i2c_write_to_all_sensors(i2c_multiplexer_handle, i2c_sensor_handle, channel_
             reg, data)
 
 
-def determine_absorbance(pin_light, i2c_multiplexer_handle, i2c_sensor_handle, channel_number):
+def determine_intensity(pin_light, i2c_multiplexer_handle, i2c_sensor_handle, channel_number):
     pi.write(pin_light, 1)
     i2c_multiplexer_select_channel(
         i2c_multiplexer_handle, channel_number)
@@ -28,15 +28,23 @@ def determine_absorbance(pin_light, i2c_multiplexer_handle, i2c_sensor_handle, c
     return timepoint, intensity
 
 
-def determine_absorbance_over_time(pins_light, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, total_time):
+def determine_intensity_over_time(pins_light, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, total_time):
     num_sensors = len(channel_numbers)
     start_time = time.time()
     stop_time = start_time() + total_time
+    intensity = [[]] * num_sensors
+    time = [[]] * num_sensors
     while time.time() < stop_time:
         for i in range(len(num_sensors)):
             pi.write(pins_light[i])
             i2c_multiplexer_select_channel(
                 i2c_multiplexer_handle, channel_numbers[i])
-            timepoint, intensity = determine_absorbance(
+            timepoint, intensity_datapoint = determine_intensity(
                 pins_light[i], i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers[i])
-            # TODO store these in a list?
+            intensity[i].append(intensity_datapoint)
+            time[i].append(timepoint)
+    return time, intensity
+
+
+def calculate_absorbance(intensity, blanc):
+    for i in range(len(intensity)):
