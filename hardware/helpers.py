@@ -8,6 +8,8 @@ import pigpio
 def i2c_multiplexer_select_channel(pi, i2c_multiplexer_handle, channel_number):
     channel_decimal = 2 ** channel_number
     channel_hex = hex(channel_decimal)
+    print(type(channel_hex))
+    print(type(0x80))
     pi.i2c_write_device(i2c_multiplexer_handle, [0x80 | channel_hex])
     time.sleep(0.1)
 
@@ -167,6 +169,6 @@ def initialize_light_pins(pi, pins):
         pi.set_pull_up_down(pin, pigpio.PUD_DOWN)
 
 
-def initialize_heating_pi(pi, pin, pwm_freq):
+def initialize_heating_pin(pi, pin, pwm_freq):
     pi.set_pull_up_down(pin, pigpio.PUD_DOWN)
     pi.set_PWM_frequency(pin, pwm_freq)
