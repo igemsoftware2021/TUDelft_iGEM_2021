@@ -19,8 +19,16 @@ adc = pi.spi_open(0, 50000, 0)  # CE0 (indicates to which slave it's talking)
 
 stop = time.time() + 5
 
+v_ref = 3.3
+gain = 2.96
+
 while time.time() < stop:
-    print(read_mcp3008(adc, 0))
+    adc_value = read_mcp3008(adc, 0)
+    print(adc_value)
+    adc_voltage = adc_value * v_ref / 1024
+    adc_temperature = adc_voltage * 100 / gain
+    print(adc_temperature)
+
 
 pi.spi_close(adc)
 
