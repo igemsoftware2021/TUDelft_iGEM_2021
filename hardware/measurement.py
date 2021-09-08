@@ -1,3 +1,4 @@
+from hardware.helpers import i2c_multiplexer_select_channel
 import time
 import multiprocessing
 import numpy as np
@@ -9,10 +10,10 @@ import helpers
 
 # Control pins
 pin_heating = "TBD"
-pin_light_1 = 17
-pin_light_2 = 27
-pin_light_3 = 22
-pin_light_4 = 23
+pin_light_1 = "TBD"
+pin_light_2 = "TBD"
+pin_light_3 = "TBD"
+pin_light_4 = "TBD"
 pins_light = [pin_light_1, pin_light_2, pin_light_3, pin_light_4]
 
 # Constants for heating
@@ -73,8 +74,14 @@ adc_handle = pi.spi_open(spi_channel, spi_baud, spi_flags)
 # Initialize I2C connection
 i2c_multiplexer_handle = pi.i2c_open(i2c_bus, i2c_multiplexer_adress)
 helpers.i2c_multiplexer_select_channel(
-    i2c_multiplexer_handle, i2c_sensor_1_channel)  # Create 1 sensor handle
+    i2c_multiplexer_handle, i2c_sensor_1_channel)  # Switch to a sensor channel
 i2c_sensor_handle = APDS9930(i2c_bus)  # Create 1 sensor handle
+
+for i in range(len(i2c_sensor_channels)):  # Activate ambient light sensing
+    helpers.i2c_multiplexer_select_channel(
+        i2c_multiplexer_select_channel, i2c_sensor_channels[i])
+    i2c_sensor_handle.enable_ambient_light_sensor()
+
 helpers.i2c_write_to_all_sensors(i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels,
                                  APDS9930_ATIME, i2c_sensor_int_time)  # Set integration time
 
