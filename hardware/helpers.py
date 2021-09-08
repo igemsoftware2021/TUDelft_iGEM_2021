@@ -47,4 +47,7 @@ def determine_intensity_over_time(pins_light, i2c_multiplexer_handle, i2c_sensor
 
 
 def calculate_absorbance(intensity, blanc):
-    for i in range(len(intensity)):
+    intensity_np_arr = np.array(intensity)
+    ratio = intensity_np_arr / blanc
+    absorbance = np.log10(ratio)
+    return absorbance
