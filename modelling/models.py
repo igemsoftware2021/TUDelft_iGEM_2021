@@ -338,8 +338,6 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
     blue = eps_cpr * p * h
     yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
-    p = p / np.amax(p)
-
     return time, p
 
 

@@ -107,4 +107,4 @@ no_aptamer_eukaryotic_problem = {
 
 # Saving the data
 morris_datawriter(no_aptamer_prokaryotic_problem, "modelling\data\morris_no_aptamer",
-                  "Wat je hier neerzet geeft een tag aan de file, bijv: mu_star_wathierstaat.csv", time, mu, mu_star, sigma, mu_star_conf_level)
+                  "test", time, mu, mu_star, sigma, mu_star_conf_level)
