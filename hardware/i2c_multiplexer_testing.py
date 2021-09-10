@@ -30,13 +30,16 @@ while time.time() < stop:
     i2c_sensor_handle.ch0_light
     i2c_sensor_handle.ch1_light
     result = i2c_sensor_handle.ambient_light
+    time_1 = time.time()
     result_0 = i2c_sensor_handle.ch0_light
+    time_2 = time.time()
+    print(time_2-time_1)
     result_1 = i2c_sensor_handle.ch1_light
-    print("Lux", result)
+    #print("Lux", result)
     print("CH0", result_0)
-    print("CH1", result_1)
+    #print("CH1", result_1)
     time.sleep(0.3)
-    print(time.time() - stop + 60)
+    #print(time.time() - stop + 60)
     if time.time() > stop - 55:
         pi.i2c_write_device(i2c_multiplexer_handle, [0x80 | 0x02])
 

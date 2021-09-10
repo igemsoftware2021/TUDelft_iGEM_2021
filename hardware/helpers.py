@@ -1,16 +1,13 @@
-from copy import error
 import time
-import multiprocessing
 import numpy as np
 import pigpio
+import csv
 
 
 def i2c_multiplexer_select_channel(pi, i2c_multiplexer_handle, channel_number):
-    channel_decimal = 2 ** channel_number
-    channel_hex = hex(channel_decimal)
-    print(type(channel_hex))
-    print(type(0x80))
-    pi.i2c_write_device(i2c_multiplexer_handle, [0x80 | channel_hex])
+    channel_base_2_number = 2 ** channel_number
+    pi.i2c_write_device(i2c_multiplexer_handle,
+                        [0x80 | channel_base_2_number])
     time.sleep(0.1)
 
 
@@ -31,8 +28,8 @@ def i2c_change_gain_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, c
 
 def i2c_activate_als_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers):
     for channel_number in channel_numbers:
-        i2c_multiplexer_select_channel(
-            i2c_multiplexer_select_channel, channel_number)
+        i2c_multiplexer_select_channel(pi,
+                                       i2c_multiplexer_handle, channel_number)
         i2c_sensor_handle.enable_ambient_light_sensor()
 
 
@@ -42,33 +39,8 @@ def determine_intensity_single_channel(pi, pin_light, i2c_multiplexer_handle, i2
                                    i2c_multiplexer_handle, channel_number)
     intensity = i2c_sensor_handle.ch0_light
     timepoint = time.time()
+    pi.write(pin_light, 0)
     return timepoint, intensity
-
-
-def determine_intensity_over_time(pi, pins_light, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, total_time):
-    num_sensors = len(channel_numbers)
-    start_time = time.time()
-    stop_time = start_time() + total_time
-    intensity = [[]] * num_sensors
-    timepoints = []
-    for i in range(num_sensors):
-        timepoints.append([])
-    while time.time() < stop_time:
-        for i in range(len(num_sensors)):
-            pi.write(pins_light[i])
-            i2c_multiplexer_select_channel(pi,
-                                           i2c_multiplexer_handle, channel_numbers[i])
-            timepoint, intensity_datapoint = determine_intensity_single_channel(pi,
-                                                                                pins_light[i], i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers[i])
-            intensity[i].append(intensity_datapoint)
-            timepoints[i].append(timepoint)
-    for i in range(len(num_sensors)):
-        intensity_single_channel = intensity[i]
-        timepoints_single_channel = timepoints[i]
-        absorbance_single_channel = calculate_absorbance(
-            intensity_single_channel)
-        # TODO write to file with something to denote well
-    return timepoints, intensity
 
 
 def calculate_absorbance(intensity):
@@ -85,8 +57,8 @@ def read_mcp3008(pi, adc, channel):  # TODO link to stackoverflow
     return value
 
 
-def read_mcp3008_median(pi, adc, channel, v_ref, gain, duration=0.25, interval=0.025):
-    samples = duration / interval
+def read_mcp3008_median(pi, adc, channel, v_ref, gain, duration=0.17, interval=0.005):
+    samples = int(np.floor(duration / interval))
     adc_values = np.zeros(samples, dtype=np.float32)
     for i in range(samples):
         adc_values[i] = read_mcp3008(pi, adc, channel)
@@ -97,7 +69,7 @@ def read_mcp3008_median(pi, adc, channel, v_ref, gain, duration=0.25, interval=0
     return adc_temperature
 
 
-def pid_controller_calculator(pid_parameters, error, duration):
+def pid_controller_calculator(pid_parameters, error, duration=0.17):
     k_p = pid_parameters[0]
     k_i = pid_parameters[1]
     k_d = pid_parameters[2]
@@ -118,49 +90,42 @@ def check_heated_up(error):
         return True
 
 
-def pre_heater(pi, adc, channel, pin_heating, pid_parameters, v_ref, gain, duration=0.25, interval=0.005):
-    temperature_desired = pid_parameters[4]
+def pre_heater(pi, adc, channel, pin_heating, pid_parameters, v_ref, gain, duration=0.17, interval=0.005):
+    temperature_desired = pid_parameters[3]
+    pwm_freq = pid_parameters[4]
     temperature_error = []
+    temperature_time = []
     heated_up = False
+
+    T_c = 0.001  # Lowest high or low time [ms] to protect the hardware
+    duty_cycle_lower_bound = T_c * pwm_freq * 10 ** 6
+    duty_cycle_upper_bound = (1 - T_c * pwm_freq) * 10**6
 
     while heated_up == False:
         # Measure temperature error
         temperature_median = read_mcp3008_median(pi, adc, channel, v_ref, gain,
                                                  duration=duration, interval=interval)
+        temperature_time.append(time.time())
         temperature_median_error = temperature_desired - temperature_median
         temperature_error.append(temperature_median_error)
 
         # PID controller
         duty_cycle = pid_controller_calculator(pid_parameters, temperature_error,
-                                               duration=0.25)
-        duty_cycle = int(duty_cycle)
-        pi.set_PWM_dutycycle(pin_heating, duty_cycle)
+                                               duration=duration)
+        duty_cycle = int(duty_cycle)  # PWM will have freq
+        if duty_cycle < duty_cycle_lower_bound:
+            duty_cycle = 0
+        if duty_cycle > duty_cycle_upper_bound:
+            duty_cycle = duty_cycle_upper_bound
+        print(duty_cycle)
+        pi.hardware_PWM(pin_heating, pwm_freq, duty_cycle)
 
         # Register that and display message if the box is stable at desired temperature
         heated_up = check_heated_up(temperature_error)
         if heated_up == True:
-            return
-
-
-def temperature_controller(pi, adc, channel, total_time, pin_heating, pid_parameters, v_ref, gain, duration=0.25, interval=0.005):
-    stop_time = time.time() + total_time
-    temperature_desired = pid_parameters[4]
-    temperature_error = []
-
-    while time.time() < stop_time:
-        # Measure temperature error
-        temperature_median = read_mcp3008_median(pi, adc, channel, v_ref, gain,
-                                                 duration=duration, interval=interval)
-        temperature_median_error = temperature_desired - temperature_median
-        temperature_error.append(temperature_median_error)
-
-        # PID controller
-        duty_cycle = pid_controller_calculator(pid_parameters, temperature_error,
-                                               duration=0.25)
-        duty_cycle = int(duty_cycle)
-        pi.set_PWM_dutycycle(pin_heating, duty_cycle)
-    pi.set_PWM_dutycycle(pin_heating, 0)  # Turn of the PWM output signal
-    return error
+            # Turn of the PWM output signal
+            pi.hardware_PWM(pin_heating, pwm_freq, 0)
+            return temperature_time, temperature_error
 
 
 def initialize_light_pins(pi, pins):
@@ -169,6 +134,92 @@ def initialize_light_pins(pi, pins):
         pi.set_pull_up_down(pin, pigpio.PUD_DOWN)
 
 
-def initialize_heating_pin(pi, pin, pwm_freq):
+def initialize_heating_pin(pi, pin):
     pi.set_pull_up_down(pin, pigpio.PUD_DOWN)
-    pi.set_PWM_frequency(pin, pwm_freq)
+
+
+def main_measurement(pi, pins_light, pin_heating, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, adc_handle, adc_channel, total_time, pid_parameters, v_ref, gain, duration=0.17, interval=0.005):
+    num_sensors = len(channel_numbers)
+    pwm_freq = pid_parameters[4]
+    start_time = time.time()
+    stop_time = start_time + total_time
+
+    intensity = []
+    absorbance = []
+    timepoints = []
+    temperature_error = []
+    for i in range(num_sensors):
+        intensity.append([])
+        absorbance.append([])
+        timepoints.append([])
+    timepoints.append([])
+
+    T_c = 0.001  # Lowest high or low time [ms] to protect the hardware
+    duty_cycle_lower_bound = T_c * pwm_freq * 10**6
+    duty_cycle_upper_bound = (1 - T_c * pwm_freq) * 10**6
+
+    while time.time() < stop_time:
+        for i in range(num_sensors):
+            pi.write(pins_light[i], 1)
+            temperature_controller(pi, adc_handle, adc_channel, pin_heating, duty_cycle_lower_bound, duty_cycle_upper_bound,
+                                   pid_parameters, v_ref, gain, temperature_error, duration=duration, interval=interval)
+            temperature_timepoint = time.time()
+            timepoint, intensity_datapoint = determine_intensity_single_channel(pi,
+                                                                                pins_light[i], i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers[i])
+            intensity[i].append(intensity_datapoint)
+            timepoints[i].append(timepoint)
+            timepoints[-1].append(temperature_timepoint)
+
+    pi.hardware_PWM(pin_heating, pwm_freq, 0)  # Turn of the PWM output signal
+
+    for i in range(num_sensors):
+        intensity_single_channel = intensity[i]
+        absorbance[i] = calculate_absorbance(intensity_single_channel)
+
+    return timepoints, absorbance, temperature_error
+
+
+def temperature_controller(pi, adc, channel, pin_heating, duty_cycle_lower_bound, duty_cycle_upper_bound, pid_parameters, v_ref, gain, temperature_error, duration=0.17, interval=0.005):
+    temperature_desired = pid_parameters[3]
+    pwm_freq = pid_parameters[4]
+
+    temperature_median = read_mcp3008_median(pi, adc, channel, v_ref, gain,
+                                             duration=duration, interval=interval)
+    temperature_median_error = temperature_desired - temperature_median
+    temperature_error.append(temperature_median_error)
+
+    # PID controller
+    duty_cycle = pid_controller_calculator(pid_parameters, temperature_error,
+                                           duration=duration)
+    duty_cycle = int(duty_cycle)  # PWM will have freq
+    if duty_cycle < duty_cycle_lower_bound:
+        duty_cycle = 0
+    if duty_cycle > duty_cycle_upper_bound:
+        duty_cycle = duty_cycle_upper_bound
+        print(duty_cycle)
+    pi.hardware_PWM(pin_heating, pwm_freq, duty_cycle)
+    return temperature_error
+
+
+def save_as_csv(timepoints, absorbance, path, name):
+    timepoints = np.array(timepoints)
+    absorbance = np.array(absorbance)
+    num_rows = len(timepoints)
+    with open(path + name + ".csv", 'w') as new_file:
+        csv_writer = csv.writer(new_file)
+        for i in range(num_rows):
+            row = [timepoints[i], absorbance[i]]
+        csv_writer.writerow(row)
+
+
+def read_from_csv(path, name):
+    timepoints = []
+    absorbance = []
+    with open(path + name + ".csv", "r") as csv_file:
+        csv_reader = csv.reader(csv_file)
+        for line in csv_reader:
+            timepoints.append(line[0])
+            absorbance.append(line[1])
+    timepoints = np.array(timepoints)
+    absorbance = np.array(absorbance)
+    return timepoints, absorbance
