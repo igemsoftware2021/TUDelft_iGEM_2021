@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 # Set-up
 
 # Constants for test
-total_time = 10
+total_time = 4
 
 # Control pins
 pin_heating = 18
@@ -112,6 +112,8 @@ if test == "yes":
                                                                  i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels, adc_handle,
                                                                  spi_channel, total_time, pid_parameters, v_ref, gain,
                                                                  duration=0.10, interval=0.005)  # returns a list of np arrays
+    print(temperature_error)
+    print(timepoints[-1])
     for i in range(len(i2c_sensor_channels)):
         timepoints_single_channel = timepoints[i]
         absorbance_single_channel = absorbance[i]
@@ -119,13 +121,14 @@ if test == "yes":
                     absorbance_single_channel, path, name[i])
     save_as_csv(timepoints[-1], temperature_error, path, "temperature_error")
 print("The test has been completed.")
-
+timepoints_plot, absorbance_plot = read_from_csv(path, "sensor_1")
 fig1, ax1 = plt.subplots()
-ax1.plot(timepoints[0], absorbance[0])
+ax1.plot(timepoints_plot, absorbance_plot)
 fig1.show()
 
+timepoints_plot, temperature_error = read_from_csv(path, "temperature_error")
 fig2, ax2 = plt.subplots()
-ax2.plot(timepoints[-1], temperature_error)
+ax2.plot(timepoints_plot, temperature_error)
 fig2.show()
 
 plt.show()

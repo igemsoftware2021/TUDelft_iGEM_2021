@@ -44,10 +44,10 @@ def determine_intensity_single_channel(pi, pin_light, i2c_multiplexer_handle, i2
 
 
 def calculate_absorbance(intensity):
-    blanc = intensity[0]
+    blanco = intensity[0]
     intensity_np_arr = np.array(intensity)
-    ratio = intensity_np_arr / blanc
-    absorbance = np.log10(ratio)
+    transmittance = intensity_np_arr / blanco
+    absorbance = - np.log10(transmittance)
     return absorbance
 
 
@@ -157,7 +157,7 @@ def main_measurement(pi, pins_light, pin_heating, i2c_multiplexer_handle, i2c_se
     T_c = 0.001  # Lowest high or low time [ms] to protect the hardware
     duty_cycle_lower_bound = T_c * pwm_freq * 10**6
     duty_cycle_upper_bound = (1 - T_c * pwm_freq) * 10**6
-
+    print("start")
     while time.time() < stop_time:
         for i in range(num_sensors):
             pi.write(pins_light[i], 1)
@@ -167,15 +167,15 @@ def main_measurement(pi, pins_light, pin_heating, i2c_multiplexer_handle, i2c_se
             timepoint, intensity_datapoint = determine_intensity_single_channel(pi,
                                                                                 pins_light[i], i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers[i])
             intensity[i].append(intensity_datapoint)
-            timepoints[i].append(timepoint)
-            timepoints[-1].append(temperature_timepoint)
+            timepoints[i].append(timepoint - start_time)
+            timepoints[-1].append(temperature_timepoint - start_time)
 
     pi.hardware_PWM(pin_heating, pwm_freq, 0)  # Turn of the PWM output signal
 
     for i in range(num_sensors):
         intensity_single_channel = intensity[i]
         absorbance[i] = calculate_absorbance(intensity_single_channel)
-
+        print(intensity_single_channel)
     return timepoints, absorbance, temperature_error
 
 
@@ -202,14 +202,16 @@ def temperature_controller(pi, adc, channel, pin_heating, duty_cycle_lower_bound
 
 
 def save_as_csv(timepoints, absorbance, path, name):
-    timepoints = np.array(timepoints)
-    absorbance = np.array(absorbance)
+    timepoints = timepoints
+    absorbance = absorbance
     num_rows = len(timepoints)
+    print(num_rows)
     with open(path + name + ".csv", 'w') as new_file:
         csv_writer = csv.writer(new_file)
         for i in range(num_rows):
-            row = [timepoints[i], absorbance[i]]
-        csv_writer.writerow(row)
+            row = [str(timepoints[i]), str(absorbance[i])]
+            print(row)
+            csv_writer.writerow(row)
 
 
 def read_from_csv(path, name):
@@ -218,8 +220,9 @@ def read_from_csv(path, name):
     with open(path + name + ".csv", "r") as csv_file:
         csv_reader = csv.reader(csv_file)
         for line in csv_reader:
-            timepoints.append(line[0])
-            absorbance.append(line[1])
+            print(line)
+            timepoints.append(np.float32(line[0]))
+            absorbance.append(np.float32(line[1]))
     timepoints = np.array(timepoints)
     absorbance = np.array(absorbance)
     return timepoints, absorbance
