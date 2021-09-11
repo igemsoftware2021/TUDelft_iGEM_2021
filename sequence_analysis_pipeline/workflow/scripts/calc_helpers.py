@@ -91,23 +91,23 @@ def calc_cs_and_fc_metrics(info_rows):
     for ref_seq_id in ref_seq_ids:
         rc_ref_seq_clvd_pos += info_to_read_count.get(
             (ref_seq_id, 1, 1), 0)
-        rc_ref_seq_unclvd_pos = info_to_read_count.get(
+        rc_ref_seq_unclvd_pos += info_to_read_count.get(
             (ref_seq_id, 0, 1), 0)
-        rc_ref_seq_clvd_neg = info_to_read_count.get(
+        rc_ref_seq_clvd_neg += info_to_read_count.get(
             (ref_seq_id, 1, 0), 0)
-        rc_ref_seq_unclvd_neg = info_to_read_count.get(
+        rc_ref_seq_unclvd_neg += info_to_read_count.get(
             (ref_seq_id, 0, 0), 0)
 
     # loop over all the sequences and calculate their respective neg cs, pos cs and fc
     for seq_id in seq_ids:
 
         # First calculate the negative cleavage fraction
-        rc_seq_clvd_neg = info_to_read_count.get((seq_id, 1, 0), None)
+        rc_seq_clvd_neg = info_to_read_count.get((seq_id, 1, 0), 0)
         rc_seq_unclvd_neg = info_to_read_count.get(
-            (seq_id, 0, 0), None)
+            (seq_id, 0, 0), 0)
 
         neg_cs_exists = False
-        if rc_seq_clvd_neg is not None and rc_seq_unclvd_neg is not None:
+        if rc_seq_clvd_neg != 0 and rc_seq_unclvd_neg != 0:
             neg_cs = calc_cleavage_fraction(
                 rc_seq_clvd_neg, rc_ref_seq_clvd_neg, rc_seq_unclvd_neg, rc_ref_seq_unclvd_neg)
             rowid_seq_clvd_neg = info_to_rowid.get(
@@ -119,24 +119,26 @@ def calc_cs_and_fc_metrics(info_rows):
             neg_cs_exists = True
 
         # Then calculate the positive cleavage fraction
-        rc_seq_clvd_pos = info_to_read_count.get((seq_id, 1, 1), None)
+        rc_seq_clvd_pos = info_to_read_count.get((seq_id, 1, 1), 0)
         rc_seq_unclvd_pos = info_to_read_count.get(
-            (seq_id, 0, 1), None)
+            (seq_id, 0, 1), 0)
 
         pos_cs_exists = False
-        if rc_seq_clvd_pos is not None and rc_seq_unclvd_pos is not None:
+        if rc_seq_clvd_pos != 0 and rc_seq_unclvd_pos != 0:
             pos_cs = calc_cleavage_fraction(
                 rc_seq_clvd_pos, rc_ref_seq_clvd_pos, rc_seq_unclvd_pos, rc_ref_seq_unclvd_pos)
             rowid_seq_clvd_pos = info_to_rowid.get(
-                (seq_id, 1, 0), None)
+                (seq_id, 1, 1), None)
             rowid_seq_unclvd_pos = info_to_rowid.get(
-                (seq_id, 0, 0), None)
+                (seq_id, 0, 1), None)
             rowid_to_pos_cs[rowid_seq_clvd_pos] = pos_cs
             rowid_to_pos_cs[rowid_seq_unclvd_pos] = pos_cs
             pos_cs_exists = True
 
         # Finally calculate the fold change if possible
         if neg_cs_exists and pos_cs_exists:
+            # print(neg_cs, pos_cs)
+            # fc = k * ((1 - pos_cs)/(1 - neg_cs))
             fc = calc_fold_change(cs_pos=pos_cs, cs_neg=neg_cs, k=1.0)
             fc_store.append(fc)
             rowid_to_fc[rowid_seq_clvd_neg] = fc
