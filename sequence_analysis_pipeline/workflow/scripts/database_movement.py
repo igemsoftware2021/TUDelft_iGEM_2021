@@ -1,9 +1,8 @@
 from database_interface import DatabaseInterfaceSequences
 from tqdm import tqdm
 
-# database_path = "sequence_analysis_pipeline/data/NGS/processed/S1_D80_database.db"
-# database_path = snakemake.input[0]
-database_path = "results/databases/T1_D80_database.db"
+database_path = snakemake.input[0]
+# database_path = "results/databases/T1_D80_database.db"
 
 # The table where we store all the initial data
 TABLE_RAW_SEQ = "raw_sequences"

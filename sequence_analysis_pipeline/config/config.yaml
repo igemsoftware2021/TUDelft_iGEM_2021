@@ -1,4 +1,4 @@
-dataset: T1_D80
+dataset: N35-I3_S3
 minimum_reads: 30
 ligand_positive:
     prefixes:

@@ -3,7 +3,9 @@ from tqdm import tqdm
 import seq_helpers
 import yaml_read_helpers
 
+# seq_input_file = "results/read_counts/N35-I3_S3.txt"
 seq_input_file = snakemake.input[0]
+# seq_neg_ligand_file, seq_pos_ligand_file = "results/read_counts/N35-I3_S3_L0_read_count.txt", "results/read_counts/N35-I3_S3_L0_read_count.txt"
 seq_neg_ligand_file, seq_pos_ligand_file = snakemake.output[0], snakemake.output[1]
 
 # Create the path to the config file

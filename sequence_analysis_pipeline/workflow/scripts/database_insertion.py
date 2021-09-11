@@ -15,17 +15,17 @@ ngs_references_path = Path(
     __file__).resolve().parents[2] / "data" / "ngs_references.csv"
 
 # Store the input filenames in a variable. The inputfile names are given by snakemake.
-inputfiles = [
-    Path(__file__).resolve().parents[2] / "results" /
-    "read_counts" / "T1_D80_L0_read_count.txt",
-    Path(__file__).resolve().parents[2] / "results" / "read_counts" / "T1_D80_L1_read_count.txt"]
-# inputfiles = [snakemake.input[0], snakemake.input[1]]
+# inputfiles = [
+# Path(__file__).resolve().parents[2] / "results" /
+# "read_counts" / "T1_D80_L0_read_count.txt",
+# Path(__file__).resolve().parents[2] / "results" / "read_counts" / "T1_D80_L1_read_count.txt"]
+inputfiles = [snakemake.input[0], snakemake.input[1]]
 
 # Store the output filename in a variable. The outputfile name is given by snakemake.
 # database_path = ":memory:"
-database_path = Path(__file__).resolve(
-).parents[2] / "results" / "databases" / "T1_D80_database.db"
-# database_path = snakemake.output[0]
+# database_path = Path(__file__).resolve(
+# ).parents[2] / "results" / "databases" / "T1_D80_database.db"
+database_path = snakemake.output[0]
 
 # Prep the reference sequences
 reference_prefix_patterns = yaml_read_helpers.retrieve_compiled_reference_patterns(
