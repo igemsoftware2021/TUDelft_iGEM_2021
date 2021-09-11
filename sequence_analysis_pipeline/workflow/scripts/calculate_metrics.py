@@ -2,7 +2,7 @@ from database_interface import DatabaseInterfaceSequences
 from calc_helpers import calc_cs_and_fc_metrics
 
 # database_path = snakemake.input[0]
-database_path = "results/databases/T1_D80_database.db"
+database_path = "results/databases/T1_D80_database_v2.db"
 
 # The table that links an integer to a sequence
 TABLE_ID_SEQ = "id_sequence"
