@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/T1_D80_database_v2.db"
+database_path = "./results/databases/N35-I4_S4_database.db"
 # database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence

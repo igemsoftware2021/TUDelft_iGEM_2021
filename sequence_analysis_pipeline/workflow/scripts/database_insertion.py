@@ -121,6 +121,7 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
         # Retrieve the round of DRIVER, which selection it is and whether the ligand
         # is present from the file
+        print(driver_round_pattern, inputfile)
         driver_round = int(driver_round_pattern.search(inputfile).group())
         selection = selection_pattern.search(inputfile).group()
         ligand_present = int(ligand_present_pattern.search(inputfile).group())

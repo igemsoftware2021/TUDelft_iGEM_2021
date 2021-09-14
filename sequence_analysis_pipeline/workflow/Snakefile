@@ -1,4 +1,4 @@
-configfile: "config/config_zero.yaml"
+configfile: "config/config.yaml"
 
 # Example
 # inputfiles:
@@ -105,38 +105,27 @@ rule database_movement:
     script:
         "scripts/database_movement.py"
 
-rule database_calculate_cleavage_fraction:
+rule database_calculate_metrics:
     input:
         "results/databases/{dataset}_database.db",
         "results/checkpoints/{dataset}/{dataset}_database_movement.done"
     output:
-        touch("results/checkpoints/{dataset}/{dataset}_database_cleavage_fraction.done")
+        touch("results/checkpoints/{dataset}/{dataset}_database_calculate_metrics.done")
     conda:
         "envs/database.yaml"
     script:
-        "scripts/calculation_cleavagefraction.py"
-
-rule database_calculate_fold_change:
-    input:
-        "results/databases/{dataset}_database.db",
-        "results/checkpoints/{dataset}/{dataset}_database_cleavage_fraction.done"
-    output:
-        touch("results/checkpoints/{dataset}/{dataset}_database_fold_change.done")
-    conda:
-        "envs/database.yaml"
-    script:
-        "scripts/calculation_foldchange.py"
+        "scripts/calculate_metrics.py"
 
 rule database_bootstrapping:
     input:
         "results/databases/{dataset}_database.db",
-        "results/checkpoints/{dataset}/{dataset}_database_fold_change.done"
+        "results/checkpoints/{dataset}/{dataset}_database_calculate_metrics.done"
     output:
         touch("results/checkpoints/{dataset}/{dataset}_database_bootstrapping.done")
     conda:
         "envs/database.yaml"
     script:
-        "scripts/database_bootstrapping_v2.py"
+        "scripts/database_bootstrapping_v3.py"
 
 rule database_biosensor_assay:
     input:

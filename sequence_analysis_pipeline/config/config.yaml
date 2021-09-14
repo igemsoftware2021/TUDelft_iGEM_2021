@@ -1,4 +1,4 @@
-dataset: N35-I3_S3
+dataset: N35-I4_S4
 minimum_reads: 30
 ligand_positive:
     prefixes:
@@ -8,29 +8,29 @@ ligand_positive:
             i_error: 1
             d_error: 1
             s_error: 1
-            max_error: 1
+            max_error: 0
         uncleaved:
             sequence: AGATGGGAAACAAACAAA
             name: W
             i_error: 1
             d_error: 1
             s_error: 1
-            max_error: 1
+            max_error: 0
     suffixes:
         cleaved:
-            sequence: AAAAAGAAATT
+            sequence: AAAAAGAAAT
             name: XL
             i_error: 1
             d_error: 0
             s_error: 1
-            max_error: 1
+            max_error: 0
         uncleaved:
             sequence: AAAAAGAAATT
             name: XL
             i_error: 1
             d_error: 0
             s_error: 1
-            max_error: 1
+            max_error: 0
 ligand_negative:
     prefixes:
         cleaved:
@@ -39,14 +39,14 @@ ligand_negative:
             i_error: 1
             d_error: 1
             s_error: 1
-            max_error: 1
+            max_error: 0
         uncleaved:
             sequence: GGGAAACAAACAAA
             name: W
             i_error: 1
             d_error: 1
             s_error: 1
-            max_error: 1
+            max_error: 0
     suffixes:
         cleaved:
             sequence: AAAAAGAAAT
@@ -54,14 +54,14 @@ ligand_negative:
             i_error: 1
             d_error: 0
             s_error: 1
-            max_error: 1
+            max_error: 0
         uncleaved:
             sequence: AAAAAGAAAT
             name: XN
             i_error: 1
             d_error: 0
             s_error: 1
-            max_error: 1
+            max_error: 0
 references:
     prefixes:
         cleaved:
@@ -80,20 +80,20 @@ references:
             max_error: 1
     suffixes:
         cleaved:
-            sequence: AAAAAGAAAT
+            sequence: AAAAAGAAA
             name: X
             i_error: 1
             d_error: 1
             s_error: 1
             max_error: 1
         uncleaved:
-            sequence: AAAAAGAAAT
+            sequence: AAAAAGAAA
             name: X
             i_error: 1
             d_error: 1
             s_error: 1
             max_error: 1
 info_patterns:
-    selection: "(T[0-9]+)"
-    driver_round: "(?<=D)([0-9]+)"
+    selection: "(S[0-9]+)"
+    driver_round: "(?<=N)([0-9]+)"
     ligand_present: "(?<=L)([0-1]+)"
