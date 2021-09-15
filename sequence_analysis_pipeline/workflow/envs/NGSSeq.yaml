@@ -1,0 +1,13 @@
+name: NGSSeq
+channels:
+  - conda-forge
+  - bioconda
+  - desiliniguist
+  - defaults
+dependencies:
+  - python=3.9.*
+  - nwalign=0.3.*
+  - pyyaml=5.4.*
+  - tqdm=4.61.*
+  - regex=2021.4.*
+  - pathlib
