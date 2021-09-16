@@ -5,7 +5,7 @@ from models import model_prokaryotic_readout
 from alignment_helpers import weighted_running_average
 
 
-def create_absorbance_sd(num_points, low=0.0, high=2.0, linear_coef=0.005, random_coef=0.002):
+def create_absorbance_sd(num_points, low=0.0, high=2.0, linear_coef=0.01, random_coef=0.0):
     """Function creates an array with absorbance values and an array with the corresponding standard deviation"""
     absorbance = np.linspace(low, high, num=num_points, dtype=np.float32)
     sd = linear_coef * absorbance + random_coef * np.random.randn(num_points)
@@ -192,14 +192,14 @@ if __name__ == "__main__":
     time, absorbance = model_prokaryotic_readout(
         parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-    absorbance_values, sd_values = absorbance_sd(30)
+    absorbance_values, sd_values = create_absorbance_sd(30)
 
     f = UnivariateSpline(absorbance_values, sd_values, k=3)
 
     x_new = np.arange(0, 2.0, step=0.01, dtype=np.float32)
     y_new = f(x_new)
 
-    time_new, absorbance_new = simulate_noise(
+    time_new, absorbance_new = simulate_hardware(
         time, absorbance, absorbance_values, sd_values)
 
     time_weighted, absorbance_weighted = weighted_running_average(

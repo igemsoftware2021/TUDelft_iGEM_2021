@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import alignment_helpers
+from simulation_helpers import create_absorbance_sd, simulate_hardware
 
 # Parameters
 # (#) denotes the position in the parameters array
@@ -56,6 +57,9 @@ fig1, ax1 = plt.subplots()
 count = 0
 # For loop to create reference curves for now.
 # vit concentration [µM]
+
+absorbance_values, sd_values = create_absorbance_sd(20)
+
 for i in np.linspace(5*10**-3, 5000*10**-3, num_graph):
 
     # Initial concentration of the beta-galactosidase gene [μM]
@@ -67,6 +71,10 @@ for i in np.linspace(5*10**-3, 5000*10**-3, num_graph):
     # Running the model
     (time, absorbance) = model_prokaryotic_readout(parameters,
                                                    constants, initial_conditions, dt=dt, t_tot=t_tot)
+
+    # time_hardware, absorbance_hardware = simulate_hardware(
+    #     time, absorbance, absorbance_values, sd_values)
+
     absorbance = absorbance[::sample_size]
     time = time[::sample_size]
     time_array[:, count] = time
@@ -74,6 +82,7 @@ for i in np.linspace(5*10**-3, 5000*10**-3, num_graph):
     count += 1
 
     ax1.plot(time, absorbance)
+    # ax1.scatter(time_hardware, absorbance_hardware, s=0.5)
 
 ax1.set_ylabel("Absorbance A [-]")
 ax1.set_xlabel("Time t [s]")
