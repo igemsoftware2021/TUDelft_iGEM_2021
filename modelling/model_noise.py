@@ -53,7 +53,7 @@ def simulate_time_lag(time, absorbance_data, t_lag=10.0, t_sd_lag=5.0):
     return time, absorbance_data
 
 
-def simulate_time_noise(time, absorbance_data, dt=1.0, dt_sd=0.1):
+def simulate_time_measurement(time, absorbance_data, dt=1.0, dt_sd=0.1):
     # First fit a spline to the data
     spl = UnivariateSpline(time, absorbance_data, k=1, s=0, ext=2)
 
@@ -62,19 +62,19 @@ def simulate_time_noise(time, absorbance_data, dt=1.0, dt_sd=0.1):
     time_total = time[-1]
 
     # Create a list where we will store the new timepoints
-    time_noise = []
+    time_measurement = []
 
     # Create a temporary variable to store how far in time you are
     time_temp = 0
     while time_temp < time_total:
-        time_noise.append(time_temp)
+        time_measurement.append(time_temp)
         time_temp = time_temp + (dt + dt_sd * np.random.randn())
 
     # Transform the list to a numpy array
-    time_noise = np.array(time_noise, dtype=np.float32)
-    absorbance_data_time_noise = spl(time_noise)
+    time_measurement = np.array(time_measurement, dtype=np.float32)
+    absorbance_data_time_measurement = spl(time_measurement)
 
-    return time_noise, absorbance_data_time_noise
+    return time_measurement, absorbance_data_time_measurement
 
 
 def simulate_absorbance_noise(absorbance_data, absorbance_value, absorbance_sd):
@@ -93,13 +93,15 @@ def simulate_absorbance_noise(absorbance_data, absorbance_value, absorbance_sd):
 
 
 def simulate_hardware(time, absorbance_data, absorbance_value, absorbance_sd, dt: float = 1.0, dt_sd: float = 0.1, t_lag: float = None, t_sd_lag: float = None):
-    """Function simulates the hardware, so it removes time points and it adds noise to the absorbance"""
+    """Function simulates the hardware, so it removes time points and it adds noise to the absorbance
+    Only time lag is added if t_lag and t_sd_lag are not None
+    """
 
     if t_lag is not None and t_sd_lag is not None:
         time, absorbance_data = simulate_time_lag(
             time, absorbance_data, t_lag=t_lag, t_sd_lag=t_sd_lag)
 
-    time_noise, absorbance_data = simulate_time_noise(
+    time_noise, absorbance_data = simulate_time_measurement(
         time, absorbance_data, dt=dt, dt_sd=dt_sd)
     absorbance_data_noise = simulate_absorbance_noise(
         absorbance_data, absorbance_value, absorbance_sd)
