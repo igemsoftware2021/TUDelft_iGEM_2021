@@ -12,29 +12,45 @@ def create_absorbance_sd(num_points, low=0.0, high=2.0, linear_coef=0.005, rando
     return absorbance, sd
 
 
-absorbance_values, sd_values = absorbance_sd(30)
-
-f = UnivariateSpline(absorbance_values, sd_values, k=3)
-
-x_new = np.arange(0, 2.0, step=0.01, dtype=np.float32)
-y_new = f(x_new)
-
-fig1, ax1 = plt.subplots()
-ax1.scatter(absorbance_values, sd_values, color="red")
-ax1.plot(x_new, y_new)
-fig1.show()
-plt.show()
-
-
 def find_nearest_idx(array, value):
+    """Function finds index of the array where the value is closest to the given value.
+
+    Example:
+    array = np.array([0.0, 0.6, 0.9, 1.0, 1.5, 5.0, 7.6])
+    value = 1.4
+
+    returns idx = 4
+    """
     array = np.asarray(array)
     idx = np.nanargmin(np.abs(array-value))
     return idx
 
 
 def find_nearest(array, value):
+    """Returns the value in the array that is closest to the given value
+
+    Example:
+    array = np.array([0.0, 0.6, 0.9, 1.0, 1.5, 5.0, 7.6])
+    value = 1.4
+
+    returns 1.5, since value at index = 4 is the closest
+    """
     idx = find_nearest_idx(array, value)
     return array[idx]
+
+
+def simulate_time_lag(time, absorbance_data, t_lag=10.0, t_sd_lag=5.0):
+    """Function simulates time lag in the cell free systems"""
+    time_lag = t_lag + t_sd_lag * np.random.randn()
+    dt = time[1] - time[0]
+
+    time_lag_array = np.arange(0.0, time_lag, step=dt, dtype=np.float32)
+    absorbance_lag_array = np.zeros(time_lag_array.shape, dtype=np.float32)
+
+    time = np.concatenate((time_lag_array, time), axis=0)
+    absorbance_data = np.concatenate(
+        (absorbance_lag_array, absorbance_data), axis=0)
+    return time, absorbance_data
 
 
 def simulate_time_noise(time, absorbance_data, dt=1.0, dt_sd=0.1):
@@ -76,10 +92,15 @@ def simulate_absorbance_noise(absorbance_data, absorbance_value, absorbance_sd):
     return absorbance_data_noise
 
 
-def simulate_hardware(time, absorbance_data, absorbance_value, absorbance_sd, dt=1.0, dt_sd=0.1):
+def simulate_hardware(time, absorbance_data, absorbance_value, absorbance_sd, dt: float = 1.0, dt_sd: float = 0.1, t_lag: float = None, t_sd_lag: float = None):
     """Function simulates the hardware, so it removes time points and it adds noise to the absorbance"""
+
+    if t_lag is not None and t_sd_lag is not None:
+        time, absorbance_data = simulate_time_lag(
+            time, absorbance_data, t_lag=t_lag, t_sd_lag=t_sd_lag)
+
     time_noise, absorbance_data = simulate_time_noise(
-        time, absorbance_data, dt=dt, dt_sd=0.1)
+        time, absorbance_data, dt=dt, dt_sd=dt_sd)
     absorbance_data_noise = simulate_absorbance_noise(
         absorbance_data, absorbance_value, absorbance_sd)
 
