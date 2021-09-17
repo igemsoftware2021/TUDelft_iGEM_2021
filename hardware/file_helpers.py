@@ -5,6 +5,7 @@ import re
 
 
 def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.csv"):
+    """Function to write temperature data to a csv file"""
     if len(time) != len(temperature):
         raise ValueError(
             "The time list and temperature list are not of the same length")
@@ -21,6 +22,25 @@ def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.cs
 
         for i in range(len(time)):
             writer.writerow({"time": time[i], "temperature": temperature[i]})
+
+
+def read_temperature_csv(path):
+    """Function to read the temperature data from a csv file"""
+    with open(path, "r") as csv_rf:
+        reader = csv.DictReader(csv_rf)
+        fieldnames = reader.fieldnames
+
+        if "time" not in fieldnames and "temperature" not in fieldnames:
+            raise ValueError(
+                f"Check the fieldnames of {path}, time and temperature are missing")
+
+        time = []
+        temperature = []
+
+        for row in reader:
+            time.append(float(row["time"]))
+            temperature.append(float(row["temperature"]))
+    return time, temperature
 
 
 def write_absorbance_csv(time, absorbance, path=f"absorbance-{time.time()}.csv"):
