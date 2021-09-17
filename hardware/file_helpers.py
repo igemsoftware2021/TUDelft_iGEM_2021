@@ -9,6 +9,19 @@ def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.cs
         raise ValueError(
             "The time list and temperature list are not of the same length")
 
+    with open(path, mode="w") as csv_wf:
+        dict_to_write = dict()
+
+        fieldnames = ["time", "temperature"]
+
+        writer = csv.DictWriter(csv_wf, fieldnames=fieldnames)
+
+        # Write the fieldnames to the top of the file
+        writer.writeheader()
+
+        for i in range(len(time)):
+            writer.writerow({"time": time[i], "temperature": temperature[i]})
+
 
 def write_absorbance_csv(time, absorbance, path=f"absorbance-{time.time()}.csv"):
     if len(time) != len(absorbance):
