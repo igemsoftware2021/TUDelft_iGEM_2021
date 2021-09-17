@@ -9,7 +9,7 @@ def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.cs
         raise ValueError(
             "The time list and temperature list are not of the same length")
 
-    with open(path, mode="w") as csv_wf:
+    with open(file=path, mode="w", encoding="utf-8") as csv_wf:
         fieldnames = ["time", "temperature"]
 
         writer = csv.DictWriter(csv_wf, fieldnames=fieldnames)
@@ -23,7 +23,7 @@ def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.cs
 
 def read_temperature_csv(path):
     """Function to read the temperature data from a csv file"""
-    with open(path, "r") as csv_rf:
+    with open(file=path, mode="r", encoding="utf-8") as csv_rf:
         reader = csv.DictReader(csv_rf)
         fieldnames = reader.fieldnames
 
@@ -50,7 +50,7 @@ def write_absorbance_csv(time: list, absorbance: list, path=f"absorbance-{int(ti
     max_len = max(len(absorbance_list) for absorbance_list in absorbance)
 
     # The absorbance is a list of lists, where every list contains the values of one sensor
-    with open(path, mode="w", encoding="utf-8") as csv_wf:
+    with open(file=path, mode="w", encoding="utf-8") as csv_wf:
         dict_to_write = dict()
 
         fieldnames = []
