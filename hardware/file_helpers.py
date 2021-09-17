@@ -44,16 +44,16 @@ def read_temperature_csv(path: str):
     Parameters
     ----------
     path: str
-        The path to the csv file from which the data should be read.
+        The path to the csv file from which the data should be read
 
     Returns
     -------
     time: list
         The timepoints at which the temperature measurements were taken. Timepoint at
-        index 1 corresponds to the temperature value at index 1 in the temperature list.
+        index 1 corresponds to the temperature value at index 1 in the temperature list
     temperature: list
         The temperature values stored at certain timepoints. Temperature value at index 1
-        corresponds to the timepoint at index 1 in the time list.
+        corresponds to the timepoint at index 1 in the time list
 
     Raises
     ------
@@ -79,6 +79,35 @@ def read_temperature_csv(path: str):
 
 
 def write_absorbance_csv(time: list, absorbance: list, path: str = f"absorbance-{int(time.time())}.csv"):
+    """Function to write time and absorbance data to a csv file at a specific location.
+
+    This function can write multiple time lists and multiple absorbance lists into one single file.
+    It will automatically determine the number of lists and write everything under the proper header
+    in a csv file.
+
+    Parameters
+    ----------
+    time: list of lists
+        Every list contains the timepoints at which the absorbance measurements were taken. The timepoint in list 0
+        at index 1 corresponds to the absorbance value at index 1 of absorbance list 0
+    absorbance: list of lists
+        Every list contains the absorbance values stored at certain timepoints. The absorbance value in list 0 a
+        index 1 corresponds to the timepoint at index 1 in the time list 0
+    path: str
+        The path to where the csv file should be written (default f"absorbance-{time.time()}.csv")
+
+    Raises
+    ------
+    ValueError
+        The variable time and variable absorbance should contain the same amount of lists
+
+    Notes
+    -----
+    Examples:
+    time = [[0.1, 0.2, 0.35, 0.56], [0.1, 0.35, 0.56], [0.1, 0.25, 0.35, 0.56, 0.80]]
+    absorbance = [[0.2, 0.3, 0.43, 8], [0.2, 0.43, 8], [0.2, 0.35, 0.43, 8, 6.8]]
+    """
+
     if len(time) != len(absorbance):
         raise ValueError(
             "The variable time and variable absorbance should contain the same amount of lists")
@@ -119,6 +148,33 @@ def write_absorbance_csv(time: list, absorbance: list, path: str = f"absorbance-
 
 def read_absorbance_csv(path: str):
     """Function reads an absorbance file and returns a list of timepoints and a list of absorbance points"""
+    """Function to write time and absorbance data to a csv file at a specific location.
+
+    This function can write multiple time lists and multiple absorbance lists into one single file.
+    It will automatically determine the number of lists and write everything under the proper header
+    in a csv file.
+
+    Parameters
+    ----------
+    path: str
+        The path to the csv file from which the data should be read
+    
+    Returns
+    -------
+    time: list of lists
+        Every list contains the timepoints at which the absorbance measurements were taken. The timepoint in list 0
+        at index 1 corresponds to the absorbance value at index 1 of absorbance list 0
+    absorbance: list of lists
+        Every list contains the absorbance values stored at certain timepoints. The absorbance value in list 0 a
+        index 1 corresponds to the timepoint at index 1 in the time list 0
+
+    Notes
+    -----
+    Examples:
+    time = [[0.1, 0.2, 0.35, 0.56], [0.1, 0.35, 0.56], [0.1, 0.25, 0.35, 0.56, 0.80]]
+    absorbance = [[0.2, 0.3, 0.43, 8], [0.2, 0.43, 8], [0.2, 0.35, 0.43, 8, 6.8]]
+    """
+
     with open(file=path, mode="r", encoding="utf-8") as csv_rf:
 
         reader = csv.DictReader(csv_rf)
