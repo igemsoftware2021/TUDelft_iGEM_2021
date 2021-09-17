@@ -148,6 +148,7 @@ def main_measurement(pi, pins_light, pin_heating, i2c_multiplexer_handle, i2c_se
     absorbance = []
     timepoints = []
     temperature_error = []
+    # Add a list in every list, where every list is a channel
     for i in range(num_sensors):
         intensity.append([])
         absorbance.append([])
