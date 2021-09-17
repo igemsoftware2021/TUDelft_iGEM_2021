@@ -4,7 +4,24 @@ import re
 
 
 def write_temperature_csv(time: list, temperature: list, path: str = f"temperature-{time.time()}.csv"):
-    """Function to write temperature data to a csv file"""
+    """Function to write time and temperature data to a csv file at a specific location.
+
+    Parameters
+    ----------
+    time: list
+        The timepoints at which the temperature measurements were taken. Timepoint at
+        index 1 corresponds to the temperature value at index 1 in the temperature list
+    temperature: list
+        The temperature values stored at certain timepoints. Temperature value at index 1
+        corresponds to the timepoint at index 1 in the time list
+    path: str
+        The path to where the csv file should be written (default f"temperature-{time.time()}.csv")
+
+    Raises
+    ------
+    ValueError
+        If the time list and temperature are not of the same length
+    """
     if len(time) != len(temperature):
         raise ValueError(
             "The time list and temperature list are not of the same length")
@@ -22,7 +39,28 @@ def write_temperature_csv(time: list, temperature: list, path: str = f"temperatu
 
 
 def read_temperature_csv(path: str):
-    """Function to read the temperature data from a csv file"""
+    """Function to read time and temperature data from a csv file at a specific location.
+
+    Parameters
+    ----------
+    path: str
+        The path to the csv file from which the data should be read.
+
+    Returns
+    -------
+    time: list
+        The timepoints at which the temperature measurements were taken. Timepoint at
+        index 1 corresponds to the temperature value at index 1 in the temperature list.
+    temperature: list
+        The temperature values stored at certain timepoints. Temperature value at index 1
+        corresponds to the timepoint at index 1 in the time list.
+
+    Raises
+    ------
+    ValueError
+        If the csv file does not contain the proper fieldnames, namely
+        "time" and "temperature"
+    """
     with open(file=path, mode="r", encoding="utf-8") as csv_rf:
         reader = csv.DictReader(csv_rf)
         fieldnames = reader.fieldnames
