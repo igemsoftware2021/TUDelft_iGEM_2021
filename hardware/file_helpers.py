@@ -21,7 +21,7 @@ def write_temperature_csv(time: list, temperature: list, path: str = f"temperatu
             writer.writerow({"time": time[i], "temperature": temperature[i]})
 
 
-def read_temperature_csv(path: str) -> tuple(list, list):
+def read_temperature_csv(path: str):
     """Function to read the temperature data from a csv file"""
     with open(file=path, mode="r", encoding="utf-8") as csv_rf:
         reader = csv.DictReader(csv_rf)
@@ -79,7 +79,7 @@ def write_absorbance_csv(time: list, absorbance: list, path: str = f"absorbance-
             writer.writerow(dict_to_write)
 
 
-def read_absorbance_csv(path: str) -> tuple(list, list):
+def read_absorbance_csv(path: str):
     """Function reads an absorbance file and returns a list of timepoints and a list of absorbance points"""
     with open(file=path, mode="r", encoding="utf-8") as csv_rf:
 
