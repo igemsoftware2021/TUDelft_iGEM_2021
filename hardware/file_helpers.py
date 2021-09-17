@@ -3,7 +3,7 @@ import time
 import re
 
 
-def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.csv"):
+def write_temperature_csv(time: list, temperature: list, path: str = f"temperature-{time.time()}.csv"):
     """Function to write temperature data to a csv file"""
     if len(time) != len(temperature):
         raise ValueError(
@@ -21,7 +21,7 @@ def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.cs
             writer.writerow({"time": time[i], "temperature": temperature[i]})
 
 
-def read_temperature_csv(path):
+def read_temperature_csv(path: str) -> tuple(list, list):
     """Function to read the temperature data from a csv file"""
     with open(file=path, mode="r", encoding="utf-8") as csv_rf:
         reader = csv.DictReader(csv_rf)
@@ -40,7 +40,7 @@ def read_temperature_csv(path):
     return time, temperature
 
 
-def write_absorbance_csv(time: list, absorbance: list, path=f"absorbance-{int(time.time())}.csv"):
+def write_absorbance_csv(time: list, absorbance: list, path: str = f"absorbance-{int(time.time())}.csv"):
     if len(time) != len(absorbance):
         raise ValueError(
             "The variable time and variable absorbance should contain the same amount of lists")
@@ -79,7 +79,7 @@ def write_absorbance_csv(time: list, absorbance: list, path=f"absorbance-{int(ti
             writer.writerow(dict_to_write)
 
 
-def read_absorbance_csv(path):
+def read_absorbance_csv(path: str) -> tuple(list, list):
     """Function reads an absorbance file and returns a list of timepoints and a list of absorbance points"""
     with open(file=path, mode="r", encoding="utf-8") as csv_rf:
 
