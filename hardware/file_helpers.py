@@ -11,8 +11,6 @@ def write_temperature_csv(time, temperature, path=f"temperature-{time.time()}.cs
             "The time list and temperature list are not of the same length")
 
     with open(path, mode="w") as csv_wf:
-        dict_to_write = dict()
-
         fieldnames = ["time", "temperature"]
 
         writer = csv.DictWriter(csv_wf, fieldnames=fieldnames)
@@ -43,7 +41,7 @@ def read_temperature_csv(path):
     return time, temperature
 
 
-def write_absorbance_csv(time, absorbance, path=f"absorbance-{time.time()}.csv"):
+def write_absorbance_csv(time: list, absorbance: list, path=f"absorbance-{int(time.time())}.csv"):
     if len(time) != len(absorbance):
         raise ValueError(
             "The variable time and variable absorbance should contain the same amount of lists")
@@ -53,7 +51,7 @@ def write_absorbance_csv(time, absorbance, path=f"absorbance-{time.time()}.csv")
     max_len = max(len(absorbance_list) for absorbance_list in absorbance)
 
     # The absorbance is a list of lists, where every list contains the values of one sensor
-    with open(path, mode="w") as csv_wf:
+    with open(path, mode="w", encoding="utf-8") as csv_wf:
         dict_to_write = dict()
 
         fieldnames = []
@@ -84,19 +82,25 @@ def write_absorbance_csv(time, absorbance, path=f"absorbance-{time.time()}.csv")
 
 def read_absorbance_csv(path):
     """Function reads an absorbance file and returns a list of timepoints and a list of absorbance points"""
-    with open(path, mode="r") as csv_rf:
+    with open(file=path, mode="r", encoding="utf-8") as csv_rf:
 
-        reader = csv.DictReader(path)
+        reader = csv.DictReader(csv_rf)
+
         headers = reader.fieldnames
 
         # Find the total number of channels of which there is absorbance in the csv file
-        num_channels = 0
+        max_chan_number = 0
         for fieldname in headers:
-            # This regex matches an integer
-            result = re.match(r"[\d]+", fieldname)
-            number = result.group(0)
-            if number > num_channels:
-                num_channels = number
+
+            # This regex matches an integer in the name, use re.search
+            # not re.match because re.match only checks from the first character
+            # onwards
+            result = re.search(r"[\d]+", fieldname)
+            chan_number = int(result.group(0))
+            if chan_number > max_chan_number:
+                max_chan_number = chan_number
+
+        num_channels = max_chan_number + 1  # Do +1, because the chan_number starts at 0
 
         # Create the lists in which to store the timepoints and absorbance
         time = []
