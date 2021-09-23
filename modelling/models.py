@@ -4,7 +4,7 @@ import csv
 
 
 @njit(cache=True, nogil=True)
-def model_yfp_expression(parameters, dna_i, dt=0.1, t_tot=7200):
+def model_yfp_expression(parameters, dna_i, dt=0.01, t_tot=7200):
     """Function does a simulation of YFP expression.
 
     Parameters:
@@ -95,7 +95,7 @@ def model_yfp_expression(parameters, dna_i, dt=0.1, t_tot=7200):
 
 
 @njit(cache=True, nogil=True)
-def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
+def model_no_aptamer(parameters, constants, initial_conditions, dt=0.01, t_tot=7200):
     """Function does a simulation of the kinetics of the AptaVita system without aptamers.
 
     Parameters:
@@ -209,7 +209,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.1, t_tot=72
 
 
 @njit(cache=True, nogil=True)
-def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
+def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=7200):
     """Function does a simulation of the kinetics of the prokaryotic AptaVita system.
 
     Parameters:
@@ -342,7 +342,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7
 
 
 @njit(cache=True, nogil=True)
-def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
+def model_eukaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=7200):
     """Function does a simulation of the kinetics of the eukaryotic AptaVita system.
 
     Parameters:
@@ -475,7 +475,7 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.1, t_tot=72
 
 
 @njit(cache=True, nogil=True)
-def model_prokaryotic_readout(parameters, constants, initial_conditions, dt=0.1, t_tot=7200):
+def model_prokaryotic_readout(parameters, constants, initial_conditions, dt=0.01, t_tot=7200):
     """Function does a simulation of the kinetics of the prokaryotic AptaVita system for different vitamin concentrations.
     There is some timedelay in the readout to visualize differences in viscosity of blood plasma and the delay of 
     manually putting in the detection strip.
