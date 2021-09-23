@@ -30,6 +30,10 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     absorbance1 = np.zeros((num_steps, timesteps), dtype=np.float32)
     absorbance2 = np.zeros((num_steps, timesteps), dtype=np.float32)
 
+    # Preallocate necessary storage
+    area_step = dna_conc_all
+    area_array = np.zeros(num_steps, dtype=np.float32)
+
     # Precompute everything
     for i in range(num_steps):
         parameters, constants, initial_conditions = standard_parameters(
@@ -42,8 +46,21 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
         time2, absorbance2[i, :] = model_prokaryotic(
             parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
 
+        area = np.sum((absorbance1[i, :] - absorbance2[i, :]) * dt)
+
+        # area = np.sum(
+        #     (np.cumsum(absorbance1[i, :]) - np.cumsum(absorbance2[i, :])) * dt)
+        area_array[i] = area
+
+    # absorbance1 = np.cumsum(absorbance1, axis=1)
+    # absorbance2 = np.cumsum(absorbance2, axis=1)
+
+    area_array = area_array / area_array[0]
+
     # Create the figure
     fig, ax = plt.subplots()
+    fig2, ax2 = plt.subplots()
+    ax2.plot(area_step, area_array)
 
     # Store the label str expressions
     label_line1 = micromolar_conc_to_math_exp(vit_conc1) + " original"
@@ -59,16 +76,17 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
                      label=label_line2, color="#8B992F")
     line4, = ax.plot(time2, absorbance2[0, :],
                      label=label_line4, color="#667817")
+
     dna_conc_math_exp = "DNA concentration:\n" + \
         micromolar_conc_to_math_exp(high_dna_conc)
     dna_conc_text = ax.text(100, 100, dna_conc_math_exp,
                             fontsize=10, bbox=dict(facecolor="#FFCF39", alpha=0.5, boxstyle="round"))
 
     def init():
-        ax.grid(True)
+        # ax.grid(True)
         ax.legend()
         ax.set_xlim(0, t_tot)
-        ax.set_ylim(-10, 160)
+        # ax.set_ylim(-10, 160)
         return line1, line2, line3, line4, dna_conc_text,
 
     def update(index):
@@ -91,7 +109,8 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     plt.show()
 
 
-anim_two_vitamin_conc_differing_dna_conc(0.5, 1, num_steps=50)
+anim_two_vitamin_conc_differing_dna_conc(
+    0.5, 2, low_dna_conc=0.5*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=14400)
 
 
 # parameters, constants, initial_conditions = standard_parameters(
