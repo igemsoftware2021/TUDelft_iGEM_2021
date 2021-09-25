@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def standard_parameters(dna_conc=5*10**-3, vit_conc=5):
+def standard_parameters_prokaryotic(dna_conc=5*10**-3, vit_conc=5):
     # Parameters
     # (#) denotes the position in the parameters array
     k_ts = 6.7*10**-5     # (0)  Transcription rate [uM/s]
@@ -23,6 +23,10 @@ def standard_parameters(dna_conc=5*10**-3, vit_conc=5):
     parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                            k_tlr, k_m, deg_mrna, deg_tlr, k_on, k_off, k_c])  # Array containing above parameters
 
+    return parameters
+
+
+def standard_constants():
     # Constants
     # (#) denotes the position in the constants array
     h = 0.020  # (0) Height of the paper [cm]
@@ -30,14 +34,11 @@ def standard_parameters(dna_conc=5*10**-3, vit_conc=5):
     eps_cprg = 0.294
     # (2) Exctinction coefficient of CPR at a wavelength of 580 in 25% serum [1/(µM*cm)]
     eps_cpr = 0.539
-    # I_null = ... Has to be filled in after the experiments.
 
     # Array containing above constants
     constants = np.array([h, eps_cprg, eps_cpr])
+    return constants
 
-    # Initial concentration of the beta-galactosidase gene [μM]
-    # dna_i = 5*10**-3
-    s_i = 150         # Initial substrate concentration [μM]
 
-    initial_conditions = np.array([dna_conc, s_i, vit_conc])
-    return parameters, constants, initial_conditions
+def standard_initial_conditions(dna_conc=5*10**-3, s_i=150, vit_conc=1):
+    return np.array([dna_conc, s_i, vit_conc])
