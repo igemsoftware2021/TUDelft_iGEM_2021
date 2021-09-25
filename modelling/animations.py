@@ -1,10 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
-from matplotlib.animation import PillowWriter
+from matplotlib.animation import FuncAnimation, FFMpegFileWriter
 from models import model_prokaryotic, model_prokaryotic_readout, model_prokaryotic_all
-from standard_parameters import standard_parameters
-from alignment_helpers import graph_alignment
+from standard_parameters import standard_constants, standard_initial_conditions, standard_parameters_prokaryotic
 
 
 def micromolar_conc_to_math_exp(conc: float, decimals: int):
@@ -28,6 +26,19 @@ def micromolar_conc_to_math_exp(conc: float, decimals: int):
 
 def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=1*10**-6, high_dna_conc=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save=False):
     """All inputs are in micromolar"""
+
+    # The difference in dt between every plotted point, this is done to speed up the animation
+    # so that if the dt=0.001 matplotlib does not have to plot every single point, while the
+    # simulation can still be run at dt timesteps
+    plot_dt = 0.1
+    # The index difference in the timestep array to make sure you plot every point with
+    # timestep difference of plot_dt. However the simulation is still run at timestep dt
+
+    if dt >= plot_dt:
+        plot_di = 1
+    else:
+        plot_di = int(np.floor((plot_dt / dt)))
+
     # Determine all the DNA concentrations to try
     dna_conc_all = np.linspace(low_dna_conc, high_dna_conc, num_steps)[::-1]
 
@@ -36,42 +47,35 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     absorbance1 = np.zeros((num_steps, timesteps), dtype=np.float32)
     absorbance2 = np.zeros((num_steps, timesteps), dtype=np.float32)
 
-    absorbance1_cumsum = np.zeros((num_steps, timesteps), dtype=np.float32)
-    absorbance2_cumsum = np.zeros((num_steps, timesteps), dtype=np.float32)
-
     # Preallocate necessary storage
-    area_step = dna_conc_all
     area_array = np.zeros(num_steps, dtype=np.float32)
 
     # Precompute everything
+    parameters = standard_parameters_prokaryotic()
+    constants = standard_constants()
+
     for i in range(num_steps):
-        parameters, constants, initial_conditions = standard_parameters(
-            dna_conc=dna_conc_all[i], vit_conc=vit_conc1)
+        initial_conditions = standard_initial_conditions(
+            dna_conc=dna_conc_all[i], s_1=150, vit_conc=vit_conc1)
         time1, absorbance1[i, :] = model_prokaryotic_readout(
             parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-        parameters, constants, initial_conditions = standard_parameters(
-            dna_conc=dna_conc_all[i], vit_conc=vit_conc2)
+        initial_conditions = standard_initial_conditions(
+            dna_conc=dna_conc_all[i], s_1=150, vit_conc=vit_conc2)
         time2, absorbance2[i, :] = model_prokaryotic_readout(
             parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-        # area = np.sum((absorbance1[i, :] - absorbance2[i, :]) * dt)
+        area = np.sum((absorbance1[i, :] - absorbance2[i, :]) * dt)
 
-        area = np.sum(
-            (np.cumsum(absorbance1[i, :]) - np.cumsum(absorbance2[i, :])) * dt)
         area_array[i] = area
-
-    absorbance1_cumsum = np.cumsum(absorbance1, axis=1)
-    absorbance2_cumsum = np.cumsum(absorbance2, axis=1)
 
     area_array = area_array / area_array[0]
 
     # Create the figure
-    fig, ax = plt.subplots()
-    fig2, ax2 = plt.subplots()
-    fig3, ax3 = plt.subplots()
+    fig, (ax, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(
+        12, 8), gridspec_kw={"height_ratios": [2, 1]})
 
-    ax3.plot(dna_conc_all, area_array)
+    # fig2, ax2 = plt.subplots()
 
     # Store the label str expressions
     label_line1 = micromolar_conc_to_math_exp(vit_conc1, 0) + " original"
@@ -80,55 +84,85 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     label_line4 = micromolar_conc_to_math_exp(vit_conc2, 0) + " moving"
 
     # First normal product lines
-    line1, = ax.plot(time1, absorbance1[0, :],
+    line1, = ax.plot(time1[::plot_di], absorbance1[0, ::plot_di],
                      label=label_line1, color="#E389BB")
-    line3, = ax.plot(time1, absorbance1[0, :],
-                     label=label_line3, color="#9B0138")
-    line2, = ax.plot(time2, absorbance2[0, :],
+    line2, = ax.plot(time2[::plot_di], absorbance2[0, ::plot_di],
                      label=label_line2, color="#8B992F")
-    line4, = ax.plot(time2, absorbance2[0, :],
+    line3, = ax.plot(time1[::plot_di], absorbance1[0, ::plot_di],
+                     label=label_line3, color="#9B0138")
+    line4, = ax.plot(time2[::plot_di], absorbance2[0, ::plot_di],
                      label=label_line4, color="#667817")
 
-    line1_ax2, = ax2.plot(time1, absorbance1_cumsum[0, :],
-                          label=label_line1, color="#E389BB")
-    line3_ax2, = ax2.plot(time1, absorbance1_cumsum[0, :],
-                          label=label_line3, color="#9B0138")
-    line2_ax2, = ax2.plot(time2, absorbance2_cumsum[0, :],
-                          label=label_line2, color="#8B992F")
-    line4_ax2, = ax2.plot(time2, absorbance2_cumsum[0, :],
-                          label=label_line4, color="#667817")
+    fill1 = ax.fill_between(
+        time1[::plot_di], absorbance1[0, ::plot_di], absorbance2[0, ::plot_di], color="#FFCF39", alpha=0.25)
+    fill2 = ax.fill_between(
+        time1[::plot_di], absorbance1[0, ::plot_di], absorbance2[0, ::plot_di], color="#FFCF39", alpha=0.75)
 
-    dna_conc_math_exp = "DNA concentration:\n" + \
+    # Area line
+    area_line1, = ax2.plot(dna_conc_all, area_array, color="#E389BB")
+    area_line2, = ax2.plot(dna_conc_all[0], area_array[0], color="#9B0138")
+    # ax2.plot(dna_conc_all, area_array)
+
+    dna_conc_math_exp = "DNA concentration: " + \
         micromolar_conc_to_math_exp(high_dna_conc, 2)
-    dna_conc_text = ax.text(100, 100, dna_conc_math_exp,
+    dna_conc_text = ax.text(0.7, 0.1, dna_conc_math_exp, transform=ax.transAxes,
                             fontsize=10, bbox=dict(facecolor="#FFCF39", alpha=0.5, boxstyle="round"))
 
     def init():
         # ax.grid(True)
+
+        ax.set_title("Absorbance over time")
         ax.legend()
+        ax.set_xlabel(r"Time $[s]$")
+        ax.set_ylabel(r"Absorbance $[AU]$")
         ax.set_xlim(0, t_tot)
         # ax.set_ylim(-10, 160)
-        return line1, line2, line3, line4, line1_ax2, line2_ax2, line3_ax2, line4_ax2, dna_conc_text,
+
+        ax2.set_title("Relative area between two graphs over time")
+        ax2.set_xlabel(r"DNA concentration $[\mu M]$")
+        ax2.set_ylabel("Relative area")
+
+        # Determine how to set the x-axis for ax2
+        x_lim_diff = np.amax(dna_conc_all)*0.05
+        ax2.set_xlim(np.amin(dna_conc_all)-x_lim_diff,
+                     np.amax(dna_conc_all)+x_lim_diff)
+
+        # Determine how to set the y-axis for ax2
+        y_lim_diff = np.amax(area_array)*0.05
+        ax2.set_ylim(np.amin(area_array)-y_lim_diff,
+                     np.amax(area_array)+y_lim_diff)
+
+        # Set a tight_layout for the figure. This needs to be done
+        # after the axis names and title have been set
+        fig.tight_layout()
+        return line1, line2, line3, line4, fill1, fill2, area_line1, area_line2, dna_conc_text,
 
     def update(index):
-        dna_conc_math_exp = "DNA concentration:\n" + \
+
+        dna_conc_math_exp = "DNA concentration: " + \
             micromolar_conc_to_math_exp(dna_conc_all[index], 2)
         dna_conc_text.set_text(dna_conc_math_exp)
 
-        line3.set_data(time1, absorbance1[index, :])
-        line4.set_data(time2, absorbance2[index, :])
+        line3.set_data(time1[::plot_di], absorbance1[index, ::plot_di])
+        line4.set_data(time2[::plot_di], absorbance2[index, ::plot_di])
 
-        line3_ax2.set_data(time1, absorbance1_cumsum[index, :])
-        line4_ax2.set_data(time2, absorbance2_cumsum[index, :])
-        return line1, line2, line3, line4, line1_ax2, line2_ax2, line3_ax2, line4_ax2, dna_conc_text,
+        area_line2.set_data(dna_conc_all[:index], area_array[:index])
+
+        ax.collections.clear()
+        fill1 = ax.fill_between(
+            time1[::plot_di], absorbance1[0, ::plot_di], absorbance2[0, ::plot_di], color="#FFCF39", alpha=0.25)
+        fill2 = ax.fill_between(
+            time1[::plot_di], absorbance1[index, ::plot_di], absorbance2[index, ::plot_di], color="#FFCF39", alpha=0.75)
+
+        return line1, line2, line3, line4, fill1, fill2, area_line1, area_line2, dna_conc_text,
 
     anim = FuncAnimation(fig, update, frames=np.arange(num_steps),
-                         init_func=init, blit=True)
+                         init_func=init, blit=False)
 
     if save:
-        f = "test.gif"
-        writergif = PillowWriter(fps=60)
-        anim.save(f, writer=writergif)
+        f = "test.mp4"
+        writermp4 = FFMpegFileWriter(fps=5, bitrate=5000)
+        anim.save(f, writer=writermp4)
 
     plt.show()
 
@@ -225,81 +259,12 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
     if save:
         f = "test.gif"
-        writergif = PillowWriter(fps=60)
+        writergif = FFMpegFileWriter(fps=60)
         anim.save(f, writer=writergif)
 
     plt.show()
 
 
-anim_two_vitamin_conc_differing_dna_conc(
-    0.5, 2, low_dna_conc=0.5*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=7200)
-
-
-# anim_frac_mrna_conc_differing_dna_conc(
-#     2.0, low_dna_conc=0.5*10**-5, high_dna_conc=5*10**-3, num_steps=20, dt=0.01, t_tot=3600)
-
-# parameters, constants, initial_conditions = standard_parameters(
-#     dna_conc=5*10**-3, vit_conc=5)
-# time1, absorbance1 = model_prokaryotic(
-#     parameters, constants, initial_conditions, dt=0.01, t_tot=7200)
-
-
-# parameters, constants, initial_conditions = standard_parameters(
-#     dna_conc=5*10**-3, vit_conc=20)
-# time2, absorbance2 = model_prokaryotic(
-#     parameters, constants, initial_conditions, dt=0.01, t_tot=7200)
-
-# time_text = ax.text(100, 100,
-#                     r"DNA concentration: $5 \times 10^{-3}$ $\mu M$", fontsize=10)
-
-# graph_step = 50
-# label_line1 = micromolar_conc_to_math_exp(5) + " original"
-# line1, = plt.plot(time1[::graph_step],
-#                   absorbance1[::graph_step], label=label_line1)
-# line3, = plt.plot(time1[::graph_step],
-#                   absorbance1[::graph_step], label="5 move")
-# line2, = plt.plot(time2[::graph_step],
-#                   absorbance2[::graph_step], label="50 standard")
-# line4, = plt.plot(time2[::graph_step],
-#                   absorbance2[::graph_step], label="50 move")
-
-# n = 20
-# timesteps = int(np.ceil(T_TOT/DT)) + 1
-# absorbance1 = np.zeros((n, timesteps), dtype=np.float32)
-# absorbance2 = np.zeros((n, timesteps), dtype=np.float32)
-
-
-# dna_concenctrations = np.linspace(1*10**-6, 5*10**-3, n)[::-1]
-
-# for i in range(n):
-#     parameters, constants, initial_conditions = standard_parameters(
-#         dna_conc=dna_concenctrations[i], vit_conc=5)
-#     _, absorbance1[i, :] = model_prokaryotic(
-#         parameters, constants, initial_conditions, dt=DT, t_tot=T_TOT)
-
-#     parameters, constants, initial_conditions = standard_parameters(
-#         dna_conc=dna_concenctrations[i], vit_conc=20)
-#     _, absorbance2[i, :] = model_prokaryotic(
-#         parameters, constants, initial_conditions, dt=DT, t_tot=T_TOT)
-
-
-# def init():
-#     ax.legend()
-#     ax.set_xlim(0, 7200)
-#     # ax.set_ylim(0.0, 2.0)
-#     return line1, line2, line3, line4, time_text,
-
-
-# def update(index):
-#     label_dna = "DNA concentration: " + \
-#         micromolar_conc_to_math_exp(dna_concenctrations[index])
-#     time_text.set_text(label_dna)
-#     line3.set_data(time1[::graph_step], absorbance1[index, ::graph_step])
-#     line4.set_data(time2[::graph_step], absorbance2[index, ::graph_step])
-#     return line1, line2, line3, line4, time_text,
-
-
-# ani = FuncAnimation(fig, update, frames=np.arange(n),
-#                     init_func=init, blit=True)
-
-# plt.show()
+if __name__ == "__main__":
+    anim_two_vitamin_conc_differing_dna_conc(
+        6, 7, low_dna_conc=0.5*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=10800, save=False)
