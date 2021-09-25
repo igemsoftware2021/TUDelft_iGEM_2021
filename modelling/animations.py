@@ -2,26 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegFileWriter
 from models import model_prokaryotic, model_prokaryotic_readout, model_prokaryotic_all
-from standard_parameters import standard_constants, standard_initial_conditions, standard_parameters_prokaryotic
-
-
-def micromolar_conc_to_math_exp(conc: float, decimals: int):
-    """Function sets a float value that with micromolar units into a correct scientific math expression"""
-    if not isinstance(decimals, int):
-        raise TypeError("decimals variable should be an integer")
-
-    count = 0
-    temp_conc = conc  # temporary variable to store a possible
-    while temp_conc < 1:
-        temp_conc = temp_conc * 10
-        count += 1
-    if count == 0:
-        math_exp = f"${temp_conc}$ $\mu M$"
-    elif count == 1:
-        math_exp = f"${conc:.1f}$ $\mu M$"
-    else:
-        math_exp = f"${temp_conc:.{decimals}f} \\times 10^{{-{count}}}$ $\mu M$"
-    return math_exp
+from standard_values import standard_constants, standard_initial_conditions, standard_parameters_prokaryotic
+from plot_helpers import micromolar_conc_to_math_exp
 
 
 def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=1*10**-6, high_dna_conc=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save=False):
