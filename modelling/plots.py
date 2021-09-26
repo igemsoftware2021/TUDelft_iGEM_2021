@@ -210,10 +210,10 @@ def plot_absolute_mrna_prokaryotic(vit_conc: list, dna_conc: float = 5*10**-3, s
 
 
 if __name__ == "__main__":
+    pass
     # plot_vitamin_concentrations_prokaryotic(
     #     [5, 10, 20], save_path="test_plot.svg")
 
     # plot_fraction_mrna_prokaryotic(2, save_path="test_plot.svg")
     # plot_absolute_mrna_prokaryotic(2, save_path="test_plot2.svg")
-    plot_cmrna_diff_vitamin_concentrations_prokaryotic(
-        np.linspace(0, 20, 11), save_path="test_plot3.svg")
+    # plot_cmrna_diff_vitamin_concentrations_prokaryotic(np.linspace(0, 20, 11), save_path="test_plot3.svg")
