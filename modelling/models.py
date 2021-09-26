@@ -209,7 +209,7 @@ def model_no_aptamer(parameters, constants, initial_conditions, dt=0.01, t_tot=7
 
 
 @njit(cache=True, nogil=True)
-def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=7200, all_results=False):
+def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=7200):
     """Function does a simulation of the kinetics of the prokaryotic AptaVita system.
 
     Parameters:
@@ -342,9 +342,6 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=
     blue = eps_cpr * p * h
     yellow = eps_cprg * s * h
     b_y = np.divide(blue, yellow)
-    # if all_results:
-    #     return time, dna, umrna, cmrna, dmrna, vit, umrna_vit, tsr, tlr, e_mon, e, s, p
-    # else:
     return time, p
 
 
