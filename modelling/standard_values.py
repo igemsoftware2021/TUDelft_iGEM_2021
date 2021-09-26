@@ -19,7 +19,7 @@ def standard_parameters_prokaryotic(dna_conc=5*10**-3, vit_conc=5):
     deg_tlr = 7.5*10**-5
     k_on = 1*10**-2       # (11)  Association rate of vitamin and umRNA [1/µMs]
     k_off = 1*10**-2      # (12)  Dissociation rate of vitamin and umRNA [1/s]
-    k_c = (1/60)/10            # (13)  Cleaving rate of umRNA [1/s]
+    k_c = (1/60)           # (13)  Cleaving rate of umRNA [1/s]
     parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                            k_tlr, k_m, deg_mrna, deg_tlr, k_on, k_off, k_c])  # Array containing above parameters
 
