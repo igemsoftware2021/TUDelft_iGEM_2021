@@ -1,6 +1,8 @@
 import numpy as np
 from numba import njit, prange
 from models import model_prokaryotic_readout
+from standard_values import standard_parameters_prokaryotic, standard_constants, standard_initial_conditions
+import matplotlib.pyplot as plt
 
 
 @njit(cache=True, nogil=True)
@@ -14,7 +16,7 @@ def model_prokaryotic_readout_area(parameters, constants, dna_conc, s_i, vit_con
         parameters, constants, initial_conditions2, dt=dt, t_tot=t_tot)
 
     # TODO determine whether area over time? (cumsum) or just total area?
-    area = np.sum((absorbance2 - absorbance1)*dt)
+    area = np.sum((absorbance1 - absorbance2)*dt)
 
     return area
 
@@ -33,3 +35,19 @@ def model_prokaryotic_readout_area_parallel(parameters, constants, dna_conc, s_i
         _, model_output[:, ii] = model_prokaryotic_readout_area(
             parameters[ii, :], constants, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
     return model_output
+
+
+if __name__ == "__main__":
+    parameters = standard_parameters_prokaryotic()
+    constants = standard_constants()
+    result = model_prokaryotic_readout_area(
+        parameters, constants, 2*10**-3, 150, 6, 7)
+    print(result)
+    vit_conc = np.linspace(1, 20, 21)
+    results = np.zeros(vit_conc.shape)
+    for i in range(vit_conc.shape[0]):
+        results[i] = model_prokaryotic_readout_area(
+            parameters, constants, 2*10**-3, 150, vit_conc[0], vit_conc[i], dt=0.01)
+
+    plt.plot(vit_conc, results)
+    plt.show()
