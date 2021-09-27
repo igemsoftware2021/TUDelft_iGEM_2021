@@ -211,6 +211,9 @@ def morris_analysis_area(problem, trajectories, func, constants, dna_conc, s_i, 
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
+    # TODO make this part more robust, find position of of 'dna_i' in problem["names"]
+    # then do np.delete()
+    # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
     if "dna_i" in problem["names"]:
         dna_conc_array = model_input[:, -1]
         model_input_temp = model_input[:, :-1]
