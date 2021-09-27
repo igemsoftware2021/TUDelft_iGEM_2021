@@ -7,15 +7,17 @@ from scipy.optimize import curve_fit
 cwd = os.getcwd()
 path = cwd + '/GFP_PURE.xlsx'
 
-df = pd.read_excel (path, sheet_name=2)
+df = pd.read_excel(path, sheet_name=2)
 data_GFP = np.array(df)
 
 
 # Fitting function
 def func(t, k_prime, k, K, n):
     return k_prime+k*((t**n)/(t**n+K**n))
+
+
 # Experimental t and y data
-x_Data = data_GFP[5, 3::] # Time in [h]
+x_Data = data_GFP[5, 3::]  # Time in [h]
 y_Data = data_GFP[8, 3::]
 
 # Plot experimental data points
