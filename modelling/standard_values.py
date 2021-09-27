@@ -1,7 +1,7 @@
 import numpy as np
 
 
-def standard_parameters_prokaryotic(dna_conc=5*10**-3, vit_conc=5):
+def standard_parameters_prokaryotic():
     # Parameters
     # (#) denotes the position in the parameters array
     k_ts = 6.7*10**-5     # (0)  Transcription rate [uM/s]
