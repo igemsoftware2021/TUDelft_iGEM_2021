@@ -214,16 +214,14 @@ def morris_analysis_area(problem, trajectories, func, constants, initial_conditi
     model_output = func(model_input, constants,
                         initial_conditions, dt=dt, t_tot=t_tot)
 
-    # Running the Morris analysis at each timepoint (using the output of all the different simulations)
-    for ii in tqdm(range(n)):
-        indices_dict = morris_analyze.analyze(problem, model_input,
-                                              model_output[ii, :], num_levels=num_levels)
-        # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
-        mu[ii, :] = indices_dict['mu']
-        mu_star[ii, :] = indices_dict['mu_star']
-        sigma[ii, :] = indices_dict['sigma']
-        mu_star_conf_level[ii, :] = np.array(
-            indices_dict['mu_star_conf'], dtype=np.float32)
+    # Running the Morris analysis (using the output of all the different simulations)
+    indices_dict = morris_analyze.analyze(
+        problem, model_input, model_output, num_levels=num_levels)
+    mu = indices_dict['mu']
+    mu_star = indices_dict['mu_star']
+    sigma = indices_dict['sigma']
+    mu_star_conf_level = np.array(
+        indices_dict['mu_star_conf'], dtype=np.float32)
 
     return time, mu, mu_star, sigma, mu_star_conf_level
 

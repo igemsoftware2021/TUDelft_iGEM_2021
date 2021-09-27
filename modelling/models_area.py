@@ -12,7 +12,7 @@ def model_prokaryotic_readout_area(parameters, constants, dna_conc, s_i, vit_con
 
     time, absorbance1 = model_prokaryotic_readout(
         parameters, constants, initial_conditions1, dt=dt, t_tot=t_tot)
-    _, absorbance2 = model_prokaryotic_readout(
+    time, absorbance2 = model_prokaryotic_readout(
         parameters, constants, initial_conditions2, dt=dt, t_tot=t_tot)
 
     # TODO determine whether area over time? (cumsum) or just total area?
@@ -29,25 +29,29 @@ def model_prokaryotic_readout_area_parallel(parameters, constants, dna_conc, s_i
     num_simulations = parameters.shape[0]
 
     # TODO if total area, then array should be smaller, just (n,1)
-    model_output = np.zeros((n, num_simulations))
+    model_output = np.zeros(num_simulations)
     # Every column is a unique simulation
     for ii in prange(num_simulations):
-        _, model_output[:, ii] = model_prokaryotic_readout_area(
+        model_output[ii] = model_prokaryotic_readout_area(
             parameters[ii, :], constants, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
     return model_output
 
 
 if __name__ == "__main__":
     parameters = standard_parameters_prokaryotic()
+    parameters2 = standard_parameters_prokaryotic()
+    parameters2[13] = parameters2[13]/10
+    parameters = np.vstack((parameters, parameters2))
+    print(parameters, parameters.shape)
     constants = standard_constants()
-    result = model_prokaryotic_readout_area(
+    result = model_prokaryotic_readout_area_parallel(
         parameters, constants, 2*10**-3, 150, 6, 7)
-    print(result)
+    print(result, result.shape)
     vit_conc = np.linspace(1, 20, 21)
     results = np.zeros(vit_conc.shape)
-    for i in range(vit_conc.shape[0]):
-        results[i] = model_prokaryotic_readout_area(
-            parameters, constants, 2*10**-3, 150, vit_conc[0], vit_conc[i], dt=0.01)
+    # for i in range(vit_conc.shape[0]):
+    #     results[i] = model_prokaryotic_readout_area(
+    #         parameters, constants, 2*10**-3, 150, vit_conc[0], vit_conc[i], dt=0.01)
 
-    plt.plot(vit_conc, results)
-    plt.show()
+    # plt.plot(vit_conc, results)
+    # plt.show()
