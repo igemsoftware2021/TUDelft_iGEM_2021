@@ -99,8 +99,8 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    model_output = func(model_input, constants,
-                        initial_conditions, dt=dt, t_tot=t_tot)
+    model_output = func(parameters=model_input, initial_conditions=initial_conditions,
+                        constants=constants, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis at each timepoint (using the output of all the different simulations)
     for ii in tqdm(range(n)):
@@ -116,7 +116,7 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     return time, mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_analysis_area(problem, trajectories, func, constants, initial_conditions, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis_area(problem, trajectories, func, constants, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     # TODO finish this function, I only copied it and changed the input arguments
     """Function does Morris analysis on a function/model.
 
@@ -198,21 +198,29 @@ def morris_analysis_area(problem, trajectories, func, constants, initial_conditi
     # Retrieve number of parameters
     num_parameters = problem["num_vars"]
 
-    # Defining arrays for sensitivity indices.
-    # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
-    mu = np.zeros((n, num_parameters),
-                  dtype=np.float32)  # The mean elementary effect
-    mu_star = np.zeros((n, num_parameters), dtype=np.float32)
-    sigma = np.zeros((n, num_parameters), dtype=np.float32)
-    mu_star_conf_level = np.zeros((n, num_parameters), dtype=np.float32)
+    # # Defining arrays for sensitivity indices.
+    # # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
+    # mu = np.zeros((n, num_parameters),
+    #               dtype=np.float32)  # The mean elementary effect
+    # mu_star = np.zeros((n, num_parameters), dtype=np.float32)
+    # sigma = np.zeros((n, num_parameters), dtype=np.float32)
+    # mu_star_conf_level = np.zeros((n, num_parameters), dtype=np.float32)
 
     # Generating input parameters for the model
     # Each column is a parameter, one row contains all input parameters for one simulation
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    model_output = func(model_input, constants,
-                        initial_conditions, dt=dt, t_tot=t_tot)
+    if "dna_i" in problem["names"]:
+        dna_conc_array = model_input[:, -1]
+        model_input_temp = model_input[:, :-1]
+    else:
+        dna_conc_array = np.ones(
+            model_input.shape[0], dtype=np.float64) * dna_conc
+        model_input_temp = model_input
+
+    model_output = func(parameters=model_input_temp, constants=constants, dna_conc=dna_conc_array,
+                        s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis (using the output of all the different simulations)
     indices_dict = morris_analyze.analyze(

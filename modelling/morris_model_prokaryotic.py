@@ -1,36 +1,22 @@
-from morris_method import morris_analysis
-from morris_method import morris_datawriter
-from models_parallelized import run_simulations_prokaryotic
-import numpy as np
 import csv
+import numpy as np
+from morris_method import morris_analysis, morris_analysis_area
+from morris_method import morris_datawriter
+from models_area import model_prokaryotic_absorbance_area, model_prokaryotic_absorbance_area_parallel
+from standard_values import standard_parameters_prokaryotic, standard_initial_conditions, standard_constants
+import matplotlib.pyplot as plt
 
 # Defining the properties of the Morris sensitivity analysis
-trajectories = 15
+trajectories = 30
 num_levels = 4
 num_parameters = 15
 
 # Parameters
-# (#) denotes the position in the parameters array
-k_ts = 6.7*10**-5     # (0)  Transcription rate [uM/s]
-k_tl = 7.2*10**-5     # (1)  Enzyme translation rate [uM/s]
-k_mat = 0.5*10**-3    # (2)  Maturation rate of beta-galactosidase [1/s]
-k_cat = 5.14*10**1    # (3)  Catalytic rate of beta-galactosidase [1/s]
-k_s = 8.5*10**-3      # (4)  Michaelis constant of transcription [μM]
-# (5)  Scaling factor for the transcription resources [1/s]
-kc_s = 1.8*10**-4
-k_l = 65.8*10**-3     # (6)  Michaelis constant of translation [μM]
-k_tlr = 6*10**-5      # (7) Michaelis constant of translation resources [-]
-k_m = 50              # (8) Michaelis constant of beta-galactosidase [μM]
-deg_mrna = 1.3*10**-5  # (9) Degradation rate of mRNA [1/s]
-deg_tlr = 7.5*10**-5  # (10) Degradation rate of translation resources [1/s]
-k_on = 1*10**-2       # (11)  Association rate of vitamin and umRNA [1/µMs]
-k_off = 1*10**-2      # (12)  Dissociation rate of vitamin and umRNA [1/s]
-k_c = (1/60)/10            # (13)  Cleaving rate of umRNA [1/s]
-parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
-                       k_tlr, k_m, deg_mrna, deg_tlr, k_on, k_off, k_c])  # Array containing above parameters
+parameters = standard_parameters_prokaryotic()
 
-lower_range = 0.1
-upper_range = 10
+# Parameter ranges
+lower_range = 0.5
+upper_range = 2
 
 
 # Constants UNUSED ONLY LOOK AT CONCENTRATION CPR
@@ -49,15 +35,20 @@ s_i = 1000  # Initial substrate concentration [μM]
 vit_i = 14*10**-3  # Initial vitamin concentration [μM]
 initial_conditions = np.array([dna_i, s_i, vit_i])
 
+initial_conditions = standard_initial_conditions(
+    dna_conc=5*10**-3, s_i=250, vit_conc=1)
+
 # Defining timescale of the model
-t_tot = 1.5 * 3600  # Total time [s]
+t_tot = 10800  # Total time [s]
 dt = 0.01  # Timestep [s]
+
+dna = 2*10**-3
 
 # Problem definition for prokaryotic system
 prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c" "dna_i"],
+              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "dna_i"],
     'bounds': [[lower_range * parameters[0], upper_range * parameters[0]],     # (0) k_ts
                [lower_range * parameters[1], upper_range * \
                    parameters[1]],     # (1) k_tl
@@ -84,15 +75,35 @@ prokaryotic_problem = {
                [lower_range * parameters[12], upper_range * \
                    parameters[12]],  # (12) k_off
                [lower_range * parameters[13], upper_range * \
-                   parameters[13]],  # (13) k_c
+                   parameters[13]],  # ,  # (13) k_c
                [lower_range * dna_i, upper_range * dna_i]]  # (14) dna_i
+    # TODO think about how to implement the changing dna concentration
+    #    [lower_range * dna_i, upper_range * dna_i]]
 
 }
 
-# Doing Morris sensitivity analysis
-(time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(prokaryotic_problem, trajectories,
-                                                                 run_simulations_prokaryotic, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
+# # Doing Morris sensitivity analysis
+# (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(prokaryotic_problem, trajectories,
+#                                                                  run_simulations_prokaryotic, constants, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
 
+# (problem, trajectories, func, constants, initial_conditions, vit_conc1, vit_conc2, dt: int=0.01, t_tot: int=7200, num_levels: int=4, optimal_trajectories: int=None, local_optimization: bool=True, num_resamples: int=1000, conf_level: float=0.95, print_to_console: bool=False, seed: int=None):
+# Doing Morris sensitivity analysis
+(time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis_area(prokaryotic_problem, trajectories,
+                                                                      model_prokaryotic_absorbance_area_parallel, constants=constants,
+                                                                      dna_conc=5*10**-3, s_i=150, vit_conc1=0.05, vit_conc2=0.09,
+                                                                      dt=dt, t_tot=t_tot, num_levels=num_levels)
+# print(mu)
+# plt.scatter(np.arange(0, mu.shape[0]), mu)
+
+fig, ax = plt.subplots()
+ax.bar(np.arange(0, mu.shape[0]), mu)
+# plt.bar(np.arange(0, mu_star.shape[0]), mu_star)
+# plt.hist(mu_star)
+fig2, ax2 = plt.subplots()
+ax2.bar(np.arange(0, sigma.shape[0]), sigma)
+# plt.hist(sigma)
+# print(mu_star_conf_level)
+plt.show()
 
 # Saving the data
 path = "modelling\data\morris_prokaryotic"
