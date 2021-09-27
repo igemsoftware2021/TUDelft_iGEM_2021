@@ -32,7 +32,7 @@ def model_prokaryotic_absorbance_area_parallel(parameters, constants, dna_conc, 
     # Every column is a unique simulation
     for ii in prange(num_simulations):
         model_output[ii] = model_prokaryotic_absorbance_area(
-            parameters=parameters[ii, :], constants=constants, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
+            parameters=parameters[ii, :], constants=constants, dna_conc=dna_conc[ii], s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
     return model_output
 
 
