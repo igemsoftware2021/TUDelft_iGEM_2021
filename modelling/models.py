@@ -840,6 +840,7 @@ def model_eukaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=7
 
 
 if __name__ == "__main__":
+    pass
     # parameters = standard_parameters_prokaryotic()
     # constants = standard_constants()
     # initial_conditions = standard_initial_conditions(
