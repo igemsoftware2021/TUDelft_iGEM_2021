@@ -396,8 +396,8 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 
 if __name__ == "__main__":
-    # anim_two_vitamin_conc_differing_dna_conc(
-    #     0.5, 1, low_dna_conc=0.5*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=7200, save=False)
+    anim_two_vitamin_conc_differing_dna_conc(
+        0.5, 1, low_dna_conc=0.5*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=10800)
 
-    # anim_two_vitamin_conc_differing_k_c(6, 7, 2*10**-3, low_k_c=(
+    # anim_two_vitamin_conc_differing_k_c(0.5, 1, 2*10**-3, low_k_c=(
     #     1/60)/10, high_k_c=(1/60), num_steps=30, dt=0.01, t_tot=7200, save=False)
