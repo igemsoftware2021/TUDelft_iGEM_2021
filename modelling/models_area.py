@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # parameters = np.vstack((parameters, parameters2))
     # print(parameters, parameters.shape)
     constants = standard_constants()
-    result = model_prokaryotic_readout_area(
+    result = model_prokaryotic_absorbance_area(
         parameters, constants, 2*10**-3, 150, 0.05, 0.09)
     print(result)
     vit_conc = np.linspace(1, 20, 21)
