@@ -7,7 +7,7 @@ from numba import njit, prange
 
 
 @njit(parallel=True)
-def run_simulations_no_aptamer(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
+def model_no_aptamer_parallel(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
     """Function runs a simulations of the kinetics of the AptaVita system 
     without aptamers parallel using the Numba library.
 
@@ -44,7 +44,7 @@ def run_simulations_no_aptamer(parameters, constants, initial_conditions, dt: in
 
 
 @njit(parallel=True)
-def run_simulations_prokaryotic(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
+def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
     """"Function runs a simulations of the kinetics of the prokaryotic
     AptaVita system parallel using the Numba library.
 
@@ -76,12 +76,12 @@ def run_simulations_prokaryotic(parameters, constants, initial_conditions, dt: i
     # Every column is a unique simulation
     for ii in prange(num_simulations):
         _, model_output[:, ii] = model_prokaryotic(
-            parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
+            parameters=parameters[ii, :], intial_conditions=initial_conditions, dt=dt, t_tot=t_tot)
     return model_output
 
 
 @njit(parallel=True)
-def run_simulations_eukaryotic(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
+def model_eukaryotic_parallel(parameters, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
     """Function runs a simulations of the kinetics of the prokaryotic
     AptaVita system parallel using the Numba library.
 
