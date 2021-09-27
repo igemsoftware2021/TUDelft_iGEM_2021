@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 
 
 @njit(cache=True, nogil=True)
-def model_prokaryotic_readout_area(parameters, constants, dna_conc, s_i, vit_conc1, vit_conc2, dt=0.01, t_tot=7200):
+def model_prokaryotic_absorbance_area(parameters, constants, dna_conc, s_i, vit_conc1, vit_conc2, dt=0.01, t_tot=7200):
     initial_conditions1 = np.array([dna_conc, s_i, vit_conc1])
     initial_conditions2 = np.array([dna_conc, s_i, vit_conc2])
 
@@ -21,7 +21,7 @@ def model_prokaryotic_readout_area(parameters, constants, dna_conc, s_i, vit_con
 
 
 @njit(parallel=True)
-def model_prokaryotic_readout_area_parallel(parameters, constants, dna_conc, s_i, vit_conc1, vit_conc2, dt=0.01, t_tot=7200):
+def model_prokaryotic_absorbance_area_parallel(parameters, constants, dna_conc, s_i, vit_conc1, vit_conc2, dt=0.01, t_tot=7200):
     # The amount of time steps
     n = int(np.ceil(t_tot/dt) + 1)
     # The number of simulations
@@ -31,7 +31,7 @@ def model_prokaryotic_readout_area_parallel(parameters, constants, dna_conc, s_i
     model_output = np.zeros(num_simulations, dtype=np.float64)
     # Every column is a unique simulation
     for ii in prange(num_simulations):
-        model_output[ii] = model_prokaryotic_readout_area(
+        model_output[ii] = model_prokaryotic_absorbance_area(
             parameters=parameters[ii, :], constants=constants, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
     return model_output
 
