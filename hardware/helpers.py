@@ -8,7 +8,6 @@ def i2c_multiplexer_select_channel(pi, i2c_multiplexer_handle, channel_number):
     channel_base_2_number = 2 ** channel_number
     pi.i2c_write_device(i2c_multiplexer_handle,
                         [0x80 | channel_base_2_number])
-    time.sleep(0.1)
 
 
 def i2c_write_to_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, reg, data):

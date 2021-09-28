@@ -292,3 +292,11 @@ modelling/data/morris_no_aptamer/sigma_5.csv
 modelling/data/morris_no_aptamer/sigma_6.csv
 modelling/data/morris_no_aptamer/sigma_TEST.csv
 hardware/test_results
+modelling/data/morris_no_aptamer/mu_star_conf_level_Wat je hier neerzet geeft een tag aan de file, bijv
+modelling/data/morris_no_aptamer/mu_star_Wat je hier neerzet geeft een tag aan de file, bijv
+modelling/data/morris_no_aptamer/mu_Wat je hier neerzet geeft een tag aan de file, bijv
+modelling/data/morris_no_aptamer/sigma_Wat je hier neerzet geeft een tag aan de file, bijv
+modelling/data/morris_prokaryotic/mu_star_conf_level_test.csv
+modelling/data/morris_prokaryotic/mu_star_test.csv
+modelling/data/morris_prokaryotic/mu_test.csv
+modelling/data/morris_prokaryotic/sigma_test.csv
