@@ -2,12 +2,12 @@ import csv
 import numpy as np
 from morris_method import morris_analysis, morris_analysis_area
 from morris_method import morris_datawriter
-from models_area import model_prokaryotic_absorbance_area, model_prokaryotic_absorbance_area_parallel
+from models_area import model_prokaryotic_absorbance_area, model_prokaryotic_area_parallel
 from standard_values import standard_parameters_prokaryotic, standard_initial_conditions, standard_constants
 import matplotlib.pyplot as plt
 
 # Defining the properties of the Morris sensitivity analysis
-trajectories = 30
+trajectories = 45
 num_levels = 4
 num_parameters = 15
 
@@ -15,8 +15,8 @@ num_parameters = 15
 parameters = standard_parameters_prokaryotic()
 
 # Parameter ranges
-lower_range = 0.5
-upper_range = 2
+lower_range = 1/3
+upper_range = 3
 
 
 # Constants UNUSED ONLY LOOK AT CONCENTRATION CPR
@@ -42,13 +42,13 @@ initial_conditions = standard_initial_conditions(
 t_tot = 10800  # Total time [s]
 dt = 0.01  # Timestep [s]
 
-dna = 2*10**-3
+dna_conc = 3*10**-3
 
 # Problem definition for prokaryotic system
 prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "dna_i"],
+              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "dna_conc"],
     'bounds': [[lower_range * parameters[0], upper_range * parameters[0]],     # (0) k_ts
                [lower_range * parameters[1], upper_range * \
                    parameters[1]],     # (1) k_tl
@@ -76,7 +76,7 @@ prokaryotic_problem = {
                    parameters[12]],  # (12) k_off
                [lower_range * parameters[13], upper_range * \
                    parameters[13]],  # ,  # (13) k_c
-               [lower_range * dna_i, upper_range * dna_i]]  # (14) dna_i
+               [lower_range * dna_conc, upper_range * dna_conc]]  # (14) dna_i
     # TODO think about how to implement the changing dna concentration
     #    [lower_range * dna_i, upper_range * dna_i]]
 
@@ -88,10 +88,9 @@ prokaryotic_problem = {
 
 # (problem, trajectories, func, constants, initial_conditions, vit_conc1, vit_conc2, dt: int=0.01, t_tot: int=7200, num_levels: int=4, optimal_trajectories: int=None, local_optimization: bool=True, num_resamples: int=1000, conf_level: float=0.95, print_to_console: bool=False, seed: int=None):
 # Doing Morris sensitivity analysis
-(time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis_area(prokaryotic_problem, trajectories,
-                                                                      model_prokaryotic_absorbance_area_parallel, constants=constants,
-                                                                      dna_conc=5*10**-3, s_i=150, vit_conc1=0.05, vit_conc2=0.09,
-                                                                      dt=dt, t_tot=t_tot, num_levels=num_levels)
+(mu, mu_star, sigma, mu_star_conf_level) = morris_analysis_area(prokaryotic_problem, trajectories,
+                                                                model_prokaryotic_area_parallel, dna_conc=dna_conc, s_i=250, vit_conc1=0.05, vit_conc2=0.09,
+                                                                dt=dt, t_tot=t_tot, num_levels=num_levels)
 # print(mu)
 # plt.scatter(np.arange(0, mu.shape[0]), mu)
 
@@ -101,6 +100,11 @@ ax.bar(np.arange(0, mu.shape[0]), mu)
 # plt.hist(mu_star)
 fig2, ax2 = plt.subplots()
 ax2.bar(np.arange(0, sigma.shape[0]), sigma)
+ax.set_xticks(np.arange(0, num_parameters))
+ax.set_xticklabels(prokaryotic_problem["names"])
+# for param in prokaryotic_problem["names"]:
+
+
 # plt.hist(sigma)
 # print(mu_star_conf_level)
 plt.show()

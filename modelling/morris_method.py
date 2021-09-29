@@ -116,9 +116,13 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     return time, mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_analysis_area(problem, trajectories, func, constants, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis_area(problem, trajectories, func, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     # TODO finish this function, I only copied it and changed the input arguments
     """Function does Morris analysis on a function/model.
+
+    IMPORTANT
+    ---------
+    dna_conc is overriden if it is part of the problem!!!
 
     This is a wrapper function that creates model inputs required for Method of Morris. It then runs these model inputs through
     a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf_level.
@@ -198,31 +202,24 @@ def morris_analysis_area(problem, trajectories, func, constants, dna_conc, s_i, 
     # Retrieve number of parameters
     num_parameters = problem["num_vars"]
 
-    # # Defining arrays for sensitivity indices.
-    # # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
-    # mu = np.zeros((n, num_parameters),
-    #               dtype=np.float32)  # The mean elementary effect
-    # mu_star = np.zeros((n, num_parameters), dtype=np.float32)
-    # sigma = np.zeros((n, num_parameters), dtype=np.float32)
-    # mu_star_conf_level = np.zeros((n, num_parameters), dtype=np.float32)
-
     # Generating input parameters for the model
     # Each column is a parameter, one row contains all input parameters for one simulation
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    # TODO make this part more robust, find position of of 'dna_i' in problem["names"]
-    # then do np.delete()
+    # Check if you need to override the dna_conc variable then do np.delete()
     # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
-    if "dna_i" in problem["names"]:
-        dna_conc_array = model_input[:, -1]
-        model_input_temp = model_input[:, :-1]
+    if "dna_conc" in problem["names"]:
+        index = problem["names"].index("dna_conc")
+        dna_conc_array = model_input[:, index]
+        # Remove the column with the dna concentration, since this is a seperate value from the input parameters
+        model_input_temp = np.delete(model_input, index, axis=1)
     else:
         dna_conc_array = np.ones(
             model_input.shape[0], dtype=np.float64) * dna_conc
         model_input_temp = model_input
 
-    model_output = func(parameters=model_input_temp, constants=constants, dna_conc=dna_conc_array,
+    model_output = func(parameters=model_input_temp, dna_conc=dna_conc_array,
                         s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis (using the output of all the different simulations)
@@ -234,7 +231,7 @@ def morris_analysis_area(problem, trajectories, func, constants, dna_conc, s_i, 
     mu_star_conf_level = np.array(
         indices_dict['mu_star_conf'], dtype=np.float32)
 
-    return time, mu, mu_star, sigma, mu_star_conf_level
+    return mu, mu_star, sigma, mu_star_conf_level
 
 
 def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_star_conf_level):
