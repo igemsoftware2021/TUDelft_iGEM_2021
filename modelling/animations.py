@@ -6,7 +6,7 @@ from standard_values import standard_constants, standard_initial_conditions, sta
 from plot_helpers import micromolar_conc_to_math_exp
 
 
-def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=1*10**-6, high_dna_conc=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
+def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_dna_conc=1*10**-6, high_dna_conc=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
     """All inputs are in micromolar"""
 
     # The difference in dt between every plotted point, this is done to speed up the animation
@@ -26,8 +26,8 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
 
     # Preallocate all the necessary storage
     timesteps = int(np.ceil(t_tot/dt)) + 1
-    absorbance1 = np.zeros((num_steps, timesteps), dtype=np.float32)
-    absorbance2 = np.zeros((num_steps, timesteps), dtype=np.float32)
+    p1 = np.zeros((num_steps, timesteps), dtype=np.float32)
+    p2 = np.zeros((num_steps, timesteps), dtype=np.float32)
 
     # Preallocate necessary storage
     area_array = np.zeros(num_steps, dtype=np.float32)
@@ -37,19 +37,16 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     constants = standard_constants()
 
     for i in range(num_steps):
-        initial_conditions1 = standard_initial_conditions(
-            dna_conc=dna_conc_all[i], s_i=150, vit_conc=vit_conc1)
+        initial_conditions1 = np.array([dna_conc_all[i], s_i, vit_conc1])
+        initial_conditions2 = np.array([dna_conc_all[i], s_i, vit_conc2])
 
-        initial_conditions2 = standard_initial_conditions(
-            dna_conc=dna_conc_all[i], s_i=150, vit_conc=vit_conc2)
+        time1, p1[i, :] = model_prokaryotic(
+            parameters=parameters, initial_conditions=initial_conditions1, dt=dt, t_tot=t_tot)
 
-        time1, absorbance1[i, :] = model_prokaryotic_absorbance(
-            parameters=parameters, initial_conditions=initial_conditions1, constants=constants, dt=dt, t_tot=t_tot)
+        time2, p2[i, :] = model_prokaryotic(
+            parameters=parameters, initial_conditions=initial_conditions2, dt=dt, t_tot=t_tot)
 
-        time2, absorbance2[i, :] = model_prokaryotic_absorbance(
-            parameters=parameters, initial_conditions=initial_conditions2, constants=constants, dt=dt, t_tot=t_tot)
-
-        area = np.sum((absorbance1[i, :] - absorbance2[i, :]) * dt)
+        area = np.sum((p1[i, :] - p2[i, :]) * dt)
 
         area_array[i] = area
 
@@ -68,19 +65,19 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     label_line4 = micromolar_conc_to_math_exp(vit_conc2, 0) + " moving"
 
     # First normal product lines
-    line1, = ax.plot(time1[::plot_di], absorbance1[0, ::plot_di],
+    line1, = ax.plot(time1[::plot_di], p1[0, ::plot_di],
                      label=label_line1, color="#E389BB")
-    line2, = ax.plot(time2[::plot_di], absorbance2[0, ::plot_di],
+    line2, = ax.plot(time2[::plot_di], p2[0, ::plot_di],
                      label=label_line2, color="#8B992F")
-    line3, = ax.plot(time1[::plot_di], absorbance1[0, ::plot_di],
+    line3, = ax.plot(time1[::plot_di], p1[0, ::plot_di],
                      label=label_line3, color="#9B0138")
-    line4, = ax.plot(time2[::plot_di], absorbance2[0, ::plot_di],
+    line4, = ax.plot(time2[::plot_di], p2[0, ::plot_di],
                      label=label_line4, color="#667817")
 
     fill1 = ax.fill_between(
-        time1[::plot_di], absorbance1[0, ::plot_di], absorbance2[0, ::plot_di], color="#FFCF39", alpha=0.25)
+        time1[::plot_di], p1[0, ::plot_di], p2[0, ::plot_di], color="#FFCF39", alpha=0.25)
     fill2 = ax.fill_between(
-        time1[::plot_di], absorbance1[0, ::plot_di], absorbance2[0, ::plot_di], color="#FFCF39", alpha=0.75)
+        time1[::plot_di], p1[0, ::plot_di], p2[0, ::plot_di], color="#FFCF39", alpha=0.75)
 
     # Area line
     area_line1, = ax2.plot(dna_conc_all, area_array, color="#E389BB")
@@ -95,10 +92,10 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     def init():
         # ax.grid(True)
 
-        ax.set_title("Absorbance over time")
+        ax.set_title("Product concentration over time")
         ax.legend()
         ax.set_xlabel(r"Time $[s]$")
-        ax.set_ylabel(r"Absorbance $[AU]$")
+        ax.set_ylabel(r"Product concentration $[\mu M]$")
         ax.set_xlim(0, t_tot)
         # ax.set_ylim(-10, 160)
 
@@ -127,16 +124,16 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
             micromolar_conc_to_math_exp(dna_conc_all[index], 2)
         dna_conc_text.set_text(dna_conc_math_exp)
 
-        line3.set_data(time1[::plot_di], absorbance1[index, ::plot_di])
-        line4.set_data(time2[::plot_di], absorbance2[index, ::plot_di])
+        line3.set_data(time1[::plot_di], p1[index, ::plot_di])
+        line4.set_data(time2[::plot_di], p2[index, ::plot_di])
 
         area_line2.set_data(dna_conc_all[:index], area_array[:index])
 
         ax.collections.clear()
         fill1 = ax.fill_between(
-            time1[::plot_di], absorbance1[0, ::plot_di], absorbance2[0, ::plot_di], color="#FFCF39", alpha=0.25)
+            time1[::plot_di], p1[0, ::plot_di], p2[0, ::plot_di], color="#FFCF39", alpha=0.25)
         fill2 = ax.fill_between(
-            time1[::plot_di], absorbance1[index, ::plot_di], absorbance2[index, ::plot_di], color="#FFCF39", alpha=0.75)
+            time1[::plot_di], p1[index, ::plot_di], p2[index, ::plot_di], color="#FFCF39", alpha=0.75)
 
         return line1, line2, line3, line4, fill1, fill2, area_line1, area_line2, dna_conc_text,
 
@@ -398,7 +395,7 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 if __name__ == "__main__":
     anim_two_vitamin_conc_differing_dna_conc(
-        0.5, 1, low_dna_conc=0.1*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=10800)
+        0.5, 1, s_i=250, low_dna_conc=0.1*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=10800)
 
     # anim_two_vitamin_conc_differing_k_c(0.5, 1, 2*10**-3, low_k_c=(
     #     1/60)/10, high_k_c=(1/60), num_steps=30, dt=0.01, t_tot=7200, save_path="pres.mp4")
