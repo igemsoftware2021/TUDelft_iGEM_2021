@@ -68,8 +68,6 @@ def model_prokaryotic_python(parameters, constants, initial_conditions, dt=0.01,
     # Concentration of cleaved mRNA [μM]
     cmrna = np.zeros(n, dtype=np.float64)
 
-    cmrna_dt_array = np.zeros(n, dtype=np.float64)
-
     # Concentration of degraded mRNA [μM] (this does not denote a physical concentraion within the system, but merely tracks the concentration of mRNA that has been degraded)
     dmrna = np.zeros(n, dtype=np.float64)
     # Vitamine concentration [μM]
@@ -131,17 +129,12 @@ def model_prokaryotic_python(parameters, constants, initial_conditions, dt=0.01,
         e[step + 1] = e[step] + e_dt * dt
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
-        cmrna_dt_array[step + 1] = cmrna_dt * 1/dt
 
-    # Calculating blue over yellow ratio
-    blue = eps_cpr * p * h
-    yellow = eps_cprg * s * h
-    b_y = np.divide(blue, yellow)
     return time, p
 
 
 @njit(cache=True, nogil=True)
-def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=7200, all_results=False):
+def model_prokaryotic_numba(parameters, constants, initial_conditions, dt=0.01, t_tot=7200):
     """Function does a simulation of the kinetics of the prokaryotic AptaVita system.
 
     Parameters:
@@ -205,8 +198,6 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=
     # Concentration of cleaved mRNA [μM]
     cmrna = np.zeros(n, dtype=np.float64)
 
-    cmrna_dt_array = np.zeros(n, dtype=np.float64)
-
     # Concentration of degraded mRNA [μM] (this does not denote a physical concentraion within the system, but merely tracks the concentration of mRNA that has been degraded)
     dmrna = np.zeros(n, dtype=np.float64)
     # Vitamine concentration [μM]
@@ -268,12 +259,7 @@ def model_prokaryotic(parameters, constants, initial_conditions, dt=0.01, t_tot=
         e[step + 1] = e[step] + e_dt * dt
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
-        cmrna_dt_array[step + 1] = cmrna_dt * 1/dt
 
-    # Calculating blue over yellow ratio
-    blue = eps_cpr * p * h
-    yellow = eps_cprg * s * h
-    b_y = np.divide(blue, yellow)
     return time, p
 
 
@@ -286,13 +272,13 @@ if __name__ == "__main__":
     t_python = timeit.Timer(
         "model_prokaryotic_python(parameters, constants, initial_conditions)", globals=globals())
     t_numba = timeit.Timer(
-        "model_prokaryotic(parameters, constants, initial_conditions)", globals=globals())
+        "model_prokaryotic_numba(parameters, constants, initial_conditions)", globals=globals())
 
     number_python = 3
     number_numba = 3
 
-    timings_python = t_python.repeat(repeat=3, number=number_python)
-    timings_numba = t_numba.repeat(repeat=10, number=number_numba)
+    timings_python = t_python.repeat(repeat=5, number=number_python)
+    timings_numba = t_numba.repeat(repeat=20, number=number_numba)
 
     min_timings_python = min(timings_python)
     min_timings_numba = min(timings_numba)
