@@ -336,12 +336,12 @@ def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None
                     csv_writer.writerow(data_to_write[i, :])
 
 
-def morris_datareader(path=f"modelling/data", tag=f"_{int(time.time())}"):
+def morris_datareader(path="modelling/data", tag=f"_{int(time.time())}"):
 
     data_names = ["mu", "mu_star", "sigma", "mu_star_conf_level"]
     data_dict = dict()
 
-    for data_name in data_names:
+    for data_name in tqdm(data_names):
         data = []
         file_path = path + "/" + data_name + tag + ".csv"
         with open(file_path, "r") as rf:
@@ -350,7 +350,7 @@ def morris_datareader(path=f"modelling/data", tag=f"_{int(time.time())}"):
             for row in csv_reader:
                 data.append(row)
 
-        data_array = np.array(data, dtype=np.float32)
+        data_array = np.array(data, dtype=np.float64)
         if "time" in fieldnames:
             parameters = fieldnames[1:]
             time_array = data_array[:, 0]
