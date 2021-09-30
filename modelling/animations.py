@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegFileWriter
-from models import model_prokaryotic, model_prokaryotic_readout, model_prokaryotic_all
+from models import model_prokaryotic, model_prokaryotic_absorbance, model_prokaryotic_all
 from standard_values import standard_constants, standard_initial_conditions, standard_parameters_prokaryotic
 from plot_helpers import micromolar_conc_to_math_exp
 
@@ -37,15 +37,17 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     constants = standard_constants()
 
     for i in range(num_steps):
-        initial_conditions = standard_initial_conditions(
+        initial_conditions1 = standard_initial_conditions(
             dna_conc=dna_conc_all[i], s_i=150, vit_conc=vit_conc1)
-        time1, absorbance1[i, :] = model_prokaryotic_readout(
-            parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
 
-        initial_conditions = standard_initial_conditions(
+        initial_conditions2 = standard_initial_conditions(
             dna_conc=dna_conc_all[i], s_i=150, vit_conc=vit_conc2)
-        time2, absorbance2[i, :] = model_prokaryotic_readout(
-            parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
+
+        time1, absorbance1[i, :] = model_prokaryotic_absorbance(
+            parameters=parameters, initial_conditions=initial_conditions1, constants=constants, dt=dt, t_tot=t_tot)
+
+        time2, absorbance2[i, :] = model_prokaryotic_absorbance(
+            parameters=parameters, initial_conditions=initial_conditions2, constants=constants, dt=dt, t_tot=t_tot)
 
         area = np.sum((absorbance1[i, :] - absorbance2[i, :]) * dt)
 
@@ -148,7 +150,7 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, low_dna_conc=
     plt.show()
 
 
-def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, dna_conc, low_k_c=1*10**-6, high_k_c=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save=False):
+def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, dna_conc, low_k_c=1*10**-6, high_k_c=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
     """All inputs are in micromolar"""
 
     # The difference in dt between every plotted point, this is done to speed up the animation
@@ -188,11 +190,11 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, dna_conc, low_k_c=
         # Change the k_c parameter
         parameters[13] = k_c_all[i]
 
-        time1, absorbance1[i, :] = model_prokaryotic_readout(
-            parameters, constants, initial_conditions1, dt=dt, t_tot=t_tot)
+        time1, absorbance1[i, :] = model_prokaryotic_absorbance(
+            parameters=parameters, initial_conditions=initial_conditions1, constants=constants, dt=dt, t_tot=t_tot)
 
-        time2, absorbance2[i, :] = model_prokaryotic_readout(
-            parameters, constants, initial_conditions2, dt=dt, t_tot=t_tot)
+        time2, absorbance2[i, :] = model_prokaryotic_absorbance(
+            parameters=parameters, initial_conditions=initial_conditions2, constants=constants, dt=dt, t_tot=t_tot)
 
         area = np.sum((absorbance1[i, :] - absorbance2[i, :]) * dt)
 
@@ -233,7 +235,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, dna_conc, low_k_c=
     # ax2.plot(dna_conc_all, area_array)
 
     k_c_math_exp = "Cleaving rate: " + \
-        micromolar_conc_to_math_exp(high_k_c, 2)
+        micromolar_conc_to_math_exp(high_k_c, 2) + "/$s$"
     k_c_text = ax.text(0.7, 0.1, k_c_math_exp, transform=ax.transAxes,
                        fontsize=10, bbox=dict(facecolor="#FFCF39", alpha=0.5, boxstyle="round"))
 
@@ -269,7 +271,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, dna_conc, low_k_c=
     def update(index):
 
         k_c_math_exp = "Cleaving rate: " + \
-            micromolar_conc_to_math_exp(k_c_all[index], 2)
+            micromolar_conc_to_math_exp(k_c_all[index], 2) + "/$s$"
         k_c_text.set_text(k_c_math_exp)
 
         line3.set_data(time1[::plot_di], absorbance1[index, ::plot_di])
@@ -288,10 +290,9 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, dna_conc, low_k_c=
     anim = FuncAnimation(fig, update, frames=np.arange(num_steps),
                          init_func=init, blit=False)
 
-    if save:
-        f = "test.mp4"
+    if save_path is not None:
         writermp4 = FFMpegFileWriter(fps=5, bitrate=5000)
-        anim.save(f, writer=writermp4)
+        anim.save(f"{save_path}", writer=writermp4)
 
     plt.show()
 
@@ -397,7 +398,7 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 if __name__ == "__main__":
     anim_two_vitamin_conc_differing_dna_conc(
-        0.5, 1, low_dna_conc=0.5*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=10800)
+        0.5, 1, low_dna_conc=0.1*10**-4, high_dna_conc=5*10**-3, num_steps=50, dt=0.01, t_tot=10800)
 
     # anim_two_vitamin_conc_differing_k_c(0.5, 1, 2*10**-3, low_k_c=(
-    #     1/60)/10, high_k_c=(1/60), num_steps=30, dt=0.01, t_tot=7200, save=False)
+    #     1/60)/10, high_k_c=(1/60), num_steps=30, dt=0.01, t_tot=7200, save_path="pres.mp4")
