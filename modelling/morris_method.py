@@ -1,12 +1,18 @@
+import csv
+import time
 from SALib.sample import morris as morris_sample
 from SALib.analyze import morris as morris_analyze
 from tqdm import tqdm
 import numpy as np
-import csv
 
 
-def morris_analysis(problem, trajectories, func, constants, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis(problem, trajectories, func, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     """Function does Morris analysis on a function/model.
+
+    IMPORTANT
+    ---------
+    dna_conc and vit_conc are overriden if they are part of the part of the problem!!!
+
 
     This is a wrapper function that creates model inputs required for Method of Morris. It then runs these model inputs through
     a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf_level.
@@ -79,6 +85,9 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
         raise ValueError(
             "Variable 'problem' needs to contain key 'bounds' (https://salib.readthedocs.io/en/latest/basics.html)")
 
+    # Unpack initial conditions array
+    dna_conc, s_i, vit_conc = initial_conditions
+
     # Determening the timepoints of the simulation.
     n = int(np.ceil(t_tot/dt) + 1)  # Number of timesteps of the simulation [-]
     time = np.linspace(0, t_tot, n)  # Array with all timepoints.
@@ -99,8 +108,40 @@ def morris_analysis(problem, trajectories, func, constants, initial_conditions, 
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    model_output = func(parameters=model_input, initial_conditions=initial_conditions,
-                        constants=constants, dt=dt, t_tot=t_tot)
+    # Check if you need to override the dna_conc variable then do np.delete()
+    # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
+    if "dna_conc" in problem["names"]:
+        print("dna_conc is part of the problem, so will be overriden!!")
+        index = problem["names"].index("dna_conc")
+        dna_conc_array = model_input[:, index]
+        # Remove the column with the dna concentration, since this is a seperate value from the input parameters
+        model_input_temp = np.delete(model_input, index, axis=1)
+    else:
+        dna_conc_array = np.ones(
+            model_input.shape[0], dtype=np.float64) * dna_conc
+        model_input_temp = model_input
+
+    # Check if you need to override the vit_conc variable then do np.delete()
+    # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
+    if "vit_conc" in problem["names"]:
+        print("vit_conc is part of the problem, so will be overriden!!")
+        index = problem["names"].index("vit_conc")
+        vit_conc_array = model_input[:, index]
+        # Remove the column with the dna concentration, since this is a seperate value from the input parameters
+        model_input_temp = np.delete(model_input, index, axis=1)
+    else:
+        vit_conc_array = np.ones(
+            model_input.shape[0], dtype=np.float64) * vit_conc
+        model_input_temp = model_input_temp
+
+    s_i_array = np.ones(
+        model_input.shape[0], dtype=np.float64) * s_i
+
+    initial_conditions = np.stack(
+        (dna_conc_array, s_i_array, vit_conc_array), axis=1)
+
+    model_output = func(parameters=model_input,
+                        initial_conditions=initial_conditions, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis at each timepoint (using the output of all the different simulations)
     for ii in tqdm(range(n)):
@@ -234,43 +275,135 @@ def morris_analysis_area(problem, trajectories, func, dna_conc, s_i, vit_conc1, 
     return mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_star_conf_level):
-    # Names of the 4 files
-    filenames = ["\mu", "\mu_star", "\sigma", "\mu_star_conf_level"]
-    # Names of the columns of each file, namely time and all the parameters
-    fieldnames = ["time"]
+def morris_problem_description_prokaryotic(problem, trajectories, num_levels, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
+    file_path = path + "/" + "description" + tag + ".txt"
+    with open(file_path, "w") as wf:
+        wf.write("Description Morris sensitivity analysis\n")
+        wf.write("\n")
+        wf.write(
+            f"Morris sensitivity analysis for the prokaryotic system was run using {trajectories} trajectories and {num_levels} levels.\n")
+        wf.write(
+            f"The concentration of the product was taken as the output variable. In total {len(problem['names'])} parameters were varied.\n")
+        wf.write(
+            "The name of these parameters and their respective ranges are as follows:\n")
+        wf.write("\n")
+        count = 0
+        for param in problem["names"]:
+            # Write down the parameter name and the bounds
+            wf.write(
+                f"{param} = ({problem['bounds'][count][0]:.3e}, {problem['bounds'][count][1]:.3e})\n")
+            # Next parameter is linked to next bound in the bounds list
+            count += 1
+
+        wf.write("\n")
+        wf.write(
+            f"The simulation was run for {t_tot} seconds with timesteps of {dt} seconds. Analysis was performed\n")
+        wf.write("at every timestep.")
+
+
+def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None, path=f"modelling/data", tag=f"_{int(time.time())}"):
+
+    data_order = ["mu", "mu_star", "sigma", "mu_star_conf_level"]
+    data_dict = {"mu": mu, "mu_star": mu_star, "sigma": sigma,
+                 "mu_star_conf_level": mu_star_conf_level}
+
+    # Only add time column if it is given
+    if time is not None:
+        fieldnames = ["time"]
+    else:
+        fieldnames = []
+
+    # Create all the fieldnames
     for parameter in problem["names"]:
         fieldnames.append(parameter)
-    # Put all data in 1 list
-    indices = [mu, mu_star, sigma, mu_star_conf_level]
-    # A column array containing all timepoints
-    time_column = np.zeros((time.shape[0], 1), dtype=np.float64)
-    time_column[:, 0] = time
-    # Loop over the four files
-    for ii in range(4):
-        # Make file
-        new_file_name = path + filenames[ii] + "_" + filenumber + ".csv"
-        new_file = open(new_file_name, "x")
-        csv_writer = csv.writer(new_file)
-        # Write header
-        csv_writer.writerow(fieldnames)
-        # Store all the information to be saved in the data variable
-        data = np.concatenate((time_column, indices[ii]), axis=1)
-        # Loop over rows of each file (each row denoting a timepoint)
-        for jj in range(time.shape[0]):
-            csv_writer.writerow(data[jj, :])
-        new_file.close()
+
+    for data_name in data_order:
+        if "time" in fieldnames:
+            data_to_write = np.concatenate(
+                (time[:, np.newaxis], data_dict[data_name]), axis=1)
+        else:
+            data_to_write = data_dict[data_name]
+
+        file_path = path + "/" + data_name + tag + ".csv"
+        with open(file_path, "w") as wf:
+            csv_writer = csv.writer(wf)
+            csv_writer.writerow(fieldnames)
+
+            if len(data_to_write.shape) == 1:
+                csv_writer.writerow(data_to_write)
+            elif len(data_to_write.shape) == 2:
+                for i in range(data_to_write.shape[0]):
+                    csv_writer.writerow(data_to_write[i, :])
 
 
-def morris_datareader(parameter, index, path, filenumber):
-    filename = path + "\\" + index + "_" + filenumber + ".csv"
-    print(filename)
-    file = open(filename, "r")
-    csv_reader = csv.DictReader(file)
-    data = []
-    for line in csv_reader:
-        data.append(line[parameter])
-    file.close()
-    map(int, data)
-    data = np.array(data, dtype=np.float64)
-    return data
+def morris_datareader(path=f"modelling/data", tag=f"_{int(time.time())}"):
+
+    data_names = ["mu", "mu_star", "sigma", "mu_star_conf_level"]
+    data_dict = dict()
+
+    for data_name in data_names:
+        data = []
+        file_path = path + "/" + data_name + tag + ".csv"
+        with open(file_path, "r") as rf:
+            csv_reader = csv.reader(rf)
+            fieldnames = next(csv_reader)
+            for row in csv_reader:
+                data.append(row)
+
+        data_array = np.array(data, dtype=np.float32)
+        if "time" in fieldnames:
+            parameters = fieldnames[1:]
+            time_array = data_array[:, 0]
+            data_array = np.delete(data_array, 0, axis=1)
+        else:
+            parameters = fieldnames
+            time_array = None
+
+        data_dict[data_name] = data_array
+
+    # This only needs to be done once
+    data_dict["time"] = time_array
+
+    return parameters, data_dict
+
+
+# def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_star_conf_level):
+#     # Names of the 4 files
+#     filenames = ["\mu", "\mu_star", "\sigma", "\mu_star_conf_level"]
+#     # Names of the columns of each file, namely time and all the parameters
+#     fieldnames = ["time"]
+#     for parameter in problem["names"]:
+#         fieldnames.append(parameter)
+#     # Put all data in 1 list
+#     indices = [mu, mu_star, sigma, mu_star_conf_level]
+#     # A column array containing all timepoints
+#     time_column = np.zeros((time.shape[0], 1), dtype=np.float64)
+#     time_column[:, 0] = time
+#     # Loop over the four files
+#     for ii in range(4):
+#         # Make file
+#         new_file_name = path + filenames[ii] + "_" + filenumber + ".csv"
+#         new_file = open(new_file_name, "x")
+#         csv_writer = csv.writer(new_file)
+#         # Write header
+#         csv_writer.writerow(fieldnames)
+#         # Store all the information to be saved in the data variable
+#         data = np.concatenate((time_column, indices[ii]), axis=1)
+#         # Loop over rows of each file (each row denoting a timepoint)
+#         for jj in range(time.shape[0]):
+#             csv_writer.writerow(data[jj, :])
+#         new_file.close()
+
+
+# def morris_datareader(parameter, index, path, filenumber):
+#     filename = path + "\\" + index + "_" + filenumber + ".csv"
+#     print(filename)
+#     file = open(filename, "r")
+#     csv_reader = csv.DictReader(file)
+#     data = []
+#     for line in csv_reader:
+#         data.append(line[parameter])
+#     file.close()
+#     map(int, data)
+#     data = np.array(data, dtype=np.float64)
+#     return data
