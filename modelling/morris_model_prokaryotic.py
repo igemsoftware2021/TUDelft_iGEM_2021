@@ -2,7 +2,7 @@ import time
 import numpy as np
 from morris_method import morris_analysis
 from morris_method import morris_datawriter, morris_problem_description_prokaryotic
-from models import model_prokaryotic_parallel
+from models_parallelized import model_prokaryotic_parallel
 from standard_values import standard_parameters_prokaryotic
 
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         s_i, prokaryotic_problem, num_trajectories, num_levels, dt=dt, t_tot=t_tot, path=path, tag=tag)
 
     (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(prokaryotic_problem,
-                                                                     trajectories, model_prokaryotic_parallel, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
+                                                                     num_trajectories, model_prokaryotic_parallel, initial_conditions, dt=dt, t_tot=t_tot, num_levels=num_levels)
 
     morris_datawriter(prokaryotic_problem, mu, mu_star, sigma,
                       mu_star_conf_level, time=time, path=path, tag=tag)
