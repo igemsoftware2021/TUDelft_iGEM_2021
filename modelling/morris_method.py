@@ -275,7 +275,7 @@ def morris_analysis_area(problem, trajectories, func, dna_conc, s_i, vit_conc1, 
     return mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_problem_description_prokaryotic(problem, trajectories, num_levels, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
+def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_levels, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
     file_path = path + "/" + "description" + tag + ".txt"
     with open(file_path, "w") as wf:
         wf.write("Description Morris sensitivity analysis\n")
@@ -283,9 +283,9 @@ def morris_problem_description_prokaryotic(problem, trajectories, num_levels, dt
         wf.write(
             f"Morris sensitivity analysis for the prokaryotic system was run using {trajectories} trajectories and {num_levels} levels.\n")
         wf.write(
-            f"The concentration of the product was taken as the output variable. In total {len(problem['names'])} parameters were varied.\n")
+            f"The initial substrate concentration was {s_i} uM. The concentration of the product was taken as the output variable for the analysis.\n")
         wf.write(
-            "The name of these parameters and their respective ranges are as follows:\n")
+            f"In total {len(problem['names'])} parameters were varied. The name of these parameters and their respective ranges are as follows:\n")
         wf.write("\n")
         count = 0
         for param in problem["names"]:
