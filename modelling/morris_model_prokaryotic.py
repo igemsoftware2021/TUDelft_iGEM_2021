@@ -1,7 +1,7 @@
 import csv
 import numpy as np
 from morris_method import morris_analysis, morris_analysis_area
-from morris_method import morris_datawriter
+from morris_method import morris_datawriter, morris_problem_description_prokaryotic
 from models_area import model_prokaryotic_absorbance_area, model_prokaryotic_area_parallel
 from standard_values import standard_parameters_prokaryotic, standard_initial_conditions, standard_constants
 import matplotlib.pyplot as plt
@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 # Defining the properties of the Morris sensitivity analysis
 trajectories = 45
 num_levels = 4
-num_parameters = 15
+num_parameters = 16
 
 # Parameters
 parameters = standard_parameters_prokaryotic()
@@ -43,12 +43,13 @@ t_tot = 10800  # Total time [s]
 dt = 0.01  # Timestep [s]
 
 dna_conc = 3*10**-3
+vit_conc = 0.07
 
 # Problem definition for prokaryotic system
 prokaryotic_problem = {
     'num_vars': num_parameters,
     'names': ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
-              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "dna_conc"],
+              "k_tlr", "k_m", "deg_mrna", "deg_tlr", "k_on", "k_off", "k_c", "dna_conc", "vit_conc"],
     'bounds': [[lower_range * parameters[0], upper_range * parameters[0]],     # (0) k_ts
                [lower_range * parameters[1], upper_range * \
                    parameters[1]],     # (1) k_tl
@@ -76,11 +77,13 @@ prokaryotic_problem = {
                    parameters[12]],  # (12) k_off
                [lower_range * parameters[13], upper_range * \
                    parameters[13]],  # ,  # (13) k_c
-               [lower_range * dna_conc, upper_range * dna_conc]]  # (14) dna_i
-    # TODO think about how to implement the changing dna concentration
-    #    [lower_range * dna_i, upper_range * dna_i]]
-
+               [lower_range * dna_conc, upper_range * \
+                   dna_conc],  # (14) dna_conc
+               [lower_range * vit_conc, upper_range * vit_conc]]  # (15) vit_conc
 }
+
+morris_problem_description_prokaryotic(
+    prokaryotic_problem, trajectories, num_levels, dt, t_tot)
 
 # # Doing Morris sensitivity analysis
 # (time, mu, mu_star, sigma, mu_star_conf_level) = morris_analysis(prokaryotic_problem, trajectories,
@@ -88,32 +91,32 @@ prokaryotic_problem = {
 
 # (problem, trajectories, func, constants, initial_conditions, vit_conc1, vit_conc2, dt: int=0.01, t_tot: int=7200, num_levels: int=4, optimal_trajectories: int=None, local_optimization: bool=True, num_resamples: int=1000, conf_level: float=0.95, print_to_console: bool=False, seed: int=None):
 # Doing Morris sensitivity analysis
-(mu, mu_star, sigma, mu_star_conf_level) = morris_analysis_area(prokaryotic_problem, trajectories,
-                                                                model_prokaryotic_area_parallel, dna_conc=dna_conc, s_i=250, vit_conc1=0.05, vit_conc2=0.09,
-                                                                dt=dt, t_tot=t_tot, num_levels=num_levels)
+# (mu, mu_star, sigma, mu_star_conf_level) = morris_analysis_area(prokaryotic_problem, trajectories,
+#                                                                 model_prokaryotic_area_parallel, dna_conc=dna_conc, s_i=250, vit_conc1=0.05, vit_conc2=0.09,
+#                                                                 dt=dt, t_tot=t_tot, num_levels=num_levels)
 # print(mu)
 # plt.scatter(np.arange(0, mu.shape[0]), mu)
 
-fig, ax = plt.subplots()
-ax.bar(np.arange(0, mu.shape[0]), mu)
-# plt.bar(np.arange(0, mu_star.shape[0]), mu_star)
-# plt.hist(mu_star)
-fig2, ax2 = plt.subplots()
-ax2.bar(np.arange(0, sigma.shape[0]), sigma)
-ax.set_xticks(np.arange(0, num_parameters))
-ax.set_xticklabels(prokaryotic_problem["names"])
-# for param in prokaryotic_problem["names"]:
+# fig, ax = plt.subplots()
+# ax.bar(np.arange(0, mu.shape[0]), mu)
+# # plt.bar(np.arange(0, mu_star.shape[0]), mu_star)
+# # plt.hist(mu_star)
+# fig2, ax2 = plt.subplots()
+# ax2.bar(np.arange(0, sigma.shape[0]), sigma)
+# ax.set_xticks(np.arange(0, num_parameters))
+# ax.set_xticklabels(prokaryotic_problem["names"])
+# # for param in prokaryotic_problem["names"]:
 
 
-# plt.hist(sigma)
-# print(mu_star_conf_level)
-plt.show()
+# # plt.hist(sigma)
+# # print(mu_star_conf_level)
+# plt.show()
 
-# Saving the data
-path = "modelling\data\morris_prokaryotic"
-tag = "test"
-morris_datawriter(prokaryotic_problem, path,
-                  tag, time, mu, mu_star, sigma, mu_star_conf_level)
+# # Saving the data
+# path = "modelling\data\morris_prokaryotic"
+# tag = "test"
+# morris_datawriter(prokaryotic_problem, path,
+#                   tag, time, mu, mu_star, sigma, mu_star_conf_level)
 # The names of the files are in the format:
 # path/time_tag.csv
 # path/mu_tag.csv
