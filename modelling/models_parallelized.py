@@ -39,7 +39,7 @@ def model_no_aptamer_parallel(parameters, constants, initial_conditions, dt: int
     # Every column is a unique simulation
     for ii in prange(num_simulations):
         _, model_output[:, ii] = model_no_aptamer(
-            parameters[ii, :], constants, initial_conditions, dt=dt, t_tot=t_tot)
+            parameters[ii, :], constants, initial_conditions[ii, :], dt=dt, t_tot=t_tot)
     return model_output
 
 
@@ -54,7 +54,7 @@ def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t
         The Numpy array containing all the parameters for the model of dtype=float
     constants: numpy.array
         The Numpy array containing all the constants for the model of dtype=float
-    initial_condition: numpy.array
+    initial_condition: numpy.array (2D)
         The Numpy array containing all the initial conditions for the model of dtype=float
     dt: int
         The time each timestep takes in seconds. (default 0.01)
@@ -76,7 +76,7 @@ def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t
     # Every column is a unique simulation
     for ii in prange(num_simulations):
         _, model_output[:, ii] = model_prokaryotic(
-            parameters=parameters[ii, :], intial_conditions=initial_conditions, dt=dt, t_tot=t_tot)
+            parameters=parameters[ii, :], initial_conditions=initial_conditions[ii, :], dt=dt, t_tot=t_tot)
     return model_output
 
 
