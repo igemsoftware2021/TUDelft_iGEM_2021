@@ -302,7 +302,33 @@ def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_level
 
 
 def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None, path=f"modelling/data", tag=f"_{int(time.time())}"):
+    """Function writes results from a Morris sensitivty analysis to a file.
 
+    Parameters
+    ----------
+    problem: dict
+        The problem as required for SALib to work
+    mu: numpy.array
+        The Numpy array containing the mean elementary effects over time. Each row is a timepoint and every column
+        contains the mean elementary effects for a certain parameter. The Numpy array is of dtype=float.
+    mu_star: numpy.array
+        The Numpy array containing the absolute mean elementary effects over time. Each row is a timepoint and every column
+        contains the absolute mean elementary effects for a certain parameter. The Numpy array is of dtype=float.
+    sigma: numpy.array
+        The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
+        and every column contains the standard deviations of the mean elementary effect for a certain parameter.
+        The Numpy array is of dtype=float.
+    mu_star_conf_level: numpy.array
+        The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
+        contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.
+    time: numpy.array
+        The Numpy array containing all the timepoints at which the simulation was run. The Numpy array is of dtype=float.
+        The default behaviour is that no time column is added to the file. (default None)
+    path: str
+        Path to the directory where all the data can be found. (default 'modelling/data')
+    tag: str
+        The tag that is added after 'mu'/
+    """
     data_order = ["mu", "mu_star", "sigma", "mu_star_conf_level"]
     data_dict = {"mu": mu, "mu_star": mu_star, "sigma": sigma,
                  "mu_star_conf_level": mu_star_conf_level}
