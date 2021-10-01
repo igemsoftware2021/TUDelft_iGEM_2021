@@ -17,9 +17,9 @@ def standard_parameters_prokaryotic():
     deg_mrna = 1.3*10**-5  # (9) Degradation rate of mRNA [1/s]
     # (10) Degradation rate of translation resources [1/s]
     deg_tlr = 7.5*10**-5
-    k_on = 1*10**-2       # (11)  Association rate of vitamin and umRNA [1/µMs]
+    k_on = 2*10**-1  # (11)  Association rate of vitamin and umRNA [1/µMs]
     k_off = 1*10**-2      # (12)  Dissociation rate of vitamin and umRNA [1/s]
-    k_c = (1/60)           # (13)  Cleaving rate of umRNA [1/s]
+    k_c = 1/60           # (13)  Cleaving rate of umRNA [1/s]
     parameters = np.array([k_ts, k_tl, k_mat, k_cat, k_s, kc_s, k_l,
                            k_tlr, k_m, deg_mrna, deg_tlr, k_on, k_off, k_c])  # Array containing above parameters
 
@@ -40,5 +40,8 @@ def standard_constants():
     return constants
 
 
-def standard_initial_conditions(dna_conc=5*10**-3, s_i=150, vit_conc=1):
+def standard_initial_conditions():
+    dna_conc = 3*10**-3     # DNA concentration [µM]
+    s_i = 250               # Substrate concentration [µM]
+    vit_conc = 0.07         # Vitamin concentration [µM]
     return np.array([dna_conc, s_i, vit_conc])
