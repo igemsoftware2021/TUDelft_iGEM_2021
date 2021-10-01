@@ -115,7 +115,7 @@ def pre_heater(pi, adc, channel, pin_heating, pid_parameters, v_ref, gain, durat
         if duty_cycle < duty_cycle_lower_bound:
             duty_cycle = 0
         if duty_cycle > duty_cycle_upper_bound:
-            duty_cycle = duty_cycle_upper_bound
+            duty_cycle = 1*10**6
         print(duty_cycle)
         pi.hardware_PWM(pin_heating, pwm_freq, duty_cycle)
 
