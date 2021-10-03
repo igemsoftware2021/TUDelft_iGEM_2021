@@ -11,8 +11,7 @@ def plot_different_dt_error(low=0, high=-8, num=17, base=10, t_tot=7200):
 
     parameters = standard_parameters_prokaryotic()
     constants = standard_constants()
-    initial_conditions = standard_initial_conditions(
-        dna_conc=5*10**-3, s_i=150, vit_conc=5)
+    initial_conditions = standard_initial_conditions()
 
     time_final = np.arange(0, t_tot, 0.1, dtype=np.float32)
     p_final = np.zeros((num, time_final.shape[0]), dtype=np.float32)
