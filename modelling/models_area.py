@@ -77,7 +77,7 @@ if __name__ == "__main__":
     # result = model_prokaryotic_absorbance_area(
     #     parameters, constants, 2*10**-3, 250, 0.05, 0.09)
     result = model_prokaryotic_area(
-        parameters, 2*10**-3, 250, 0.05, 0.09)
+        parameters, 3*10**-3, 250, 0.05, 0.09)
     print(result)
     vit_conc = np.linspace(1, 20, 21)
     results = np.zeros(vit_conc.shape)
