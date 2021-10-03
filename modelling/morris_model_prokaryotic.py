@@ -6,12 +6,7 @@ from morris_method import morris_datawriter
 from standard_values import standard_parameters_prokaryotic
 
 
-def run_morris_analysis_prokaryotic():
-    import time  # Otherwise it does not work, I don't undestand why not
-    # Set the variables for the storing the information
-    path = "modelling/data"
-    tag = f"_{int(time.time())}"
-
+def run_morris_analysis_prokaryotic(path="modelling/data", tag=f"_{int(time.time())}"):
     # Set Morris method values
     num_trajectories = 20
     num_levels = 4
@@ -90,11 +85,7 @@ def run_morris_analysis_prokaryotic():
                       mu_star_conf_level, time=time, path=path, tag=tag)
 
 
-def run_morris_analysis_area_prokaryotic():
-    # Set the variables for the storing the information
-    path = "modelling/data"
-    tag = f"_{int(time.time())}"
-
+def run_morris_analysis_area_prokaryotic(path="modelling/data", tag=f"_{int(time.time())}"):
     # Set Morris method values
     num_trajectories = 20
     num_levels = 4
