@@ -4,9 +4,11 @@ from SALib.sample import morris as morris_sample
 from SALib.analyze import morris as morris_analyze
 from tqdm import tqdm
 import numpy as np
+from models_parallelized import model_prokaryotic_parallel
+from models_area import model_prokaryotic_area_parallel
 
 
-def morris_analysis(problem, trajectories, func, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     """Function does Morris analysis on a function/model.
 
     IMPORTANT
@@ -140,8 +142,8 @@ def morris_analysis(problem, trajectories, func, initial_conditions, dt: int = 0
     initial_conditions = np.stack(
         (dna_conc_array, s_i_array, vit_conc_array), axis=1)
 
-    model_output = func(parameters=model_input,
-                        initial_conditions=initial_conditions, dt=dt, t_tot=t_tot)
+    model_output = model_prokaryotic_parallel(parameters=model_input,
+                                              initial_conditions=initial_conditions, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis at each timepoint (using the output of all the different simulations)
     for ii in tqdm(range(n)):
@@ -157,7 +159,7 @@ def morris_analysis(problem, trajectories, func, initial_conditions, dt: int = 0
     return time, mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_analysis_area(problem, trajectories, func, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     # TODO finish this function, I only copied it and changed the input arguments
     """Function does Morris analysis on a function/model.
 
@@ -260,8 +262,8 @@ def morris_analysis_area(problem, trajectories, func, dna_conc, s_i, vit_conc1, 
             model_input.shape[0], dtype=np.float64) * dna_conc
         model_input_temp = model_input
 
-    model_output = func(parameters=model_input_temp, dna_conc=dna_conc_array,
-                        s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
+    model_output = model_prokaryotic_area_parallel(parameters=model_input_temp, dna_conc=dna_conc_array,
+                                                   s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis (using the output of all the different simulations)
     indices_dict = morris_analyze.analyze(
