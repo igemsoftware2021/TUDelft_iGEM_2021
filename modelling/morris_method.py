@@ -303,6 +303,34 @@ def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_level
         wf.write("at every timestep.")
 
 
+def morris_area_problem_description_prokaryotic(s_i, vit_conc1, vit_conc2, problem, trajectories, num_levels, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
+    file_path = path + "/" + "description" + tag + ".txt"
+    with open(file_path, "w") as wf:
+        wf.write("Description Morris sensitivity analysis area\n")
+        wf.write("\n")
+        wf.write(
+            f"Morris sensitivity analysis for the prokaryotic system was run using {trajectories} trajectories and {num_levels} levels.\n")
+        wf.write(
+            f"The initial substrate concentration was {s_i} uM. The area difference of two product curves was taken as the output variable for the analysis.\n")
+        wf.write(
+            f"The two product curves were simulated using a vitamin concentration of {vit_conc1} uM and {vit_conc2} uM.\n")
+        wf.write(
+            f"In total {len(problem['names'])} parameters were varied. The name of these parameters and their respective ranges are as follows:\n")
+        wf.write("\n")
+        count = 0
+        for param in problem["names"]:
+            # Write down the parameter name and the bounds
+            wf.write(
+                f"{param} = ({problem['bounds'][count][0]:.3e}, {problem['bounds'][count][1]:.3e})\n")
+            # Next parameter is linked to next bound in the bounds list
+            count += 1
+
+        wf.write("\n")
+        wf.write(
+            f"The simulation was run for {t_tot} seconds with timesteps of {dt} seconds. Analysis was performed\n")
+        wf.write("at every timestep.")
+
+
 def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None, path=f"modelling/data", tag=f"_{int(time.time())}"):
     """Function writes results from a Morris sensitivty analysis to a file.
 
