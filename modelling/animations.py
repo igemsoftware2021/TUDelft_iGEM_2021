@@ -156,7 +156,7 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
                          init_func=init, blit=False)
 
     if save_path is not None:
-        writermp4 = FFMpegFileWriter(fps=5, bitrate=5000)
+        writermp4 = FFMpegFileWriter(fps=10, bitrate=5000)
         anim.save(f"{save_path}", writer=writermp4)
 
     plt.show()
@@ -316,7 +316,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
                          init_func=init, blit=False)
 
     if save_path is not None:
-        writermp4 = FFMpegFileWriter(fps=10, bitrate=5000)
+        writermp4 = FFMpegFileWriter(fps=10, bitrate=10000)
         anim.save(f"{save_path}", writer=writermp4)
 
     plt.show()
