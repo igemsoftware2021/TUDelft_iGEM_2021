@@ -37,22 +37,23 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
 
     # Set all proporties for ax1
     ax1.legend()
-    ax1.set_xlabel(r"Time $(s)$")
-    ax1.set_ylabel(r"$\mu$ $[\mu M]$")
+    ax1.set_xlabel(r"Time $\mathrm{(s)}$")
+    ax1.set_ylabel(r"$\mathrm{\mu}$ $(\mathrm{\mu M})$")
 
     # Set all proporties for ax2
     ax2.legend()
-    ax2.set_xlabel(r"Time $(s)$")
-    ax2.set_ylabel(r"$\mu^{\ast}$ $[\mu M]$")
+    ax2.set_xlabel(r"Time $\mathrm{(s)}$")
+    ax2.set_ylabel(r"$\mathrm{\mu}^{\ast}$ $(\mathrm{\mu M})$")
 
     # Set all proporites for ax3
     ax3.legend()
-    ax3.set_xlabel(r"Time $(s)$")
-    ax3.set_ylabel(r"$\sigma$ $[\mu M]$")
+    ax3.set_xlabel(r"Time $\mathrm{(s)}$")
+    ax3.set_ylabel(r"$\mathrm{\sigma}$ $(\mathrm{\mu M})$")
 
     ax4.legend()
-    ax4.set_xlabel(r"Time $(s)$")
-    ax4.set_ylabel(r"$\mu^{\ast}$ $95\%$-confidence interval $[\mu M]$")
+    ax4.set_xlabel(r"Time $\mathrm{(s)}$")
+    ax4.set_ylabel(
+        r"$\mathrm{\mu^{\ast}}$ $95\%$-confidence interval $(\mathrm{\mu M})$")
 
     if save_path is not None:
         fig1.savefig(f"{save_path}/plot_mu{tag}", format="svg", dpi=1200)
@@ -64,7 +65,7 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     plt.show()
 
 
-def plot_morris_analysis_area(path="modelling/data", tag="_1633250120", save_path=None):
+def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_path=None):
     parameters, data_dict = morris_datareader(path=path, tag=tag)
 
     mu = data_dict["mu"].reshape(-1)
@@ -73,9 +74,9 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633250120", save_pat
 
     custom_colors = custom_aptavita_colors()
 
-    fig1, ax1 = plt.subplots(figsize=(18, 10), dpi=100)
-    fig2, ax2 = plt.subplots(figsize=(18, 10), dpi=100)
-    fig3, ax3 = plt.subplots(figsize=(18, 10), dpi=100)
+    fig1, ax1 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig2, ax2 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig3, ax3 = plt.subplots(figsize=(16, 9), dpi=125)
 
     ax1.bar(np.arange(0, mu.shape[0]), mu, color=custom_colors)
     ax2.bar(np.arange(0, mu_star.shape[0]), mu_star, color=custom_colors)
@@ -85,19 +86,19 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633250120", save_pat
     # ax1.set_xlabel(r"Time $(s)$")
     ax1.set_xticks(np.arange(0, len(parameters)))
     ax1.set_xticklabels(parameters)
-    ax1.set_ylabel(r"$\mu$")
+    ax1.set_ylabel(r"$\mathrm{\mu}$")
     ax1.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporties for ax2
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(parameters)
-    ax2.set_ylabel(r"$\mu^{\ast}$")
+    ax2.set_ylabel(r"$\mathrm{\mu}^{\ast}$")
     ax2.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporites for ax3
     ax3.set_xticks(np.arange(0, len(parameters)))
     ax3.set_xticklabels(parameters)
-    ax3.set_ylabel(r"$\sigma$")
+    ax3.set_ylabel(r"$\mathrm{\sigma}$")
     ax3.yaxis.set_major_locator(MultipleLocator(5000))
 
     if save_path is not None:
@@ -112,4 +113,4 @@ if __name__ == "__main__":
     # plot_morris_analysis(path="modelling/data",
     #                      tag="_1633190385")  # , save_path="modelling/data/plots")
     plot_morris_analysis_area(
-        path="modelling/data", tag="_1633250120")  # , save_path="modelling/data/plots")
+        path="modelling/data")  # , tag="_1633293196")  # , save_path="modelling/data/plots")
