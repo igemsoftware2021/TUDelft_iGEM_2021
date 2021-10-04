@@ -94,20 +94,19 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
     # Plot the position of the dna_conc that determines the standard area
     ax2.scatter(standard_dna_conc, 1.0, color="#057D54")
 
-    dna_conc_math_exp = "DNA concentration: " + \
-        micromolar_conc_to_math_exp(high_dna_conc, 2)
+    dna_conc_math_exp = f"DNA concentration: {(standard_dna_conc*1000):.3f} $\mathrm{{nM}}$"
     dna_conc_text = ax.text(0.7, 0.1, dna_conc_math_exp, transform=ax.transAxes,
                             fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
     def init():
         ax.set_title("Product concentration over time")
         ax.legend()
-        ax.set_xlabel(r"Time $[s]$")
-        ax.set_ylabel(r"Product concentration $[\mu M]$")
+        ax.set_xlabel(r"Time $(\mathrm{{s}})$")
+        ax.set_ylabel(r"Product concentration $(\mathrm{{\mu M}})$")
         ax.set_xlim(0, t_tot)
 
         ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"DNA concentration $[\mu M]$")
+        ax2.set_xlabel(r"DNA concentration $(\mathrm{{\mu M}})$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
@@ -135,8 +134,7 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
 
     def update(index):
 
-        dna_conc_math_exp = "DNA concentration: " + \
-            micromolar_conc_to_math_exp(dna_conc_all[index], 2)
+        dna_conc_math_exp = f"DNA concentration: {(dna_conc_all[index]*1000):.3f} $\mathrm{{nM}}$"
         dna_conc_text.set_text(dna_conc_math_exp)
 
         line3.set_data(time1[::plot_di], p1[index, ::plot_di])
@@ -249,7 +247,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
     # Plot the position of the k_c that is the standard area
     ax2.scatter(standard_k_c, 1.0, color="#057D54")
 
-    k_c_math_exp = f"Cleaving rate: {k_c_all[0]:.2e} $[1/s]$"
+    k_c_math_exp = f"Cleaving rate: {k_c_all[0]:.2e} $(\mathrm{{1/s}})$"
     k_c_text = ax1.text(0.7, 0.1, k_c_math_exp, transform=ax1.transAxes,
                         fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
@@ -257,12 +255,12 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
         # ax1.set_title("Product concentration over time")
         # ax1.legend(title="Vitamin concentration")
         ax1.legend()
-        ax1.set_xlabel(r"Time $[s]$")
-        ax1.set_ylabel(r"Product concentration $[\mu M]$")
+        ax1.set_xlabel(r"Time $(\mathrm{{s}})$")
+        ax1.set_ylabel(r"Product concentration $(\mathrm{{\mu M}})$")
         ax1.set_xlim(0, t_tot)
 
         # ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"Cleaving rate $[1/s]$")
+        ax2.set_xlabel(r"Cleaving rate $(\mathrm{{1/s}})$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
@@ -296,7 +294,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
 
     def update(index):
 
-        k_c_math_exp = f"Cleaving rate: {k_c_all[index]:.2e} $[1/s]$"
+        k_c_math_exp = f"Cleaving rate: {k_c_all[index]:.2e} $(\mathrm{{1/s}})$"
         k_c_text.set_text(k_c_math_exp)
 
         line3.set_data(time1[::plot_di], p1[index, ::plot_di])
@@ -423,7 +421,7 @@ def anim_two_vitamin_conc_differing_k_D(vit_conc1, vit_conc2, s_i=250, dna_conc=
     # Plot the position of the k_D that is the standard area
     ax2.scatter(standard_k_D, 1.0, color="#057D54")
 
-    k_D_math_exp = f"$K_{{D}}$: {k_D_all[0]:.2e} $[\mu M]$"
+    k_D_math_exp = f"$\mathrm{{K}}_{{\mathrm{{D}}}}$: {k_D_all[index]:.2e} $(\mathrm{{\mu M}})$"
     k_D_text = ax1.text(0.7, 0.1, k_D_math_exp, transform=ax1.transAxes,
                         fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
@@ -431,12 +429,12 @@ def anim_two_vitamin_conc_differing_k_D(vit_conc1, vit_conc2, s_i=250, dna_conc=
         # ax1.set_title("Product concentration over time")
         # ax1.legend(title="Vitamin concentration")
         ax1.legend()
-        ax1.set_xlabel(r"Time $[s]$")
-        ax1.set_ylabel(r"Product concentration $[\mu M]$")
+        ax1.set_xlabel(r"Time $(\mathrm{{s}})$")
+        ax1.set_ylabel(r"Product concentration $(\mathrm{{\mu M}})$")
         ax1.set_xlim(0, t_tot)
 
         # ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"Dissociation constant $[\mu M]$")
+        ax2.set_xlabel(r"Dissociation constant $(\mathrm{{\mu M}})$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
@@ -471,7 +469,7 @@ def anim_two_vitamin_conc_differing_k_D(vit_conc1, vit_conc2, s_i=250, dna_conc=
 
     def update(index):
 
-        k_D_math_exp = f"$K_{{D}}$: {k_D_all[index]:.2e} $[\mu M]$"
+        k_D_math_exp = f"$\mathrm{{K}}_{{\mathrm{{D}}}}$: {k_D_all[index]:.2e} $(\mathrm{{\mu M}})$"
         k_D_text.set_text(k_D_math_exp)
 
         line3.set_data(time1[::plot_di], p1[index, ::plot_di])
@@ -597,11 +595,11 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 
 if __name__ == "__main__":
-    anim_two_vitamin_conc_differing_dna_conc(
-        0.05, 0.09, s_i=250, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=50, dt=0.01, t_tot=10800)
+    # anim_two_vitamin_conc_differing_dna_conc(
+    #     0.05, 0.09, s_i=250, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=50, dt=0.01, t_tot=10800)
 
-    # anim_two_vitamin_conc_differing_k_c(
-    #     0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=100, dt=0.01, t_tot=7200)  # , save_path="test.mp4")
+    anim_two_vitamin_conc_differing_k_c(
+        0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=100, dt=0.01, t_tot=7200)  # , save_path="test.mp4")
     # anim_two_vitamin_conc_differing_k_D(0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_D=0.005,
     #                                     standard_k_D=0.05, high_k_D=5, num_steps=100, dt=0.01, t_tot=7200, save_path=None)
     # For changing K_D do the sqrt(10)
