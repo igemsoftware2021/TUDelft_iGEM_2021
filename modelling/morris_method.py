@@ -159,7 +159,7 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
     return time, mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = None, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = 10, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     # TODO finish this function, I only copied it and changed the input arguments
     """Function does Morris analysis on a function/model.
 
@@ -277,13 +277,13 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
     return mu, mu_star, sigma, mu_star_conf_level
 
 
-def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_levels, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
+def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_levels, optimal_trajectories, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
     file_path = path + "/" + "description" + tag + ".txt"
     with open(file_path, "w") as wf:
         wf.write("Description Morris sensitivity analysis\n")
         wf.write("\n")
         wf.write(
-            f"Morris sensitivity analysis for the prokaryotic system was run using {trajectories} trajectories and {num_levels} levels.\n")
+            f"For the Morris sensitivity analysis for the prokaryotic system {trajectories} trajectories were sampled of which {optimal_trajectories} optimal_trajectories were chosen. Every factor had {num_levels} levels.\n")
         wf.write(
             f"The initial substrate concentration was {s_i} uM. The concentration of the product was taken as the output variable for the analysis.\n")
         wf.write(
@@ -303,13 +303,13 @@ def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_level
         wf.write("at every timestep.")
 
 
-def morris_area_problem_description_prokaryotic(s_i, vit_conc1, vit_conc2, problem, trajectories, num_levels, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
+def morris_area_problem_description_prokaryotic(s_i, vit_conc1, vit_conc2, problem, trajectories, num_levels, optimal_trajectories, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
     file_path = path + "/" + "description" + tag + ".txt"
     with open(file_path, "w") as wf:
         wf.write("Description Morris sensitivity analysis area\n")
         wf.write("\n")
         wf.write(
-            f"Morris sensitivity analysis for the prokaryotic system was run using {trajectories} trajectories and {num_levels} levels.\n")
+            f"For the Morris sensitivity analysis for the prokaryotic system {trajectories} trajectories were sampled of which {optimal_trajectories} optimal_trajectories were chosen. Every factor had {num_levels} levels.\n")
         wf.write(
             f"The initial substrate concentration was {s_i} uM. The area difference of two product curves was taken as the output variable for the analysis.\n")
         wf.write(
