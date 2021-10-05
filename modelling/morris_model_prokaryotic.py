@@ -158,7 +158,7 @@ def run_morris_analysis_area_prokaryotic(path="modelling/data", tag=f"_{int(time
         s_i, vit_conc1, vit_conc2, prokaryotic_problem, num_trajectories, num_levels, num_optimal_trajectories, dt=dt, t_tot=t_tot, path=path, tag=tag)
 
     (mu, mu_star, sigma, mu_star_conf_level) = morris_analysis_area_prokaryotic(prokaryotic_problem,
-                                                                                num_trajectories, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot, num_levels=num_levels, optimal_trajectories=50)
+                                                                                num_trajectories, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot, num_levels=num_levels, optimal_trajectories=num_optimal_trajectories)
 
     morris_datawriter(prokaryotic_problem, mu, mu_star, sigma,
                       mu_star_conf_level, path=path, tag=tag)
