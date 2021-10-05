@@ -38,22 +38,22 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     # Set all proporties for ax1
     ax1.legend()
     ax1.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax1.set_ylabel(r"$\mathrm{\mu}$ $(\mathrm{\mu M})$")
+    ax1.set_ylabel(r"$\mu$ $(\mathrm{\mu M})$")
 
     # Set all proporties for ax2
     ax2.legend()
     ax2.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax2.set_ylabel(r"$\mathrm{\mu}^{\ast}$ $(\mathrm{\mu M})$")
+    ax2.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M})$")
 
     # Set all proporites for ax3
     ax3.legend()
     ax3.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax3.set_ylabel(r"$\mathrm{\sigma}$ $(\mathrm{\mu M})$")
+    ax3.set_ylabel(r"$\sigma$ $(\mathrm{\mu M})$")
 
     ax4.legend()
     ax4.set_xlabel(r"Time $\mathrm{(s)}$")
     ax4.set_ylabel(
-        r"$\mathrm{\mu^{\ast}}$ $95\%$-confidence interval $(\mathrm{\mu M})$")
+        r"$\mu^{\ast}$ $95\%$-confidence interval $(\mathrm{\mu M})$")
 
     if save_path is not None:
         fig1.savefig(f"{save_path}/plot_mu{tag}", format="svg", dpi=1200)
@@ -86,19 +86,19 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_pat
     # ax1.set_xlabel(r"Time $(s)$")
     ax1.set_xticks(np.arange(0, len(parameters)))
     ax1.set_xticklabels(parameters)
-    ax1.set_ylabel(r"$\mathrm{\mu}$")
+    ax1.set_ylabel(r"$\mu$")
     ax1.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporties for ax2
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(parameters)
-    ax2.set_ylabel(r"$\mathrm{\mu}^{\ast}$")
+    ax2.set_ylabel(r"$\mu^{\ast}$")
     ax2.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporites for ax3
     ax3.set_xticks(np.arange(0, len(parameters)))
     ax3.set_xticklabels(parameters)
-    ax3.set_ylabel(r"$\mathrm{\sigma}$")
+    ax3.set_ylabel(r"$\sigma$")
     ax3.yaxis.set_major_locator(MultipleLocator(5000))
 
     if save_path is not None:
