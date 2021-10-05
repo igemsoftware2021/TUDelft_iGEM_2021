@@ -10,10 +10,10 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
 
     custom_cycler = custom_aptavita_color_cycler()
 
-    fig1, ax1 = plt.subplots(figsize=(20, 12), dpi=100)
-    fig2, ax2 = plt.subplots(figsize=(20, 12), dpi=100)
-    fig3, ax3 = plt.subplots(figsize=(20, 12), dpi=100)
-    fig4, ax4 = plt.subplots(figsize=(20, 12), dpi=100)
+    fig1, ax1 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig2, ax2 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig3, ax3 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig4, ax4 = plt.subplots(figsize=(16, 9), dpi=125)
 
     # Set the color cycler
     ax1.set_prop_cycle(custom_cycler)
@@ -111,6 +111,6 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_pat
 
 if __name__ == "__main__":
     # plot_morris_analysis(path="modelling/data",
-    #                      tag="_1633190385")  # , save_path="modelling/data/plots")
+    #                      tag="_1633414661")  # , save_path="modelling/data/plots")
     plot_morris_analysis_area(
-        path="modelling/data")  # , tag="_1633293196")  # , save_path="modelling/data/plots")
+        path="modelling/data", tag="_1633468059")  # , save_path="modelling/data/plots")
