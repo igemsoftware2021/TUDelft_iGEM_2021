@@ -99,13 +99,13 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
                             fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
     def init():
-        ax.set_title("Product concentration over time")
+        # ax.set_title("Product concentration over time")
         ax.legend()
         ax.set_xlabel(r"Time $(\mathrm{{s}})$")
         ax.set_ylabel(r"Product concentration $(\mathrm{{\mu M}})$")
         ax.set_xlim(0, t_tot)
 
-        ax2.set_title("Relative area between two graphs over time")
+        # ax2.set_title("Relative area between two graphs over time")
         ax2.set_xlabel(r"DNA concentration $(\mathrm{{\mu M}})$")
         ax2.set_ylabel("Relative area")
 
