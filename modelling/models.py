@@ -643,6 +643,8 @@ def model_prokaryotic_all(parameters, initial_conditions, dt=0.01, t_tot=7200):
     # Concentration of cleaved mRNA [μM]
     cmrna = np.zeros(n, dtype=np.float64)
 
+    production = np.zeros(n, dtype=np.float64)
+
     # Concentration of degraded mRNA [μM] (this does not denote a physical concentraion within the system, but merely tracks the concentration of mRNA that has been degraded)
     dmrna = np.zeros(n, dtype=np.float64)
     # Vitamine concentration [μM]
@@ -676,6 +678,8 @@ def model_prokaryotic_all(parameters, initial_conditions, dt=0.01, t_tot=7200):
         umrna_dt = k_ts * tsr[step] * dna[step] / \
             (k_s + dna[step]) - k_c * umrna[step] - k_on * umrna[step] * \
             vit[step] + k_off * umrna_vit[step] - deg_mrna * umrna[step]
+        production_dt = k_ts * tsr[step] * dna[step] / \
+            (k_s + dna[step])
         cmrna_dt = k_c * umrna[step] - deg_mrna * cmrna[step]
         dmrna_dt = deg_mrna * (umrna[step] + cmrna[step])
         vit_dt = - k_on * vit[step] * umrna[step] + k_off * umrna_vit[step]
@@ -692,6 +696,7 @@ def model_prokaryotic_all(parameters, initial_conditions, dt=0.01, t_tot=7200):
         # Computing the concentration of each species for the next step
         dna[step + 1] = dna[step] + dna_dt * dt
         umrna[step + 1] = umrna[step] + umrna_dt * dt
+        production[step + 1] = production_dt * dt
         cmrna[step + 1] = cmrna[step] + cmrna_dt * dt
         dmrna[step + 1] = dmrna[step] + dmrna_dt * dt
         vit[step + 1] = vit[step] + vit_dt * dt
@@ -703,7 +708,7 @@ def model_prokaryotic_all(parameters, initial_conditions, dt=0.01, t_tot=7200):
         s[step + 1] = s[step] + s_dt * dt
         p[step + 1] = p[step] + p_dt * dt
 
-    return time, dna, umrna, cmrna, dmrna, vit, umrna_vit, tsr, tlr, e_mon, e, s, p
+    return time, dna, umrna, cmrna, dmrna, vit, umrna_vit, tsr, tlr, e_mon, e, s, p, production
 
 
 @njit(cache=True, nogil=True)
