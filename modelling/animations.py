@@ -64,55 +64,59 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
     area_array = area_array / area_standard
 
     # Create the figure
-    fig, (ax, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(
-        24, 10), gridspec_kw={"height_ratios": [2, 1]})
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(
+        16, 9), gridspec_kw={"height_ratios": [2, 1]}, dpi=125)
 
     # Store the label str expressions
-    label_line1 = micromolar_conc_to_math_exp(vit_conc1, 0) + " original"
-    label_line2 = micromolar_conc_to_math_exp(vit_conc2, 0) + " original"
-    label_line3 = micromolar_conc_to_math_exp(vit_conc1, 0) + " moving"
-    label_line4 = micromolar_conc_to_math_exp(vit_conc2, 0) + " moving"
+    label_line1 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ fixed at {int(standard_dna_conc*1000)} $\mathrm{{nM}}$"
+    label_line2 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ fixed at {int(standard_dna_conc*1000)} $\mathrm{{nM}}$"
+    label_line3 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ variable"
+    label_line4 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ variable"
 
     # First normal product lines
-    line1, = ax.plot(time1[::plot_di], p1_standard[::plot_di],
-                     label=label_line1, color="#F3758A")
-    line2, = ax.plot(time2[::plot_di], p2_standard[::plot_di],
-                     label=label_line2, color="#4FD590")
-    line3, = ax.plot(time1[::plot_di], p1[0, ::plot_di],
-                     label=label_line3, color="#9B0138")
-    line4, = ax.plot(time2[::plot_di], p2[0, ::plot_di],
-                     label=label_line4, color="#057D54")
+    line1, = ax1.plot(time1[::plot_di], p1_standard[::plot_di],
+                      label=label_line1, color="#F3758A")
+    line2, = ax1.plot(time2[::plot_di], p2_standard[::plot_di],
+                      label=label_line2, color="#4FD590")
+    line3, = ax1.plot(time1[::plot_di], p1[0, ::plot_di],
+                      label=label_line3, color="#9B0138")
+    line4, = ax1.plot(time2[::plot_di], p2[0, ::plot_di],
+                      label=label_line4, color="#057D54")
 
-    fill1 = ax.fill_between(
-        time1[::plot_di], p1_standard[::plot_di], p2_standard[::plot_di], color="#FFCE3A", alpha=0.4)
-    fill2 = ax.fill_between(
-        time1[::plot_di], p1[0, ::plot_di], p2[0, ::plot_di], color="#FFCE3A", alpha=0.8)
+    fill1 = ax1.fill_between(
+        time1[::plot_di], p1_standard[::plot_di], p2_standard[::plot_di], color="#FFCE3A", alpha=0.25)
+    fill2 = ax1.fill_between(
+        time1[::plot_di], p1[0, ::plot_di], p2[0, ::plot_di], color="#FFCE3A", alpha=0.75)
+
+    # Simulations have been ran, so make it nM
+    dna_conc_all_nM = dna_conc_all * 1000
+    standard_dna_conc_nM = standard_dna_conc * 1000
 
     # Area line
-    area_line1, = ax2.plot(dna_conc_all, area_array, color="#F3758A")
-    area_line2, = ax2.plot(dna_conc_all[0], area_array[0], color="#9B0138")
+    area_line1, = ax2.plot(dna_conc_all_nM, area_array, color="#F3758A")
+    area_line2, = ax2.plot(dna_conc_all_nM[0], area_array[0], color="#9B0138")
     # Plot the position of the dna_conc that determines the standard area
-    ax2.scatter(standard_dna_conc, 1.0, color="#057D54")
+    ax2.scatter(standard_dna_conc_nM, 1.0, color="#057D54")
 
-    dna_conc_math_exp = f"DNA concentration: {(standard_dna_conc*1000):.3f} $\mathrm{{nM}}$"
-    dna_conc_text = ax.text(0.7, 0.1, dna_conc_math_exp, transform=ax.transAxes,
-                            fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
+    dna_conc_math_exp = f"DNA concentration: {(standard_dna_conc_nM):.3f} $\mathrm{{nM}}$"
+    dna_conc_text = ax1.text(0.01, 0.65, dna_conc_math_exp, transform=ax1.transAxes,
+                             fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
     def init():
         # ax.set_title("Product concentration over time")
-        ax.legend()
-        ax.set_xlabel(r"Time $(\mathrm{{s}})$")
-        ax.set_ylabel(r"Product concentration $(\mathrm{{\mu M}})$")
-        ax.set_xlim(0, t_tot)
+        ax1.legend()
+        ax1.set_xlabel(r"Time $(\mathrm{{s}})$")
+        ax1.set_ylabel(r"Product concentration $(\mathrm{{\mu M}})$")
+        ax1.set_xlim(0, t_tot)
 
         # ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"DNA concentration $(\mathrm{{\mu M}})$")
+        ax2.set_xlabel(r"DNA concentration $(\mathrm{{n M}})$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
-        x_lim_diff = np.amax(dna_conc_all)*0.05
-        ax2.set_xlim(np.amin(dna_conc_all)-x_lim_diff,
-                     np.amax(dna_conc_all)+x_lim_diff)
+        x_lim_diff = np.amax(dna_conc_all_nM)*0.05
+        ax2.set_xlim(np.amin(dna_conc_all_nM)-x_lim_diff,
+                     np.amax(dna_conc_all_nM)+x_lim_diff)
 
         # Determine how to set the y-axis for ax2
         y_lim_diff = np.amax(area_array)*0.05
@@ -121,15 +125,22 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
 
         # Plot vertical and horizontal lines to the the position of the
         # dna_conc that determines the standard area
-        ax2.vlines(standard_dna_conc, 0, 1,
+        ax2.vlines(standard_dna_conc_nM, 0, 1,
                    color="#057D54", linestyle="dashed")
         ax2.axhline(1, color="#057D54", linestyle="dashed")
-        # ax2.hlines(1, np.amin(dna_conc_all)-x_lim_diff, standard_dna_conc,
-        #            color="#057D54", linestyle="dashed")
+
+        # Set major tick locator
+        ax2.xaxis.set_major_locator(MultipleLocator(0.5))
+
+        # Set the character labels
+        ax1.text(-0.05, 1.05, "a", transform=ax1.transAxes,
+                 size=16, weight="bold")
+        ax2.text(-0.05, 1.05, "b", transform=ax2.transAxes,
+                 size=16, weight="bold")
 
         # Set a tight_layout for the figure. This needs to be done
         # after the axis names and title have been set
-        fig.tight_layout()
+        # fig.tight_layout()
         return line1, line2, line3, line4, fill1, fill2, area_line1, area_line2, dna_conc_text,
 
     def update(index):
@@ -140,12 +151,12 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
         line3.set_data(time1[::plot_di], p1[index, ::plot_di])
         line4.set_data(time2[::plot_di], p2[index, ::plot_di])
 
-        area_line2.set_data(dna_conc_all[:index], area_array[:index])
+        area_line2.set_data(dna_conc_all_nM[:index], area_array[:index])
 
-        ax.collections.clear()
-        fill1 = ax.fill_between(
+        ax1.collections.clear()
+        fill1 = ax1.fill_between(
             time1[::plot_di], p1_standard[::plot_di], p2_standard[::plot_di], color="#FFCE3A", alpha=0.25)
-        fill2 = ax.fill_between(
+        fill2 = ax1.fill_between(
             time1[::plot_di], p1[index, ::plot_di], p2[index, ::plot_di], color="#FFCE3A", alpha=0.75)
 
         return line1, line2, line3, line4, fill1, fill2, area_line1, area_line2, dna_conc_text,
@@ -154,10 +165,10 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
                          init_func=init, blit=False)
 
     if save_path is not None:
-        writermp4 = FFMpegFileWriter(fps=10, bitrate=5000)
+        writermp4 = FFMpegFileWriter(fps=24, bitrate=24000)
         anim.save(f"{save_path}", writer=writermp4)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*10, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
@@ -217,14 +228,13 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
 
     # Create the figure
     fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(
-        24, 10), gridspec_kw={"height_ratios": [2, 1]})
+        16, 9), gridspec_kw={"height_ratios": [2, 1]}, dpi=125)
 
     # Store the label str expressions
-    # micromolar_conc_to_math_exp(vit_conc1, 0) + " original"
-    label_line1 = f"{vit_conc1:.1e} $\mu M$ standard"
-    label_line2 = f"{vit_conc2:.1e} $\mu M$ standard"
-    label_line3 = f"{vit_conc1:.1e} $\mu M$ changing"
-    label_line4 = f"{vit_conc2:.1e} $\mu M$ changing"
+    label_line1 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at 1/60 $1/\mathrm{{s}}$"
+    label_line2 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at 1/60 $1/\mathrm{{s}}$"
+    label_line3 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
+    label_line4 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
 
     # First normal product lines
     line1, = ax1.plot(time1[::plot_di], p1_standard[::plot_di],
@@ -248,7 +258,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
     ax2.scatter(standard_k_c, 1.0, color="#057D54")
 
     k_c_math_exp = f"Cleaving rate: {k_c_all[0]:.2e} $(\mathrm{{1/s}})$"
-    k_c_text = ax1.text(0.7, 0.1, k_c_math_exp, transform=ax1.transAxes,
+    k_c_text = ax1.text(0.01, 0.65, k_c_math_exp, transform=ax1.transAxes,
                         fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
     def init():
@@ -260,7 +270,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
         ax1.set_xlim(0, t_tot)
 
         # ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"Cleaving rate $(\mathrm{{1/s}})$")
+        ax2.set_xlabel(r"$k_\mathrm{c}$ $(\mathrm{{1/s}})$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
@@ -286,6 +296,10 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
                  size=16, weight="bold")
         ax2.text(-0.05, 1.05, "b", transform=ax2.transAxes,
                  size=16, weight="bold")
+
+        # Set major tick locator
+        ax2.xaxis.set_major_locator(MultipleLocator(0.005))
+        ax2.xaxis.set_minor_locator(MultipleLocator(0.001))
 
         # Set a tight_layout for the figure. This needs to be done
         # after the axis names and title have been set
@@ -314,10 +328,10 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
                          init_func=init, blit=False)
 
     if save_path is not None:
-        writermp4 = FFMpegFileWriter(fps=10, bitrate=10000)
+        writermp4 = FFMpegFileWriter(fps=24, bitrate=24000)
         anim.save(f"{save_path}", writer=writermp4)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def anim_two_vitamin_conc_differing_k_D(vit_conc1, vit_conc2, s_i=250, dna_conc=3*10**-3, low_k_D=0.005, standard_k_D=0.05, high_k_D=5, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
@@ -596,10 +610,10 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 if __name__ == "__main__":
     # anim_two_vitamin_conc_differing_dna_conc(
-    #     0.05, 0.09, s_i=250, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=50, dt=0.01, t_tot=10800)
+    #     0.05, 0.09, s_i=250, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=361, dt=0.01, t_tot=10800, save_path="test2.mp4")
 
     anim_two_vitamin_conc_differing_k_c(
-        0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=100, dt=0.01, t_tot=7200)  # , save_path="test.mp4")
+        0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=361, dt=0.01, t_tot=7200, save_path="differing_k_c.mp4")
     # anim_two_vitamin_conc_differing_k_D(0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_D=0.005,
     #                                     standard_k_D=0.05, high_k_D=5, num_steps=100, dt=0.01, t_tot=7200, save_path=None)
     # For changing K_D do the sqrt(10)
