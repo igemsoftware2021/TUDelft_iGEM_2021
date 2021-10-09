@@ -25,7 +25,7 @@ def run_morris_analysis_prokaryotic(path="modelling/data", tag=f"_{int(time.time
     # Set the parameters and the parameter ranges
     parameters = standard_parameters_prokaryotic()
 
-    dna_conc = 3*10**-3
+    dna_conc = 0.3*10**-3
     s_i = 250
     vit_conc = 0.07
 
@@ -93,7 +93,7 @@ def run_morris_analysis_area_prokaryotic(path="modelling/data", tag=f"_{int(time
     num_optimal_trajectories = 70
 
     # Set the time of the simulation and timesteps
-    t_tot = 10800
+    t_tot = 7200
     dt = 0.01
 
     var_names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
