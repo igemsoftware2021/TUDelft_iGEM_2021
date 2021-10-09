@@ -17,7 +17,7 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
 
 
     This is a wrapper function that creates model inputs required for Method of Morris. It then runs these model inputs through
-    a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf_level.
+    a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf.
 
     This is a wrapper function that uses two functions from the SAlib library. Hence the description for the parameters:
     problem, trajectories, num_levels, optimal_trajectories, local_optimization, num_resamples, conf_level, print_to_console
@@ -72,7 +72,7 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
         The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
         and every column contains the standard deviations of the mean elementary effect for a certain parameter.
         The Numpy array is of dtype=float.
-    mu_star_conf_level: numpy.array
+    mu_star_conf: numpy.array
         The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
         contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.
     """
@@ -94,6 +94,8 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
     n = int(np.ceil(t_tot/dt) + 1)  # Number of timesteps of the simulation [-]
     time = np.linspace(0, t_tot, n)  # Array with all timepoints.
 
+    n = int(np.ceil(n/10))
+
     # Retrieve number of parameters
     num_parameters = problem["num_vars"]
 
@@ -103,12 +105,15 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
                   dtype=np.float32)  # The mean elementary effect
     mu_star = np.zeros((n, num_parameters), dtype=np.float32)
     sigma = np.zeros((n, num_parameters), dtype=np.float32)
-    mu_star_conf_level = np.zeros((n, num_parameters), dtype=np.float32)
+    mu_star_conf = np.zeros((n, num_parameters), dtype=np.float32)
 
     # Generating input parameters for the model
     # Each column is a parameter, one row contains all input parameters for one simulation
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
+
+    # np.savetxt("modelling/trajectories_nice.txt", model_input)
+    # model_input = np.loadtxt("modelling/trajectories_nice.txt")
 
     # Check if you need to override the dna_conc variable then do np.delete()
     # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
@@ -120,7 +125,7 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
         model_input_temp = np.delete(model_input, index, axis=1)
     else:
         dna_conc_array = np.ones(
-            model_input.shape[0], dtype=np.float64) * dna_conc
+            model_input.shape[0], dtype=np.float32) * dna_conc
         model_input_temp = model_input
 
     # Check if you need to override the vit_conc variable then do np.delete()
@@ -146,17 +151,17 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
                                               initial_conditions=initial_conditions, dt=dt, t_tot=t_tot)
 
     # Running the Morris analysis at each timepoint (using the output of all the different simulations)
-    for ii in tqdm(range(n)):
+    for ii in tqdm(range(model_output.shape[0])):
         indices_dict = morris_analyze.analyze(problem, model_input,
                                               model_output[ii, :], num_levels=num_levels)
         # Each column contains the sensitivity index of one parameter, each column contains the sensitivity indeces at one timestep
         mu[ii, :] = indices_dict['mu']
         mu_star[ii, :] = indices_dict['mu_star']
         sigma[ii, :] = indices_dict['sigma']
-        mu_star_conf_level[ii, :] = np.array(
+        mu_star_conf[ii, :] = np.array(
             indices_dict['mu_star_conf'], dtype=np.float32)
 
-    return time, mu, mu_star, sigma, mu_star_conf_level
+    return time[::10], mu, mu_star, sigma, mu_star_conf
 
 
 def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = 10, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
@@ -168,7 +173,7 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
     dna_conc is overriden if it is part of the problem!!!
 
     This is a wrapper function that creates model inputs required for Method of Morris. It then runs these model inputs through
-    a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf_level.
+    a model using a parallelized function. Then it analyses the model output and returns the Numpy arrays: time, mu, mu_star, sigma, mu_star_conf.
 
     This is a wrapper function that uses two functions from the SAlib library. Hence the description for the parameters:
     problem, trajectories, num_levels, optimal_trajectories, local_optimization, num_resamples, conf_level, print_to_console
@@ -223,7 +228,7 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
         The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
         and every column contains the standard deviations of the mean elementary effect for a certain parameter.
         The Numpy array is of dtype=float.
-    mu_star_conf_level: numpy.array
+    mu_star_conf: numpy.array
         The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
         contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.
     """
@@ -250,6 +255,9 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
+    # np.savetxt("modelling/trajectories_nice_area.txt", model_input)
+    # model_input = np.loadtxt("modelling/trajectories_nice.txt")
+
     # Check if you need to override the dna_conc variable then do np.delete()
     # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
     if "dna_conc" in problem["names"]:
@@ -259,7 +267,7 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
         model_input_temp = np.delete(model_input, index, axis=1)
     else:
         dna_conc_array = np.ones(
-            model_input.shape[0], dtype=np.float64) * dna_conc
+            model_input.shape[0], dtype=np.float32) * dna_conc
         model_input_temp = model_input
 
     model_output = model_prokaryotic_area_parallel(parameters=model_input_temp, dna_conc=dna_conc_array,
@@ -271,10 +279,10 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
     mu = indices_dict['mu']
     mu_star = indices_dict['mu_star']
     sigma = indices_dict['sigma']
-    mu_star_conf_level = np.array(
+    mu_star_conf = np.array(
         indices_dict['mu_star_conf'], dtype=np.float32)
 
-    return mu, mu_star, sigma, mu_star_conf_level
+    return mu, mu_star, sigma, mu_star_conf
 
 
 def morris_problem_description_prokaryotic(s_i, problem, trajectories, num_levels, optimal_trajectories, dt, t_tot, path="modelling/data", tag=f"_{int(time.time())}"):
@@ -331,7 +339,7 @@ def morris_area_problem_description_prokaryotic(s_i, vit_conc1, vit_conc2, probl
         wf.write("at every timestep.")
 
 
-def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None, path=f"modelling/data", tag=f"_{int(time.time())}"):
+def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf, time=None, path=f"modelling/data", tag=f"_{int(time.time())}"):
     """Function writes results from a Morris sensitivty analysis to a file.
 
     Parameters
@@ -348,7 +356,7 @@ def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None
         The Numpy array containing the standard deviation sof the mean elementary effect over time. Each row is a timepoint
         and every column contains the standard deviations of the mean elementary effect for a certain parameter.
         The Numpy array is of dtype=float.
-    mu_star_conf_level: numpy.array
+    mu_star_conf: numpy.array
         The Numpy array containing the bootstrapped confidence intervals. Each row is a timepoint and every column
         contains the bootstrapped confidence interval for a certain parameter. The Numpy array is of dtype=float.
     time: numpy.array
@@ -359,9 +367,9 @@ def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None
     tag: str
         The tag that is added after 'mu'/
     """
-    data_order = ["mu", "mu_star", "sigma", "mu_star_conf_level"]
+    data_order = ["mu", "mu_star", "sigma", "mu_star_conf"]
     data_dict = {"mu": mu, "mu_star": mu_star, "sigma": sigma,
-                 "mu_star_conf_level": mu_star_conf_level}
+                 "mu_star_conf": mu_star_conf}
 
     # Only add time column if it is given
     if time is not None:
@@ -392,9 +400,9 @@ def morris_datawriter(problem, mu, mu_star, sigma, mu_star_conf_level, time=None
                     csv_writer.writerow(data_to_write[i, :])
 
 
-def morris_datareader(path="modelling/data", tag=f"_{int(time.time())}"):
+def morris_datareader(path="modelling/data", tag=f"_{int(time.time())}", data_names=["mu", "mu_star", "sigma", "mu_star_conf"]):
 
-    data_names = ["mu", "mu_star", "sigma", "mu_star_conf_level"]
+    # data_names = ["mu", "mu_star", "sigma", "mu_star_conf"]
     data_dict = dict()
 
     for data_name in tqdm(data_names):
@@ -423,15 +431,15 @@ def morris_datareader(path="modelling/data", tag=f"_{int(time.time())}"):
     return parameters, data_dict
 
 
-# def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_star_conf_level):
+# def morris_datawriter(problem, path, filenumber, time, mu, mu_star, sigma, mu_star_conf):
 #     # Names of the 4 files
-#     filenames = ["\mu", "\mu_star", "\sigma", "\mu_star_conf_level"]
+#     filenames = ["\mu", "\mu_star", "\sigma", "\mu_star_conf"]
 #     # Names of the columns of each file, namely time and all the parameters
 #     fieldnames = ["time"]
 #     for parameter in problem["names"]:
 #         fieldnames.append(parameter)
 #     # Put all data in 1 list
-#     indices = [mu, mu_star, sigma, mu_star_conf_level]
+#     indices = [mu, mu_star, sigma, mu_star_conf]
 #     # A column array containing all timepoints
 #     time_column = np.zeros((time.shape[0], 1), dtype=np.float64)
 #     time_column[:, 0] = time
