@@ -63,7 +63,7 @@ rule fastq_to_fasta:
         awk '{if(NR%4==2) print $0}' {input} > {output}
         """
 
-rule sort_fasta:
+rule sort_and_combine_fasta:
     input:
         "results/fasta/{dataset}.assembled.seq"
     output:
@@ -78,7 +78,8 @@ rule split_file:
         "results/read_counts/{dataset}_read_count.txt"
     output:
         "results/read_counts/{dataset}_L0_read_count.txt",
-        "results/read_counts/{dataset}_L1_read_count.txt"
+        "results/read_counts/{dataset}_L1_read_count.txt",
+        "results/read_counts/{dataset}_other_read_count.txt"
     conda:
         "envs/tqdm.yaml"
     script:

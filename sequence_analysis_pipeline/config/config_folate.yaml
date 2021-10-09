@@ -1,0 +1,99 @@
+dataset: S1_D67
+minimum_reads: 30
+ligand_positive:
+    prefixes:
+        cleaved:
+            sequence: AGATCTTTTCCGTATATCTCGCCAG
+            name: A
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 0
+        uncleaved:
+            sequence: AGATGGGAAACAAACAAA
+            name: W
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 0
+    suffixes:
+        cleaved:
+            sequence: AAAAAGAAA
+            name: XL
+            i_error: 1
+            d_error: 0
+            s_error: 1
+            max_error: 0
+        uncleaved:
+            sequence: AAAAAGAAATT
+            name: XL
+            i_error: 1
+            d_error: 0
+            s_error: 1
+            max_error: 0
+ligand_negative:
+    prefixes:
+        cleaved:
+            sequence: CTTTTCCGTATATCTCGCCAG
+            name: A
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 0
+        uncleaved:
+            sequence: GGGAAACAAACAAA
+            name: W
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 0
+    suffixes:
+        cleaved:
+            sequence: AAAAAGAAAT
+            name: XN
+            i_error: 1
+            d_error: 0
+            s_error: 1
+            max_error: 0
+        uncleaved:
+            sequence: AAAAAGAAAT
+            name: XN
+            i_error: 1
+            d_error: 0
+            s_error: 1
+            max_error: 0
+references:
+    prefixes:
+        cleaved:
+            sequence: CTTTTCCGTATATCTCGCCAG
+            name: A
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 1
+        uncleaved:
+            sequence: GGGAAACAAACAAA
+            name: W
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 1
+    suffixes:
+        cleaved:
+            sequence: AAAAAGAAA
+            name: X
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 1
+        uncleaved:
+            sequence: AAAAAGAAA
+            name: X
+            i_error: 1
+            d_error: 1
+            s_error: 1
+            max_error: 1
+info_patterns:
+    selection: "(S[0-9]+)"
+    driver_round: "(?<=N)([0-9]+)"
+    ligand_present: "(?<=L)([0-1]+)"
