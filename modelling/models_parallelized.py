@@ -72,11 +72,15 @@ def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t
     n = int(np.ceil(t_tot/dt) + 1)
     # The number of simulations
     num_simulations = parameters.shape[0]
-    model_output = np.zeros((n, num_simulations))
+    # model_output = np.zeros((n, num_simulations))
+    # The division by 10 was done, because 70 trajectories with timesteps of 0.01 for 10800 seconds
+    # does not fit in memory
+    model_output = np.zeros((int(np.ceil(n/10)), num_simulations))
     # Every column is a unique simulation
     for ii in prange(num_simulations):
-        _, model_output[:, ii] = model_prokaryotic(
+        _, product = model_prokaryotic(
             parameters=parameters[ii, :], initial_conditions=initial_conditions[ii, :], dt=dt, t_tot=t_tot)
+        model_output[:, ii] = product[::10]
     return model_output
 
 
