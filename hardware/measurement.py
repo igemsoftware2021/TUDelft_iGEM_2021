@@ -2,14 +2,16 @@ import time
 import multiprocessing
 import numpy as np
 import pigpio
-from helpers import initialize_light_pins, initialize_heating_pin, main_measurement
+from helpers import initialize_light_pins, initialize_heating_pin
 from helpers import i2c_multiplexer_select_channel, i2c_activate_als_all_sensors
-from helpers import i2c_write_to_all_sensors, pre_heater
+from helpers import i2c_write_to_all_sensors, pre_heater, temperature_controller
+from helpers import determine_intensity_single_channel, calculate_absorbance
 from helpers import save_as_csv, read_from_csv
 from apds9930 import APDS9930
 from apds9930.values import APDS9930_ATIME
 import matplotlib.pyplot as plt
-
+from file_helpers import write_temperature_csv, write_absorbance_csv
+from file_helpers import read_absorbance_csv, read_temperature_csv
 ###############################################################################
 # Set-up
 
@@ -35,7 +37,8 @@ pwm_freq = 10  # simulations suggest this is fine, see LT spice. Need to do this
 pid_parameters = [k_p, k_i, k_d, temperature_desired, pwm_freq]
 v_ref = 3.3
 gain = 2.96
-
+duration = 0.10
+interval = 0.005
 
 # SPI
 spi_channel = 0  # SPI channel of the Raspberry Pi that is connected to the ADC
@@ -54,6 +57,7 @@ i2c_sensor_3_channel = 2  # Channel of the multiplexer to which the sensor is co
 i2c_sensor_4_channel = 3  # Channel of the multiplexer to which the sensor is connected
 i2c_sensor_channels = [i2c_sensor_1_channel]  # , i2c_sensor_2_channel,
 # i2c_sensor_3_channel, i2c_sensor_4_channel]
+num_sensors = len(i2c_sensor_channels)
 ###############################################################################
 
 
@@ -92,43 +96,55 @@ i2c_write_to_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sens
 ###############################################################################
 
 
-# print("Would you like to pre-heat the box? (yes or no)")
-# pre_heating = input()
-# if pre_heating == "yes":
-#     pre_heater(pi, adc_handle, spi_channel, pin_heating,
-#                pid_parameters, v_ref, gain)
-#     print("Pre-heating has finished.")
+print("Pre-heat the box? (y or n)")
+pre_heating = input()
+if pre_heating == "y":
+    temperature_time, temperature_error = pre_heater(pi, adc_handle, spi_channel, pin_heating,
+                                                     pid_parameters, v_ref, gain)
+    write_temperature_csv(temperature_time, temperature_error)
 
-# Heat
 
-# print("Would you like to run a test? (yes or no)")
-# test = input()
-test = "yes"
-if test == "yes":
-    path = "hardware/test_results/"
-    name = ["sensor_1", "sensor_2", "sensor_3", "sensor_4"]
+print("start test? (y or n)")
+start_test = input()
+if start_test == "y":
+    start_time = time.time()
+    stop_time = start_time + total_time
+    intensity = []
+    absorbance = []
+    timepoints = []
+    temperature_error = []
 
-    timepoints, absorbance, temperature_error = main_measurement(pi, pins_light, pin_heating,
-                                                                 i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels, adc_handle,
-                                                                 spi_channel, total_time, pid_parameters, v_ref, gain,
-                                                                 duration=0.10, interval=0.005)  # returns a list of np arrays
-    print(temperature_error)
-    print(timepoints[-1])
-    for i in range(len(i2c_sensor_channels)):
-        timepoints_single_channel = timepoints[i]
-        absorbance_single_channel = absorbance[i]
-        save_as_csv(timepoints_single_channel,
-                    absorbance_single_channel, path, name[i])
-    save_as_csv(timepoints[-1], temperature_error, path, "temperature_error")
-print("The test has been completed.")
-timepoints_plot, absorbance_plot = read_from_csv(path, "sensor_1")
-fig1, ax1 = plt.subplots()
-ax1.plot(timepoints_plot, absorbance_plot)
-fig1.show()
+    # Add a list in every list, where every list is a channel
+    for i in range(num_sensors):
+        intensity.append([])
+        absorbance.append([])
+        timepoints.append([])
+    timepoints.append([])
 
-timepoints_plot, temperature_error = read_from_csv(path, "temperature_error")
-fig2, ax2 = plt.subplots()
-ax2.plot(timepoints_plot, temperature_error)
-fig2.show()
+    T_c = 0.001  # Lowest high or low time [ms] to protect the hardware
+    duty_cycle_lower_bound = T_c * pwm_freq * 10**6
+    duty_cycle_upper_bound = (1 - T_c * pwm_freq) * 10**6
 
-plt.show()
+    print("start")
+    while time.time() < stop_time:
+        for i in range(num_sensors):
+            pi.write(pins_light[i], 1)
+            temperature_error = temperature_controller(pi, adc_handle, spi_channel, pin_heating, duty_cycle_lower_bound, duty_cycle_upper_bound,
+                                                       pid_parameters, v_ref, gain, temperature_error, duration=duration, interval=interval)
+            temperature_timepoint = time.time()
+            timepoint, intensity_datapoint = determine_intensity_single_channel(pi,
+                                                                                pins_light[i], i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers[i])
+            intensity[i].append(intensity_datapoint)
+            timepoints[i].append(timepoint - start_time)
+            timepoints[-1].append(temperature_timepoint - start_time)
+
+    pi.hardware_PWM(pin_heating, pwm_freq, 0)  # Turn of the PWM output signal
+    print("test completed, processing results")
+    for i in range(num_sensors):  # check this
+        intensity_single_channel = intensity[i]
+        absorbance[i] = calculate_absorbance(intensity_single_channel)
+
+write_absorbance_csv(timepoints[0:num_sensors], absorbance)
+write_temperature_csv(timepoints[-1], temperature_error)
+
+print("finished processing result")
