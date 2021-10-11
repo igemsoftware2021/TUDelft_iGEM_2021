@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from morris_method import morris_datareader
 from plot_helpers import custom_aptavita_colors, custom_aptavita_color_cycler, senstivity_analysis_factor_names
+from standard_values import standard_parameters_prokaryotic
+from models_area import model_prokaryotic_area
 
 
 def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=None):
@@ -11,10 +13,10 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     custom_cycler = custom_aptavita_color_cycler()
     factor_names = senstivity_analysis_factor_names()
 
-    fig1, ax1 = plt.subplots(figsize=(16, 9), dpi=125)
-    fig2, ax2 = plt.subplots(figsize=(16, 9), dpi=125)
-    fig3, ax3 = plt.subplots(figsize=(16, 9), dpi=125)
-    fig4, ax4 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig3, ax3 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig4, ax4 = plt.subplots(figsize=(14, 8), dpi=125)
 
     # Set the color cycler
     ax1.set_prop_cycle(custom_cycler)
@@ -39,22 +41,22 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     # Set all proporties for ax1
     ax1.legend()
     ax1.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax1.set_ylabel(r"$\mu$ $(\mathrm{\mu M})$")
+    ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M}]$")
 
     # Set all proporties for ax2
     ax2.legend()
     ax2.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax2.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M})$")
+    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
 
     # Set all proporites for ax3
     ax3.legend()
     ax3.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax3.set_ylabel(r"$\sigma$ $(\mathrm{\mu M})$")
+    ax3.set_ylabel(r"$\mathrm{{\sigma}}$ $[\mathrm{\mu M}]$")
 
     ax4.legend()
     ax4.set_xlabel(r"Time $\mathrm{(s)}$")
     ax4.set_ylabel(
-        r"$\mu^{\ast}$ $95\%$-confidence interval $(\mathrm{\mu M})$")
+        r"$\mathrm{{\mu}}^{\ast}$ $95\%$-confidence interval $[\mathrm{\mu M}]$")
 
     if save_path is not None:
         fig1.savefig(f"{save_path}/plot_mu{tag}", format="svg", dpi=1200)
@@ -68,6 +70,7 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
 
 def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_1633190385", save_path=None):
 
+    fill_plot_step = 10
     plot_steps = 10
     plot_time = 72001
 
@@ -79,7 +82,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
     factor_names = senstivity_analysis_factor_names()
 
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
-        nrows=2, ncols=2, figsize=(20, 16), dpi=125)
+        nrows=2, ncols=2, figsize=(14, 10), dpi=125)
 
     # Set the color cycler
     # ax1.set_prop_cycle(custom_cycler)
@@ -95,7 +98,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
         if parameters[i] in {"deg_mrna", "kc_s", "k_tlr"}:
             ax1.plot(
                 x, y, color=custom_colors[0], label="Insensitive" if parameters[i] == "deg_mrna" else "")
-            ax1.fill_between(x, (y-ci), (y+ci),
+            ax1.fill_between(x[::fill_plot_step], (y-ci)[::fill_plot_step], (y+ci)[::fill_plot_step],
                              color=custom_colors[0], alpha=0.05)
 
             ax2.plot(x, y, label=factor_names[i])
@@ -108,7 +111,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
 
             ax1.plot(
                 x, y, color=custom_colors[1], label="Sensitive" if parameters[i] == "k_m" else "")
-            ax1.fill_between(x, (y-ci), (y+ci),
+            ax1.fill_between(x[::fill_plot_step], (y-ci)[::fill_plot_step], (y+ci)[::fill_plot_step],
                              color=custom_colors[1], alpha=0.05)
 
             ax3.plot(x, y, label=factor_names[i])
@@ -120,7 +123,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
         if parameters[i] in {"dna_conc", "k_ts", "k_s", "k_tl", "k_l", "k_mat", "k_cat"}:
             ax1.plot(
                 x, y, color=custom_colors[2], label="Very sensitive" if parameters[i] == "k_ts" else "")
-            ax1.fill_between(x, (y-ci), (y+ci),
+            ax1.fill_between(x[::fill_plot_step], (y-ci)[::fill_plot_step], (y+ci)[::fill_plot_step],
                              color=custom_colors[2], alpha=0.05)
 
             ax4.plot(x, y, label=factor_names[i])
@@ -136,25 +139,25 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
 
     # Set all proporties for ax1
     ax1.legend(loc="upper left")
-    ax1.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax1.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M})$")
+    ax1.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax1.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
     ax1_ylim = ax1.get_ylim()
 
     # Set all proporties for ax2
     ax2.legend()
-    ax2.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax2.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M})$")
+    ax2.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
     # ax2.set_ylim(ax1_ylim)
 
     # Set all proporites for ax3
     ax3.legend()
-    ax3.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax3.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M})$")
+    ax3.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax3.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
     # ax3.set_ylim(ax1_ylim)
 
     ax4.legend()
-    ax4.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax4.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M})$")
+    ax4.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax4.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
     # ax4.set_ylim(ax1_ylim)
 
     # Set the character labels
@@ -168,7 +171,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
              size=16, weight="bold")
 
     if save_path is not None:
-        fig1.savefig(f"{save_path}/subplots_mu{tag}", format="svg", dpi=1200)
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
     else:
         plt.show()
 
@@ -183,39 +186,88 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_pat
     custom_colors = custom_aptavita_colors()
     factor_names = senstivity_analysis_factor_names()
 
-    fig1, ax1 = plt.subplots(figsize=(16, 9), dpi=125)
-    fig2, ax2 = plt.subplots(figsize=(16, 9), dpi=125)
-    fig3, ax3 = plt.subplots(figsize=(16, 9), dpi=125)
+    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig3, ax3 = plt.subplots(figsize=(14, 8), dpi=125)
 
     ax1.bar(np.arange(0, mu.shape[0]), mu, color=custom_colors)
     ax2.bar(np.arange(0, mu_star.shape[0]), mu_star, color=custom_colors)
     ax3.bar(np.arange(0, sigma.shape[0]), sigma, color=custom_colors)
 
     # Set all proporties for ax1
-    # ax1.set_xlabel(r"Time $(s)$")
+    # ax1.set_xlabel(r"Time $[s]$")
     ax1.set_xticks(np.arange(0, len(parameters)))
     ax1.set_xticklabels(factor_names[:len(parameters)])
-    ax1.set_ylabel(r"$\mu$ $(\mathrm{\mu M \cdot s})$")
+    ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
     ax1.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporties for ax2
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(factor_names[:len(parameters)])
-    ax2.set_ylabel(r"$\mu^{\ast}$ $(\mathrm{\mu M \cdot s})$")
+    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M \cdot s}]$")
     ax2.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporites for ax3
     ax3.set_xticks(np.arange(0, len(parameters)))
     ax3.set_xticklabels(factor_names[:len(parameters)])
-    ax3.set_ylabel(r"$\sigma$ $(\mathrm{\mu M \cdot s})$")
+    ax3.set_ylabel(r"$\mathrm{{\sigma}}$ $[\mathrm{\mu M \cdot s}]$")
     ax3.yaxis.set_major_locator(MultipleLocator(5000))
 
     if save_path is not None:
-        fig1.savefig(f"{save_path}/plot_mu{tag}", format="svg", dpi=1200)
-        fig2.savefig(f"{save_path}/plot_mu_star{tag}", format="svg", dpi=1200)
-        fig3.savefig(f"{save_path}/plot_sigma{tag}", format="svg", dpi=1200)
+        fig1.savefig(f"{save_path}_mu.svg", format="svg", dpi=1200)
+        fig2.savefig(f"{save_path}_mu_star.svg", format="svg", dpi=1200)
+        fig3.savefig(f"{save_path}_sigma.svg", format="svg", dpi=1200)
+    else:
+        plt.show()
 
-    plt.show()
+
+def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_1633293118", save_path=None, standard_area=8758.052481272032):
+    parameters, data_dict = morris_datareader(path=path, tag=tag)
+
+    mu = data_dict["mu"].reshape(-1)
+    mu_star = data_dict["mu_star"].reshape(-1)
+    sigma = data_dict["sigma"].reshape(-1)
+
+    custom_colors = custom_aptavita_colors()
+    factor_names = senstivity_analysis_factor_names()
+
+    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig3, ax3 = plt.subplots(figsize=(14, 8), dpi=125)
+
+    mu_fc = mu/standard_area
+    mu_star_fc = mu_star/standard_area
+    sigma_fc = sigma/standard_area
+
+    ax1.bar(np.arange(0, mu_fc.shape[0]), mu_fc, color=custom_colors)
+    ax2.bar(np.arange(0, mu_star_fc.shape[0]), mu_star_fc, color=custom_colors)
+    ax3.bar(np.arange(0, sigma_fc.shape[0]), sigma_fc, color=custom_colors)
+
+    # Set all proporties for ax1
+    # ax1.set_xlabel(r"Time $[s]$")
+    ax1.set_xticks(np.arange(0, len(parameters)))
+    ax1.set_xticklabels(factor_names[:len(parameters)])
+    ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax1.yaxis.set_major_locator(MultipleLocator(5000))
+
+    # Set all proporties for ax2
+    ax2.set_xticks(np.arange(0, len(parameters)))
+    ax2.set_xticklabels(factor_names[:len(parameters)])
+    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax2.yaxis.set_major_locator(MultipleLocator(5000))
+
+    # Set all proporites for ax3
+    ax3.set_xticks(np.arange(0, len(parameters)))
+    ax3.set_xticklabels(factor_names[:len(parameters)])
+    ax3.set_ylabel(r"$\mathrm{{\sigma}}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax3.yaxis.set_major_locator(MultipleLocator(5000))
+
+    if save_path is not None:
+        fig1.savefig(f"{save_path}_mu_fc.svg", format="svg", dpi=1200)
+        fig2.savefig(f"{save_path}_mu_star_fc.svg", format="svg", dpi=1200)
+        fig3.savefig(f"{save_path}_sigma_fc.svg", format="svg", dpi=1200)
+    else:
+        plt.show()
 
 
 def morris_method_visualization():
@@ -385,39 +437,40 @@ def morris_method_visualization():
 
     custom_cycler = custom_aptavita_color_cycler()
 
-    fig1 = plt.figure(figsize=(12, 8), frameon=False)
+    fig1 = plt.figure(figsize=(6, 5), dpi=150, frameon=False)
     ax1 = fig1.add_subplot(projection="3d")
     ax1.set_prop_cycle(custom_cycler)
     for i in range(num_trajectories):
         # print(trajectories[:, :, i])
         ax1.plot(trajectories[:, 0, i],
-                 trajectories[:, 1, i], trajectories[:, 2, i], linewidth=4)
+                 trajectories[:, 1, i], trajectories[:, 2, i], linewidth=2)
         ax1.scatter(trajectories[:, 0, i],
-                    trajectories[:, 1, i], trajectories[:, 2, i], s=75, alpha=1.0)
+                    trajectories[:, 1, i], trajectories[:, 2, i], s=50, alpha=1.0)
 
     # Plot all x-axis lines
     for i in range(factor_a.shape[0]):
         for k in range(factor_c.shape[0]):
             ax1.plot(np.ones(factor_a.shape) *
-                     factor_a[i], factor_b, factor_c[k], color="#000000", linewidth=0.5, alpha=0.5)
+                     factor_a[i], factor_b, factor_c[k], color="#000000", linewidth=0.25, alpha=0.5)
+            ax1.scatter(np.ones(factor_a.shape) *
+                        factor_a[i], factor_b, factor_c[k], color="#000000", s=1, alpha=0.5)
 
     # Plot all y-axis lines
     for j in range(factor_b.shape[0]):
         for k in range(factor_c.shape[0]):
             ax1.plot(factor_a, np.ones(factor_b.shape) *
-                     factor_b[j], factor_c[k], color="#000000", linewidth=0.5, alpha=0.5)
+                     factor_b[j], factor_c[k], color="#000000", linewidth=0.25, alpha=0.5)
+            ax1.scatter(factor_a, np.ones(factor_b.shape) *
+                        factor_b[j], factor_c[k], color="#000000", s=1, alpha=0.5)
 
     # Plot all z-axis lines
     for i in range(factor_a.shape[0]):
         for j in range(factor_b.shape[0]):
             for k in range(factor_c.shape[0]):
                 ax1.plot(np.ones(factor_a.shape) * factor_a[i], np.ones(
-                    factor_b.shape) * factor_b[j], factor_c, color="#000000", linewidth=0.5, alpha=0.5)
-
-    # for i in range(factor_a.shape[0]):
-    #     for j in range(factor_b.shape[0]):
-    #         for k in range(factor_c.shape[0]):
-    #             ax1.plot(factor_a[i], )
+                    factor_b.shape) * factor_b[j], factor_c, color="#000000", linewidth=0.25, alpha=0.5)
+                ax1.scatter(np.ones(factor_a.shape) * factor_a[i], np.ones(
+                    factor_b.shape) * factor_b[j], factor_c, color="#000000", s=1, alpha=0.5)
 
     ax1.grid(False)
     ax1.set_xlim(0, 3)
@@ -449,14 +502,20 @@ def morris_method_visualization():
     # 0.0, means 0 transparency so it won't be visible
     ax1.w_zaxis.set_pane_color((1.0, 1.0, 1.0, 0.0))
 
+    # This plot should be manually saved, since you need to orient
+    # the cube correctly so the trajectories are well visible
     plt.show()
 
 
 if __name__ == "__main__":
-    # plot_morris_analysis(path="modelling/data",
-    #                      tag="_1633520689")  # , save_path="modelling/data/plots")
+    # morris_method_visualization()
+    plot_morris_analysis_mu_star_subplots(
+        path="modelling/data", tag="_1633520689", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1633520689.svg")
     # plot_morris_analysis_area(
-    #     path="modelling/data", tag="_1633591400")  # , save_path="modelling/data/plots")
-    # plot_morris_analysis_mu_star_subplots(
-    #     path="modelling/data", tag="_1633520689")  # , save_path="modelling/data/plots")
-    morris_method_visualization()
+    #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
+
+    parameters = standard_parameters_prokaryotic()
+    standard_area = model_prokaryotic_area(
+        parameters, 3*10**-3, 250, 0.05, 0.09)
+    plot_morris_analysis_area_fold_change(
+        path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400", standard_area=standard_area)

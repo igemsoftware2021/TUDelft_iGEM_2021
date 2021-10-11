@@ -23,7 +23,7 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
     custom_cycler = custom_aptavita_color_cycler()
 
     # Create the figure
-    fig, ax = plt.subplots(figsize=(12, 6), dpi=125)
+    fig, ax = plt.subplots(figsize=(14, 8), dpi=125)
 
     ax.set_prop_cycle(custom_cycler)
 
@@ -47,8 +47,8 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
 
     ax.legend(title="Vitamin concentration")
     # ax.set_title("Absorbance over time for different vitamin concentrations")
-    ax.set_xlabel(r"Time $(\mathrm{s})$")
-    ax.set_ylabel(r"Product concentration $(\mathrm{\mu M})$")
+    ax.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax.set_ylabel(r"Product concentration $[\mathrm{\mu M}]$")
 
     # Tight layout should be set after plotting and setting the
     # correct title and labels
@@ -56,8 +56,8 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 3*10**-3, s_i: float = 250, dt=0.01, t_tot=4800, save_path: str = None):
@@ -76,6 +76,9 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
     save_path: str
         path to which the figure should be save if the value is not None (default None)
     """
+    # Plot step, was needed otherwise svg file becomes too large
+    plot_step = 100
+
     # Create the custom color cycler
     custom_cycler = custom_aptavita_color_cycler()
 
@@ -96,9 +99,12 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
         parameters, initial_conditions1, dt=dt, t_tot=t_tot)
     time2, p2 = model_prokaryotic(
         parameters, initial_conditions2, dt=dt, t_tot=t_tot)
-    ax1.plot(time1, p1, label=f"{int(vit_conc1 * 1000)} $\mathrm{{nM}}$")
-    ax1.plot(time2, p2, label=f"{int(vit_conc2 * 1000)} $\mathrm{{nM}}$")
-    ax1.fill_between(time1, p1, p2, color="#FFCE3A", alpha=0.75)
+    ax1.plot(time1[::plot_step], p1[::plot_step],
+             label=f"{int(vit_conc1 * 1000)} $\mathrm{{nM}}$")
+    ax1.plot(time2[::plot_step], p2[::plot_step],
+             label=f"{int(vit_conc2 * 1000)} $\mathrm{{nM}}$")
+    ax1.fill_between(time1[::plot_step], p1[::plot_step],
+                     p2[::plot_step], color="#FFCE3A", alpha=0.75)
 
     parameters_adjusted = parameters.copy()
     parameters_adjusted[13] = 1/600
@@ -107,22 +113,22 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
         parameters_adjusted, initial_conditions1, dt=dt, t_tot=t_tot)
     time_adjusted2, p_adjusted2 = model_prokaryotic(
         parameters_adjusted, initial_conditions2, dt=dt, t_tot=t_tot)
-    ax2.plot(time_adjusted1, p_adjusted1,
+    ax2.plot(time_adjusted1[::plot_step], p_adjusted1[::plot_step],
              label=f"{int(vit_conc1 * 1000)} $\mathrm{{nM}}$")
-    ax2.plot(time_adjusted2, p_adjusted2,
+    ax2.plot(time_adjusted2[::plot_step], p_adjusted2[::plot_step],
              label=f"{int(vit_conc2 * 1000)} $\mathrm{{nM}}$")
-    ax2.fill_between(time_adjusted1, p_adjusted1,
-                     p_adjusted2, color="#FFCE3A", alpha=0.75)
+    ax2.fill_between(time_adjusted1[::plot_step], p_adjusted1[::plot_step],
+                     p_adjusted2[::plot_step], color="#FFCE3A", alpha=0.75)
 
     # Set ax1 proporties
     ax1.legend(title="Vitamin concentration")
-    ax1.set_xlabel(r"Time $(\mathrm{s})$")
-    ax1.set_ylabel(r"Product concentration $(\mathrm{\mu M})$")
+    ax1.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax1.set_ylabel(r"Product concentration $[\mathrm{\mu M}]$")
 
     # Set ax2 proporties
     ax2.legend(title="Vitamin concentration")
-    ax2.set_xlabel(r"Time $(\mathrm{s})$")
-    ax2.set_ylabel(r"Product concentration $(\mathrm{\mu M})$")
+    ax2.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax2.set_ylabel(r"Product concentration $[\mathrm{\mu M}]$")
 
     # Set the character labels
     ax1.text(-0.05, 1.05, "a", transform=ax1.transAxes,
@@ -136,8 +142,8 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def plot_cmrna_diff_vitamin_concentrations_prokaryotic(vit_conc_list: list, dna_conc: float = 5*10**-3, s_i: float = 150, save_path: str = None):
@@ -242,8 +248,8 @@ def plot_fraction_mrna_prokaryotic(vit_conc: list, dna_conc: float = 5*10**-3, s
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def plot_absolute_mrna_prokaryotic(vit_conc: list, dna_conc: float = 5*10**-3, s_i: float = 150, save_path: str = None):
@@ -285,8 +291,8 @@ def plot_absolute_mrna_prokaryotic(vit_conc: list, dna_conc: float = 5*10**-3, s
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def plot_total_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
@@ -313,12 +319,12 @@ def plot_total_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list
         total = umrna + umrna_vit
 
         ax1.plot(time, total*1000,
-                 label=f"{k_c_list_names[i]} $\mathrm{{1/s}}$")
+                 label=f"{k_c_list_names[i]} $\mathrm{{s}}^{{-1}}$")
 
     ax1.legend(title="Cleaving rate $(k_{\mathrm{c}})$")
 
-    ax1.set_xlabel(r"Time $(\mathrm{s})$")
-    ax1.set_ylabel(r"Concentration umRNA $(\mathrm{{nM}})$")
+    ax1.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax1.set_ylabel(r"Concentration umRNA $[\mathrm{{nM}}]$")
 
     # Tight layout should be set after plotting and setting the
     # correct title and labels
@@ -326,8 +332,8 @@ def plot_total_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
@@ -355,20 +361,20 @@ def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list
         total = umrna + umrna_vit
 
         ax1.plot(time, total*1000,
-                 label=f"$\mathrm{{umRNA}}$ $+$ $\mathrm{{umRNA}} \cdot \mathrm{{Vit}}$ $(k_\mathrm{{c}}=$ {k_c_list_names[i]} $\mathrm{{1/s}})$", color=custom_colors[i])
+                 label=f"$\mathrm{{umRNA}}$ $+$ $\mathrm{{umRNA}} \cdot \mathrm{{Vit}}$ $(k_\mathrm{{c}}=$ {k_c_list_names[i]} $\mathrm{{s}}^{{-1}})$", color=custom_colors[i])
         ax1.plot(time, umrna_vit*1000,
-                 label=f"$\mathrm{{umRNA}} \cdot \mathrm{{Vit}}$ $(k_\mathrm{{c}}=$ {k_c_list_names[i]} $\mathrm{{1/s}})$", color=custom_colors[i], alpha=0.5)
+                 label=f"$\mathrm{{umRNA}} \cdot \mathrm{{Vit}}$ $[k_\mathrm{{c}}=$ {k_c_list_names[i]} $\mathrm{{s}}^{{-1}}]$", color=custom_colors[i], alpha=0.5)
 
-    ax1.legend()  # title="Cleaving rate $(k_{\mathrm{c}})$")
+    ax1.legend()
 
-    ax1.set_xlabel(r"Time $(\mathrm{s})$")
-    ax1.set_ylabel(r"Concentration $(\mathrm{{nM}})$")
+    ax1.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax1.set_ylabel(r"Concentration $[\mathrm{{nM}}]$")
 
     # # Setting proporties for ax2
     # ax2.legend(title="Cleaving rate $(k_{\mathrm{c}})$")
-    # ax2.set_xlabel(r"Time $(\mathrm{s})$")
+    # ax2.set_xlabel(r"Time $[\mathrm{s}]$")
     # ax2.set_ylabel(
-    #     r"$\mathrm{{umRNA}} \cdot \mathrm{{Vit}}$ $(\mathrm{{nM}})$")
+    #     r"$\mathrm{{umRNA}} \cdot \mathrm{{Vit}}$ $[\mathrm{{nM}}]$")
     # ax2.set_ylim(ax1_ylim)
 
     # Tight layout should be set after plotting and setting the
@@ -377,8 +383,8 @@ def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
-
-    plt.show()
+    else:
+        plt.show()
 
 
 def plot_dumrna_dt_different_dna_conc(dna_conc_list: list, dna_conc_list_names: list, vit_conc_list: float, s_i: float = 250, save_path: str = None):
@@ -404,15 +410,18 @@ def plot_dumrna_dt_different_dna_conc(dna_conc_list: list, dna_conc_list_names: 
             dcmrna_dt = (cmrna - cmrna_temp) / dt
 
             ax1.plot(time, dcmrna_dt*1000,
-                     label=fr"cmRNA formation rate $(\mathrm{{DNA}} = {dna_conc_list_names[i]}$ $\mathrm{{nM}})$ $int({vit_conc} *1000)$")
+                     label=fr"cmRNA formation rate $(\mathrm{{DNA}} = {dna_conc_list_names[i]}$ $\mathrm{{nM}}]$ $int({vit_conc} *1000)$")
 
             production_dt = results[-1] / dt
             ax1.plot(time, production_dt*1000, label="umRNA production rate")
 
-    ax1.set_xlabel("Time $(\mathrm{s})$")
-    ax1.set_ylabel("$\mathrm{d}C / \mathrm{d}t$ $(\mathrm{nM/s})$")
+    ax1.set_xlabel("Time $[\mathrm{s}]$")
+    ax1.set_ylabel("$\mathrm{d}C / \mathrm{d}t$ $[\mathrm{nM/s}]$")
     ax1.legend()
-    plt.show()
+    if save_path is not None:
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
+    else:
+        plt.show()
 
 
 def plot_dumrna_dt_different_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
@@ -438,18 +447,22 @@ def plot_dumrna_dt_different_k_c(k_c_list: list, k_c_list_names: list, vit_conc:
         dcmrna_dt = (cmrna - cmrna_temp) / dt
 
         ax1.plot(time, dcmrna_dt*1000,
-                 label=f"$\mathrm{{d}}\mathrm{{cmRNA}}/\mathrm{{d}}t$ $(k_{{\mathrm{{c}}}} = {k_c_list_names[i]}$ $1/\mathrm{{s}})$")
+                 label=f"$\mathrm{{d}}\mathrm{{cmRNA}}/\mathrm{{d}}t$ $(k_{{\mathrm{{c}}}} = {k_c_list_names[i]}$ $\mathrm{{s}}^{{-1}})$")
 
         if i == len(k_c_list)-1:
             production_dt = results[-1] / dt
             ax1.plot(time, production_dt*1000,
                      label=f"$\mathrm{{d}}\mathrm{{umRNA}}/\mathrm{{d}}t$", color="#4D94EF")
 
-    ax1.set_xlabel("Time $(\mathrm{s})$")
-    ax1.set_ylabel("$\mathrm{d}C / \mathrm{d}t$ $(\mathrm{nM/s})$")
+    ax1.set_xlabel("Time $[\mathrm{s}]$")
+    ax1.set_ylabel("$\mathrm{d}C / \mathrm{d}t$ $[\mathrm{nM/s}]$")
     ax1.legend()
     fig1.tight_layout()
-    plt.show()
+
+    if save_path is not None:
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
+    else:
+        plt.show()
 
 
 def k_D_plot():
@@ -479,25 +492,15 @@ def k_D_plot():
 
 
 if __name__ == "__main__":
-    pass
-    # plot_prokaryotic_different_vitamin_conc(
-    #     [0.05, 0.09], dna_conc=3*10**-3, s_i=250)  # , save_path="test_plot.svg")
-    # plot_area_prokaryotic_different_k_c(
-    #     0.05, 0.09, dna_conc=3*10**-3, s_i=250, save_path=None)
-    # plot_fraction_mrna_prokaryotic(2, save_path="test_plot.svg")
-    # plot_total_absolute_mrna_prokaryotic(2, save_path="test_plot2.svg")
-    # plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
-    #                                                               "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path=None)
-    # plot_all_different_absolute_mrna_prokaryotic(2, save_path="test_plot2.svg")
-    # plot_cmrna_diff_vitamin_concentrations_prokaryotic(np.linspace(0, 20, 11), save_path="test_plot3.svg")
 
-    # plot_absolute_umrna_prokaryotic_differing_vit_conc(
-    #     [1/60, 1/300, 1/600], ["1/60", "1/300", "1/600"], vit_conc=0.05, dna_conc=3*10**-3, s_i=250)
+    plot_prokaryotic_different_vitamin_conc(
+        [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
+
+    plot_area_prokaryotic_different_k_c(
+        0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800, save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
 
     plot_dumrna_dt_different_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
-                                 "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path=None)
-    # plot_dumrna_dt_different_dna_conc(dna_conc_list=[
-    #                                   3*10**-3, 1*10**-3, 0.3*10**-3], dna_conc_list_names=[
-    #     "3", "1", "0.3"], vit_conc_list=[0.05, 0.11], s_i=250, save_path=None)
-    # plot_area_prokaryotic_different_k_c(
-    #     0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800)
+                                 "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--dumRNA_dt_Different_k_c_Plot.svg")
+
+    plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
+        "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
