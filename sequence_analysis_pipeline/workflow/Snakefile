@@ -1,4 +1,4 @@
-configfile: "config/config.yaml"
+configfile: "config/config_folate.yaml"
 
 # Example
 # inputfiles:
@@ -6,7 +6,7 @@ configfile: "config/config.yaml"
 # "S1_D80_l1_read_counts.txt"
 # Then dataset = S1_D80 and sample = L0/L1
 
-# dataset = config["dataset"]
+dataset = config["dataset"]
 
 rule all:
     input:
@@ -49,7 +49,7 @@ rule pear:
     shell:
         """
         #!/bin/bash
-        pear -f {input.forward_read} -r {input.reverse_read} -o results/pear/{wildcards.dataset} > {log}
+        pear -f {input.forward_read} -r {input.reverse_read} -o results/pear/{dataset} > {log}
         """
 
 rule fastq_to_fasta:
@@ -60,7 +60,7 @@ rule fastq_to_fasta:
     shell:
         """
         #!/bin/bash
-        awk '{if(NR%4==2) print $0}' {input} > {output}
+        awk '{{if(NR%4==2) print $0}}' {input} > {output}
         """
 
 rule sort_and_combine_fasta:
