@@ -2,8 +2,8 @@
 import scipy.stats
 from database_interface import DatabaseInterfaceSequences
 
-# database_path = "./results/databases/T1_D80_database_v2.db"
-database_path = snakemake.input[0]
+database_path = "./results/databases/S2_D63_database.db"
+# database_path = snakemake.input[0]
 
 TABLE_NAME = "clean_sequences"
 
@@ -30,7 +30,10 @@ with DatabaseInterfaceSequences(path=database_path) as db:
         p_value = scipy.stats.norm.sf(abs(z_score))  # one-sided
         db.update_column_value(TABLE_NAME, rowid, "p_value", p_value)
 
+        if seq_fold_change > 1.4:
+            print(rowid, sequence_info)
         if seq_fold_change > 3.0 and p_value < 1/N:
+            print(rowid, sequence_info)
             db.update_column_value(TABLE_NAME, rowid, "possible_sensor", 1)
             count += 1
 

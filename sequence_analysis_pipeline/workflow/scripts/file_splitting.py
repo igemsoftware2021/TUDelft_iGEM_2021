@@ -11,7 +11,7 @@ seq_neg_ligand_file, seq_pos_ligand_file, seq_other_file = snakemake.output[
 
 # Create the path to the config file
 config_file_path = Path(__file__).resolve(
-).parents[2] / "config" / "config.yaml"
+).parents[2] / "config" / "config_mixture.yaml"
 
 ligand_pos_prefix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
     config_file_path, pattern="prefix", ligand_present=True)

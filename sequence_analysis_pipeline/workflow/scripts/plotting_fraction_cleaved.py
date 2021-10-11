@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/N35-I4_S4_database.db"
+database_path = "./results/databases/S2_D63_database.db"
 # database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
@@ -61,6 +61,8 @@ ax2.scatter(fraction_negative[biosensor_array],
             fraction_positive[biosensor_array], s=5, alpha=1, color="red")
 ax2.set_xlim([0, 100])
 ax2.set_ylim([0, 100])
+ax2.set_xlabel("c_s negative")
+ax2.set_ylabel("c_s positive")
 # ax2.set_xscale("log")
 # ax2.set_yscale("log")
 fig2.show()
