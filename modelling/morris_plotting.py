@@ -247,19 +247,24 @@ def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_163329311
     # ax1.set_xlabel(r"Time $[s]$")
     ax1.set_xticks(np.arange(0, len(parameters)))
     ax1.set_xticklabels(factor_names[:len(parameters)])
-    ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
+    ax1.set_ylabel(r"Fold change")
+    # ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
     # ax1.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporties for ax2
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(factor_names[:len(parameters)])
-    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax2.set_ylabel(r"Fold change")
+    ax2.set_ylabel(
+        r"$\mathrm{{\mu}}^{\ast}$ fold change $[\mathrm{\mu M \cdot s}]$")
     # ax2.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporites for ax3
     ax3.set_xticks(np.arange(0, len(parameters)))
     ax3.set_xticklabels(factor_names[:len(parameters)])
-    ax3.set_ylabel(r"$\mathrm{{\sigma}}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax2.set_ylabel(r"Fold change")
+    ax3.set_ylabel(
+        r"$\mathrm{{\sigma}}$ fold change $[\mathrm{\mu M \cdot s}]$")
     # ax3.yaxis.set_major_locator(MultipleLocator(5000))
 
     if save_path is not None:
