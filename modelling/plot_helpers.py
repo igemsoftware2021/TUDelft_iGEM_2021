@@ -12,7 +12,7 @@ def custom_aptavita_color_cycler():
 
 
 def senstivity_analysis_factor_names():
-    return ["$k_{\mathrm{ts}}$", "$k_{\mathrm{tl}}$", "$k_{\mathrm{mat}}$", "$k_{\mathrm{cat}}$", "$K_{\mathrm{s}}$", "$kc_{\mathrm{s}}$", "$K_{\mathrm{l}}$", "$K_{\mathrm{TlR}}$", "$K_{\mathrm{m}}$", "$\delta_{\mathrm{mRNA}}$", "$\delta_{\mathrm{TlR}}$", "$k_{\mathrm{on}}$", "$k_{\mathrm{off}}$", "$k_{\mathrm{c}}$", "$\mathrm{DNA}$", "$\mathrm{Vit}_\mathrm{i}$"]
+    return ["$k_{\mathrm{ts}}$", "$k_{\mathrm{tl}}$", "$k_{\mathrm{mat}}$", "$k_{\mathrm{cat}}$", "$K_{\mathrm{s}}$", "$kc_{\mathrm{s}}$", "$K_{\mathrm{l}}$", "$K_{\mathrm{TlR}}$", "$K_{\mathrm{m}}$", "$\delta_{\mathrm{mRNA}}$", "$\delta_{\mathrm{TlR}}$", "$k_{\mathrm{on}}$", "$k_{\mathrm{off}}$", "$k_{\mathrm{c}}$", "$\mathrm{DNA}$", "$\mathrm{Vit}_\mathrm{tot}$"]
 
 
 def add_value_labels(ax, spacing=5):

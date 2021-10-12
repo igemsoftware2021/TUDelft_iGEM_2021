@@ -255,8 +255,8 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    # np.savetxt("modelling/trajectories_nice_area.txt", model_input)
-    # model_input = np.loadtxt("modelling/trajectories_nice.txt")
+    # np.savetxt("modelling/trajectories_nice_area_no_dna.txt", model_input)
+    # model_input = np.loadtxt("modelling/trajectories_nice_area_no_dna.txt")
 
     # Check if you need to override the dna_conc variable then do np.delete()
     # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
