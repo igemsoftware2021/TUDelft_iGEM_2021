@@ -32,17 +32,17 @@ t_u = 1  # Oscillation frequency associated with the ultimate gain
 k_p = 0.20 * k_u        # Proportional gain PID controller
 k_i = 0.50 * t_u        # Integral gain PID controller
 k_d = 0.40 * k_u / t_u  # Derivative gain PID controller
-temperature_desired = 25  # Desired temperature in degrees Celsius
+temperature_desired = 37  # Desired temperature in degrees Celsius
 pwm_freq = 10  # simulations suggest this is fine, see LT spice. Need to do this properly with a good toggle speed
 pid_parameters = [k_p, k_i, k_d, temperature_desired, pwm_freq]
 v_ref = 3.3
-gain = 2.96
-duration = 0.10
-interval = 0.005
+gain = 2.96  # Gain of the non-inverting amplifier circuit, which is connected to the temperature sensor
+duration = 0.10  # Duration of 1 temperature measurement [s]
+interval = 0.005  # Sampling interval of the temperature measurement [s]
 
 # SPI
 spi_channel = 0  # SPI channel of the Raspberry Pi that is connected to the ADC
-spi_baud = 50000  # Speed of the serial communication in bits/s
+spi_baud = 50000  # Speed of the serial communication [bits/s]
 spi_flags = 0
 
 # I2C
@@ -51,12 +51,12 @@ i2c_multiplexer_adress = 0x70  # TCA9548
 i2c_sensor_adress = 0x39  # APDS9930
 i2c_sensor_int_time = 0xc0  # Integration time APDS9930. 0x0c <-> 175 ms
 i2c_sensor_gain = "TBD"  # Gain of the APDS9930.
-i2c_sensor_1_channel = 0  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_2_channel = 1  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_3_channel = 2  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_4_channel = 3  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_channels = [i2c_sensor_1_channel]  # , i2c_sensor_2_channel,
-# i2c_sensor_3_channel, i2c_sensor_4_channel]
+i2c_sensor_1_channel = 7  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_2_channel = 6  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_3_channel = 5  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_4_channel = 4  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_channels = [i2c_sensor_1_channel, i2c_sensor_2_channel,
+                       i2c_sensor_3_channel, i2c_sensor_4_channel]
 num_sensors = len(i2c_sensor_channels)
 ###############################################################################
 
