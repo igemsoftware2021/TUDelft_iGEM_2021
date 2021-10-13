@@ -1,8 +1,54 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 from models import model_prokaryotic, model_prokaryotic_all
 from standard_values import standard_parameters_prokaryotic, standard_constants, standard_initial_conditions
 from plot_helpers import custom_aptavita_colors, custom_aptavita_color_cycler, micromolar_conc_to_math_exp
+
+
+def yfp_plot(save_path: str = None):
+
+    custom_colors = custom_aptavita_colors()
+    time = np.array([0, 300, 600, 900, 1200, 1500, 1800, 2100, 2400, 2700, 3000, 3300, 3600, 3900, 4200.1, 4500.1, 4800.1, 5100.1, 5400.1, 5700.1, 6000.1, 6300.1, 6600.1, 6900.1, 7200.1, 7500.1, 7800.1, 8100.1, 8400.1, 8700.1, 9000.1, 9300.1, 9600.1, 9900.1, 10200, 10500, 10800, 11100, 11400, 11700, 12000, 12300, 12600, 12900, 13200, 13500, 13800, 14100, 14400, 14700, 15000, 15300, 15600, 15900, 16200, 16500, 16800, 17100, 17400, 17700, 18000, 18300, 18600, 18900, 19200, 19500, 19800, 20100, 20400, 20700, 21000, 21300, 21600, 21900, 22200, 22500, 22800, 23100, 23400, 23700, 24000, 24300, 24600, 24900, 25200, 25500, 25800, 26100, 26400, 26700, 27000, 27300, 27600, 27900, 28200, 28500,
+                    28800, 29101, 29400, 29701, 30001, 30301, 30601, 30901, 31201, 31501, 31801, 32101, 32401, 32701, 33001, 33301, 33601, 33901, 34201, 34501, 34801, 35101, 35401, 35701, 36001, 36301, 36601, 36901, 37201, 37501, 37801, 38101, 38401, 38701, 39001, 39301, 39601, 39901, 40201, 40501, 40801, 41101, 41401, 41701, 42001, 42301, 42601, 42901, 43201, 43501, 43801, 44101, 44401, 44701, 45001, 45301, 45601, 45901, 46201, 46501, 46801, 47101, 47401, 47701, 48001, 48301, 48601, 48901, 49201, 49501, 49801, 50101, 50401, 50701, 51001, 51301, 51601, 51901, 52201, 52501, 52801, 53101, 53401, 53701, 54001, 54301, 54601, 54901, 55201, 55501, 55801, 56101, 56401, 56701, 57001, 57301, 57601])
+    rlu = np.array([261, 799, 1673, 2770, 3935, 5076, 6156, 7154, 8108, 8934, 9727, 10412, 11032, 11580, 12087, 12539, 12907, 13296, 13609, 13912, 14185, 14449, 14704, 14944, 15163, 15352, 15524, 15663, 15820, 15994, 16139, 16235, 16373, 16498, 16626, 16747, 16825, 16882, 16988, 17036, 17145, 17180, 17276, 17280, 17338, 17409, 17414, 17480, 17460, 17540, 17541, 17594, 17647, 17682, 17744, 17735, 17776, 17790, 17822, 17798, 17861, 17854, 17921, 17900, 17905, 17954, 17954, 17972, 17973, 18008, 18022, 18000, 18034, 18015, 18058, 18047, 18052, 18060, 18026, 17997, 17986, 18012, 18001, 17975, 17982, 17966, 17965, 17954, 17947, 17939, 17973, 17948, 17960, 17968, 17937, 17958, 17932,
+                   17945, 17995, 17970, 18003, 17945, 17965, 17967, 17983, 17957, 17975, 17960, 17983, 17968, 17973, 17979, 17929, 17950, 17959, 17975, 17995, 18000, 18023, 18022, 17988, 18008, 18003, 18023, 17976, 18063, 18036, 18014, 18017, 17979, 18054, 18062, 18016, 18033, 18039, 18039, 18071, 18029, 18050, 18028, 18035, 18040, 18042, 18021, 18039, 18061, 18046, 18040, 18014, 18023, 18026, 18038, 18035, 18020, 18045, 18042, 18014, 18019, 18017, 18010, 18023, 18001, 18007, 17989, 17972, 17970, 17984, 17958, 17987, 17965, 17876, 17929, 17949, 17946, 17900, 17895, 17875, 17930, 17906, 17908, 17922, 17899, 17939, 17997, 17979, 17955, 17970, 17995, 17967, 18018, 17998, 18017, 18011])
+
+    time = time/3600
+
+    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+    ax1.plot(time, rlu, color=custom_colors[2], linewidth=2)
+    # Set minor and major tick locator
+    ax1.xaxis.set_major_locator(MultipleLocator(1))
+    ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
+    ax1.set_xlim(0, 6)
+    ax1.set_xlabel(r"Time $[\mathrm{h}]$")
+    ax1.set_ylabel(r"RLU")
+
+    start_steady = 0.17  # start time of the steady state regime
+    end_steady = 0.8     # end time of the steady state regime
+
+    # Colour the area for every regime
+    ax1.axvspan(0, start_steady, color=custom_colors[0], alpha=0.15)
+    ax1.axvspan(start_steady, end_steady, color=custom_colors[0], alpha=0.1)
+    ax1.axvspan(end_steady, 6, color=custom_colors[0], alpha=0.05)
+
+    # Add black dashed lines at positions x
+    ax1.axvline(start_steady, color="#000000", linestyle="dashed", linewidth=1)
+    ax1.axvline(end_steady, color="#000000", linestyle="dashed", linewidth=1)
+
+    # Set the character labels
+    ax1.text(0.0075, 0.92, "i", transform=ax1.transAxes,
+             size=16, weight="bold")
+    ax1.text(0.05, 0.92, "ii", transform=ax1.transAxes,
+             size=16, weight="bold")
+    ax1.text(0.165, 0.92, "iii", transform=ax1.transAxes,
+             size=16, weight="bold")
+
+    if save_path is not None:
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
+    else:
+        plt.show()
 
 
 def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
@@ -23,9 +69,9 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
     custom_cycler = custom_aptavita_color_cycler()
 
     # Create the figure
-    fig, ax = plt.subplots(figsize=(14, 8), dpi=125)
+    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
 
-    ax.set_prop_cycle(custom_cycler)
+    ax1.set_prop_cycle(custom_cycler)
 
     # Store the parameters and constants which are the same
     # for every simulation
@@ -42,20 +88,20 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
         time, p = model_prokaryotic(
             parameters, initial_conditions, dt=0.01, t_tot=4800)
 
-        ax.plot(time, p,
-                label=f"{int(vit_conc * 1000)} $\mathrm{{nM}}$")
+        ax1.plot(time, p,
+                 label=f"{int(vit_conc * 1000)} $\mathrm{{nM}}$")
 
-    ax.legend(title="Vitamin concentration")
+    ax1.legend(title="Vitamin concentration")
     # ax.set_title("Absorbance over time for different vitamin concentrations")
-    ax.set_xlabel(r"Time $[\mathrm{s}]$")
-    ax.set_ylabel(r"Product concentration $[\mathrm{\mu M}]$")
+    ax1.set_xlabel(r"Time $[\mathrm{s}]$")
+    ax1.set_ylabel(r"Product concentration $[\mathrm{\mu M}]$")
 
     # Tight layout should be set after plotting and setting the
     # correct title and labels
-    fig.tight_layout()
+    fig1.tight_layout()
 
     if save_path is not None:
-        fig.savefig(f"{save_path}", format="svg", dpi=1200)
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
     else:
         plt.show()
 
@@ -493,14 +539,16 @@ def k_D_plot():
 
 if __name__ == "__main__":
 
-    plot_prokaryotic_different_vitamin_conc(
-        [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
+    # plot_prokaryotic_different_vitamin_conc(
+    #     [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
 
-    plot_area_prokaryotic_different_k_c(
-        0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800, save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
+    # plot_area_prokaryotic_different_k_c(
+    #     0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800, save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
 
-    plot_dumrna_dt_different_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
-                                 "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--dumRNA_dt_Different_k_c_Plot.svg")
+    # plot_dumrna_dt_different_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
+    #                              "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--dumRNA_dt_Different_k_c_Plot.svg")
 
-    plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
-        "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
+    # plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
+    #     "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
+
+    yfp_plot()
