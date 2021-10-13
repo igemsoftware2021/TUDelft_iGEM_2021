@@ -282,8 +282,8 @@ def model_prokaryotic(parameters, initial_conditions, dt=0.01, t_tot=7200):
     ----------
     time: np.ndarray
         Array containing all timepoints of the simulation.
-    b_y: np.ndarray 
-        Array containing the blue over yellow light intensity ratio at each timepoint.
+    p: np.ndarray 
+        Array containing the product concentration at each timepoint.
     """
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
@@ -609,11 +609,11 @@ def model_prokaryotic_all(parameters, initial_conditions, dt=0.01, t_tot=7200):
 
     Returns
     ----------
-    time, dna, umrna, cmrna, dmrna, vit, umrna_vit, tsr, tlr, e_mon, e, s, p
+    time, dna, umrna, cmrna, dmrna, vit, umrna_vit, tsr, tlr, e_mon, e, s, p, production
     time: np.ndarray
         Array containing all timepoints of the simulation.
-    b_y: np.ndarray 
-        Array containing the blue over yellow light intensity ratio at each timepoint.
+    p: np.ndarray 
+        Array containing the product concentration at each timepoint.
     """
     # "Unpacking" the array with parameters into individual parameters
     k_ts = parameters[0]
