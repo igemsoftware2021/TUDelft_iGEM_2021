@@ -14,10 +14,10 @@ def yfp_plot(save_path: str = None):
     rlu = np.array([261, 799, 1673, 2770, 3935, 5076, 6156, 7154, 8108, 8934, 9727, 10412, 11032, 11580, 12087, 12539, 12907, 13296, 13609, 13912, 14185, 14449, 14704, 14944, 15163, 15352, 15524, 15663, 15820, 15994, 16139, 16235, 16373, 16498, 16626, 16747, 16825, 16882, 16988, 17036, 17145, 17180, 17276, 17280, 17338, 17409, 17414, 17480, 17460, 17540, 17541, 17594, 17647, 17682, 17744, 17735, 17776, 17790, 17822, 17798, 17861, 17854, 17921, 17900, 17905, 17954, 17954, 17972, 17973, 18008, 18022, 18000, 18034, 18015, 18058, 18047, 18052, 18060, 18026, 17997, 17986, 18012, 18001, 17975, 17982, 17966, 17965, 17954, 17947, 17939, 17973, 17948, 17960, 17968, 17937, 17958, 17932,
                    17945, 17995, 17970, 18003, 17945, 17965, 17967, 17983, 17957, 17975, 17960, 17983, 17968, 17973, 17979, 17929, 17950, 17959, 17975, 17995, 18000, 18023, 18022, 17988, 18008, 18003, 18023, 17976, 18063, 18036, 18014, 18017, 17979, 18054, 18062, 18016, 18033, 18039, 18039, 18071, 18029, 18050, 18028, 18035, 18040, 18042, 18021, 18039, 18061, 18046, 18040, 18014, 18023, 18026, 18038, 18035, 18020, 18045, 18042, 18014, 18019, 18017, 18010, 18023, 18001, 18007, 17989, 17972, 17970, 17984, 17958, 17987, 17965, 17876, 17929, 17949, 17946, 17900, 17895, 17875, 17930, 17906, 17908, 17922, 17899, 17939, 17997, 17979, 17955, 17970, 17995, 17967, 18018, 17998, 18017, 18011])
 
-    time = time/3600
+    time_h = time/3600
 
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
-    ax1.plot(time, rlu, color=custom_colors[2], linewidth=2)
+    ax1.plot(time_h, rlu, color=custom_colors[2], linewidth=2)
     # Set minor and major tick locator
     ax1.xaxis.set_major_locator(MultipleLocator(1))
     ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
@@ -100,6 +100,43 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
     # correct title and labels
     fig1.tight_layout()
 
+    if save_path is not None:
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
+    else:
+        plt.show()
+
+
+def plot_enzyme_concentration(vit_conc: float = 0.07, dna_conc: float = 5*10**-3, s_i: float = 250, save_path: str = None):
+
+    custom_cycler = custom_aptavita_color_cycler()
+
+    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+
+    ax1.set_prop_cycle(custom_cycler)
+
+    parameters = standard_parameters_prokaryotic()
+    # Set the cleaving rate extremely high so that all the
+    # umRNA will be immediately cleaved
+    parameters[13] = 1
+
+    # Set vit_conc to 0, since you want complete cleavage of all the umRNA
+    vit_conc = 0
+    initial_conditions = np.array([dna_conc, s_i, vit_conc])
+
+    results = model_prokaryotic_all(
+        parameters, initial_conditions, dt=0.01, t_tot=43200)
+
+    time = results[0]
+    enzyme_conc = results[10]
+
+    time_h = time / 3600
+    ax1.plot(time_h, enzyme_conc, linewidth=2)
+    # Set minor and major tick locator
+    ax1.xaxis.set_major_locator(MultipleLocator(1))
+    ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
+    ax1.set_xlim(0, 12)
+    ax1.set_xlabel(r"Time $[\mathrm{h}]$")
+    ax1.set_ylabel(r"Enzyme concentration $[\mathrm{\mu M}]$")
     if save_path is not None:
         fig1.savefig(f"{save_path}", format="svg", dpi=1200)
     else:
@@ -539,8 +576,8 @@ def k_D_plot():
 
 if __name__ == "__main__":
 
-    # plot_prokaryotic_different_vitamin_conc(
-    #     [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
+    plot_prokaryotic_different_vitamin_conc(
+        [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
 
     # plot_area_prokaryotic_different_k_c(
     #     0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800, save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
@@ -551,4 +588,6 @@ if __name__ == "__main__":
     # plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
     #     "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
 
-    yfp_plot()
+    yfp_plot(save_path="modelling/data/plots/T--TUDelft--YFP_Plot_Three_Regimes.svg")
+    plot_enzyme_concentration(
+        vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Plot_Enzyme_Concentration.svg")

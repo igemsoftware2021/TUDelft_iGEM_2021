@@ -252,14 +252,18 @@ def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_163329311
     # ax1.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporties for ax2
+    ax2_ylim = ax2.get_ylim()
+    ax2.set_ylim(1, ax2_ylim[1])
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(factor_names[:len(parameters)])
     # ax2.set_ylabel(r"Fold change")
     ax2.set_ylabel(
-        r"$\mathrm{{\mu}}^{\ast}$ fold change $[\mathrm{\mu M \cdot s}]$")
+        r"Fold change")
     # ax2.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporites for ax3
+    ax3_ylim = ax3.get_ylim()
+    ax3.set_ylim(1, ax3_ylim[1])
     ax3.set_xticks(np.arange(0, len(parameters)))
     ax3.set_xticklabels(factor_names[:len(parameters)])
     # ax2.set_ylabel(r"Fold change")
@@ -695,6 +699,8 @@ if __name__ == "__main__":
         parameters, 3*10**-3, 250, 0.05, 0.09)
     plot_morris_analysis_area_fold_change(
         path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400", standard_area=standard_area)
+    # plot_morris_analysis_area_fold_change(
+    #     path="modelling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
     # plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None)
     # plot_morris_analysis_area_mu_star_fold_change_multiple_DNA_conc(
     #     save_path=None)
