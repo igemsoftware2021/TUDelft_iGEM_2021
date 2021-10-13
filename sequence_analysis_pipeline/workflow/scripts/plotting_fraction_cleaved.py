@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/S2_D63_database.db"
+database_path = "./results/databases/S2_D63_15_database.db"
 # database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
@@ -17,7 +17,8 @@ with DatabaseInterfaceSequences(path=database_path) as db:
 
     num_ids = len(id_sequence_rows)
 
-    biosensor_array = np.zeros(num_ids+1, dtype=np.int8)
+    # Id position is a flag for a possible biosensor
+    biosensor_array = np.zeros(num_ids+1, dtype=np.int16)
 
     # First do negative ligand
     fraction_negative = np.zeros(num_ids+1, dtype=np.float64)
@@ -56,7 +57,7 @@ biosensor_array = biosensor_array == 1
 
 fig2, ax2 = plt.subplots()
 ax2.scatter(fraction_negative[non_biosensor_array],
-            fraction_positive[non_biosensor_array], s=2, alpha=1)
+            fraction_positive[non_biosensor_array], s=10, alpha=1)
 ax2.scatter(fraction_negative[biosensor_array],
             fraction_positive[biosensor_array], s=5, alpha=1, color="red")
 ax2.set_xlim([0, 100])

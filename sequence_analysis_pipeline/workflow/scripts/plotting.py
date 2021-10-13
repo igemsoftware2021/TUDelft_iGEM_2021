@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceSequences
 
-# database_path = "./results/databases/T1_D80_database_v2.db"
-database_path = snakemake.input[0]
+database_path = "./results/databases/S2_D63_15_database.db"
+# database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
 TABLE_ID_SEQ = "id_sequence"
@@ -87,9 +87,12 @@ ax.scatter(fc_array[non_biosensor_array],
 ax.scatter(fc_array[biosensor_array],
            p_value_minus_log_array[biosensor_array], s=2, alpha=1, color="red")
 ax.grid()
+
+ax.set_xlabel("fold change")
+ax.set_ylabel("-log10(p-value)")
 # ax.set_xlim([0.2, 10])
 # ax.set_ylim([0.0, 2])
-ax.set_xscale('log')
+# ax.set_xscale('log')
 # ax.set_yscale('log')
 # fig.savefig("fold_change_vs_fold_change_se.pdf", dpi=300)
 
