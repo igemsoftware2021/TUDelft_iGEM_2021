@@ -18,6 +18,7 @@ def i2c_multiplexer_select_channel(pi, i2c_multiplexer_handle, channel_number):
     channel_base_2_number = int(2 ** channel_number)
     pi.i2c_write_device(i2c_multiplexer_handle,
                         [0x80 | channel_base_2_number])
+    print(channel_number)
 
 
 def i2c_write_to_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, reg, data):
@@ -26,6 +27,13 @@ def i2c_write_to_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, chan
                                        i2c_multiplexer_handle, channel_number)
         i2c_sensor_handle.write_byte_data(
             reg, data)
+
+
+def i2c_set_gain_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, i2c_sensor_gain):
+    for channel_number in channel_numbers:
+        i2c_multiplexer_select_channel(pi,
+                                       i2c_multiplexer_handle, channel_number)
+        i2c_sensor_handle.ambient_light_gain = i2c_sensor_gain
 
 
 def i2c_change_gain_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, gain):
@@ -48,6 +56,7 @@ def determine_intensity_single_channel(pi, pin_light, i2c_multiplexer_handle, i2
                                    i2c_multiplexer_handle, channel_number)
     intensity = i2c_sensor_handle.ch0_light
     timepoint = time.time()
+    time.sleep(0.5)
     pi.write(pin_light, 0)
     return timepoint, intensity
 
