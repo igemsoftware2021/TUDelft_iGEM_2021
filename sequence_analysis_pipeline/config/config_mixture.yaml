@@ -1,5 +1,5 @@
-dataset: S2_D63_15
-minimum_reads: 15
+dataset: S2_D63
+minimum_reads: 25
 ligand_positive:
     prefixes:
         cleaved:

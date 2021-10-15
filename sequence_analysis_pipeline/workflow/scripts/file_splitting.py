@@ -3,7 +3,6 @@ from tqdm import tqdm
 import seq_helpers
 import yaml_read_helpers
 
-# seq_input_file = "results/read_counts/N35-I3_S3.txt"
 seq_input_file = snakemake.input[0]
 # seq_neg_ligand_file, seq_pos_ligand_file = "results/read_counts/N35-I3_S3_L0_read_count.txt", "results/read_counts/N35-I3_S3_L0_read_count.txt"
 seq_neg_ligand_file, seq_pos_ligand_file, seq_other_file = snakemake.output[
@@ -11,7 +10,7 @@ seq_neg_ligand_file, seq_pos_ligand_file, seq_other_file = snakemake.output[
 
 # Create the path to the config file
 config_file_path = Path(__file__).resolve(
-).parents[2] / "config" / "config_mixture.yaml"
+).parents[2] / "config" / "config_folate.yaml"
 
 ligand_pos_prefix_patterns = yaml_read_helpers.retrieve_compiled_patterns(
     config_file_path, pattern="prefix", ligand_present=True)
