@@ -1,8 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.ticker import MultipleLocator
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/S2_D63_15_database.db"
+database_path = "./results/databases/S1_D63_5_database.db"
 # database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
@@ -55,16 +56,55 @@ fraction_positive = fraction_positive * 100
 non_biosensor_array = biosensor_array == 0
 biosensor_array = biosensor_array == 1
 
-fig2, ax2 = plt.subplots()
+fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
 ax2.scatter(fraction_negative[non_biosensor_array],
-            fraction_positive[non_biosensor_array], s=10, alpha=1)
+            fraction_positive[non_biosensor_array], s=5, alpha=1, color="#057D54")
 ax2.scatter(fraction_negative[biosensor_array],
             fraction_positive[biosensor_array], s=5, alpha=1, color="red")
+
+ax2.plot(np.arange(100), np.arange(100),
+         color="#9B0138", label="reference", linestyle="dashed", linewidth=1)
+
+
 ax2.set_xlim([0, 100])
 ax2.set_ylim([0, 100])
-ax2.set_xlabel("c_s negative")
-ax2.set_ylabel("c_s positive")
-# ax2.set_xscale("log")
-# ax2.set_yscale("log")
-fig2.show()
+ax2.xaxis.set_major_locator(MultipleLocator(10))
+ax2.xaxis.set_minor_locator(MultipleLocator(5))
+ax2.yaxis.set_major_locator(MultipleLocator(10))
+ax2.yaxis.set_minor_locator(MultipleLocator(5))
+
+ax2.set_xlabel("Fraction cleaved (-folate)")
+ax2.set_ylabel("Fraction cleaved (+folate)")
+
+# ax2.set_xscale("symlog")
+# # ax2.set_yscale("log")
+# fig2.show()
 plt.show()
+
+
+# ax2.set_yscale("log")
+# ax2.set_ylim((0, 10))
+# ax2.spines["top"].set_visible(False)
+# ax2.xaxis.set_ticks_position("bottom")
+
+# divider = make_axes_locatable(ax2)
+# ax2_lin = divider.append_axes("top", size=2.0, pad=0, sharex=ax2)
+# ax2_lin.scatter(fraction_negative[non_biosensor_array],
+#                 fraction_positive[non_biosensor_array], s=10, alpha=1)
+# ax2_lin.scatter(fraction_negative[biosensor_array],
+#                 fraction_positive[biosensor_array], s=5, alpha=1, color="red")
+# ax2_lin.set_xscale("linear")
+# ax2_lin.set_ylim((10, 90))
+
+# ax2_log2 = divider.append_axes("top", size=2.0, pad=0, sharex=ax2)
+# ax2_log2.scatter(fraction_negative[non_biosensor_array],
+#                  fraction_positive[non_biosensor_array], s=10, alpha=1)
+# ax2_log2.scatter(fraction_negative[biosensor_array],
+#                  fraction_positive[biosensor_array], s=5, alpha=1, color="red")
+# ax2_log2.set_yscale("log")
+# ax2_log2.set_ylim((90, 100))
+
+# # Removes the bottom axis line
+# ax2_lin.spines["bottom"].set_visible(False)
+# ax2_lin.xaxis.set_ticks_position("top")
+# plt.setp(ax2_lin.get_xticklabels(), visible=False)

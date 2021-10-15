@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MultipleLocator
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 from database_interface import DatabaseInterfaceSequences
 
 database_path1 = "./results/databases/S1_D63_database.db"
@@ -90,6 +90,10 @@ for database_path in [database_path1, database_path2]:
     handle.xaxis.set_minor_locator(MultipleLocator(5))
     handle.yaxis.set_major_locator(MultipleLocator(10))
     handle.yaxis.set_minor_locator(MultipleLocator(5))
+
+    # Add a percentage sign to the values
+    handle.xaxis.set_major_formatter(FormatStrFormatter("%d%%"))
+    handle.yaxis.set_major_formatter(FormatStrFormatter("%d%%"))
 
     if count == 0:
         handle.set_xlabel("Fraction cleaved (-folate)")
