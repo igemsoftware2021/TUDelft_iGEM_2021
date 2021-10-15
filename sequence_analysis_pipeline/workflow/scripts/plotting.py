@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/S2_D63_15_database.db"
+database_path = "./results/databases/S2_D63_database.db"
 # database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
@@ -80,17 +80,17 @@ biosensor_array = biosensor_array == 1
 
 p_value_minus_log_array = - np.log(p_value_array)
 
-fig1, ax = plt.subplots()
-# ax.scatter(fold_change_array, fold_change_sd_array, s=2, alpha=1)
-ax.scatter(fc_array[non_biosensor_array],
-           p_value_minus_log_array[non_biosensor_array], s=2, alpha=1)
-ax.scatter(fc_array[biosensor_array],
-           p_value_minus_log_array[biosensor_array], s=2, alpha=1, color="red")
-ax.grid()
+# fig1, ax = plt.subplots()
+# # ax.scatter(fold_change_array, fold_change_sd_array, s=2, alpha=1)
+# ax.scatter(fc_array[non_biosensor_array],
+#            p_value_minus_log_array[non_biosensor_array], s=2, alpha=1)
+# ax.scatter(fc_array[biosensor_array],
+#            p_value_minus_log_array[biosensor_array], s=2, alpha=1, color="red")
+# ax.grid()
 
-ax.set_xlabel("fold change")
-ax.set_ylabel("-log10(p-value)")
-# ax.set_xlim([0.2, 10])
+# ax.set_xlabel("fold change")
+# ax.set_ylabel("-log10(p-value)")
+# # ax.set_xlim([0.2, 10])
 # ax.set_ylim([0.0, 2])
 # ax.set_xscale('log')
 # ax.set_yscale('log')
@@ -102,10 +102,13 @@ ax2.scatter(fc_array[non_biosensor_array],
             fc_se_array[non_biosensor_array], s=2, alpha=1)
 ax2.scatter(fc_array[biosensor_array],
             fc_se_array[biosensor_array], s=2, alpha=1, color="red")
-ax2.set_xscale("log")
-ax2.set_yscale("log")
+
+# ax2.set_xticks([10, 20, 30, 40, 50, 60, 70, 80, 90,
+#                91, 92, 93, 94, 95, 96, 97, 98, 99, 99.5])
+# ax2.set_xscale("log")
+# ax2.set_yscale("log")
 ax2.grid(True)
 
 plt.show()
-fig1.show()
+# fig1.show()
 fig2.show()
