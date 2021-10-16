@@ -106,11 +106,44 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
         plt.show()
 
 
-def plot_enzyme_concentration(vit_conc: float = 0.07, dna_conc: float = 5*10**-3, s_i: float = 250, save_path: str = None):
+def plot_TlR_over_time(vit_conc: float = 0.07, dna_conc: float = 5*10**-3, s_i: float = 250, save_path: str = None):
 
     custom_cycler = custom_aptavita_color_cycler()
 
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+
+    ax1.set_prop_cycle(custom_cycler)
+
+    parameters = standard_parameters_prokaryotic()
+
+    initial_conditions = np.array([dna_conc, s_i, vit_conc])
+
+    results = model_prokaryotic_all(
+        parameters, initial_conditions, dt=0.01, t_tot=43200)
+
+    time = results[0]
+    tlr = results[8]
+
+    time_h = time / 3600
+    ax1.plot(time_h, tlr, linewidth=2)
+
+    # Set minor and major tick locator
+    ax1.xaxis.set_major_locator(MultipleLocator(1))
+    ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
+    ax1.set_xlim(0, 12)
+    ax1.set_xlabel(r"Time $[\mathrm{h}]$")
+    # ax1.set_ylabel()
+    if save_path is not None:
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
+    else:
+        plt.show()
+
+
+def plot_enzyme_mon_and_enzyme_conc(dna_conc: float = 5*10**-3, s_i: float = 250, save_path: str = None):
+
+    custom_cycler = custom_aptavita_color_cycler()
+
+    fig1, ax1 = plt.subplots(figsize=(10, 6), dpi=150)
 
     ax1.set_prop_cycle(custom_cycler)
 
@@ -127,16 +160,20 @@ def plot_enzyme_concentration(vit_conc: float = 0.07, dna_conc: float = 5*10**-3
         parameters, initial_conditions, dt=0.01, t_tot=43200)
 
     time = results[0]
+    enzyme_mon_conc = results[9]
     enzyme_conc = results[10]
 
     time_h = time / 3600
-    ax1.plot(time_h, enzyme_conc, linewidth=2)
+    ax1.plot(time_h, enzyme_mon_conc, linewidth=2,
+             label="$\mathrm{E}^{\\ast}$")
+    ax1.plot(time_h, enzyme_conc, linewidth=2, label="$\mathrm{E}$")
     # Set minor and major tick locator
     ax1.xaxis.set_major_locator(MultipleLocator(1))
     ax1.xaxis.set_minor_locator(MultipleLocator(0.5))
     ax1.set_xlim(0, 12)
     ax1.set_xlabel(r"Time $[\mathrm{h}]$")
-    ax1.set_ylabel(r"Enzyme concentration $[\mathrm{\mu M}]$")
+    ax1.set_ylabel(r"Concentration $[\mathrm{\mu M}]$")
+    ax1.legend(title="Species")
     if save_path is not None:
         fig1.savefig(f"{save_path}", format="svg", dpi=1200)
     else:
@@ -576,8 +613,8 @@ def k_D_plot():
 
 if __name__ == "__main__":
 
-    plot_prokaryotic_different_vitamin_conc(
-        [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
+    # plot_prokaryotic_different_vitamin_conc(
+    # [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
 
     # plot_area_prokaryotic_different_k_c(
     #     0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800, save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
@@ -588,6 +625,8 @@ if __name__ == "__main__":
     # plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
     #     "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
 
-    yfp_plot(save_path="modelling/data/plots/T--TUDelft--YFP_Plot_Three_Regimes.svg")
-    plot_enzyme_concentration(
-        vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Plot_Enzyme_Concentration.svg")
+    # yfp_plot(save_path="modelling/data/plots/T--TUDelft--YFP_Plot_Three_Regimes.svg")
+    plot_enzyme_mon_and_enzyme_conc(
+        dna_conc=3*10**-3, s_i=250)  # , save_path="modelling/data/plots/T--TUDelft--Plot_Enzyme_Concentration.svg")
+    # plot_TlR_over_time(vit_conc=0.07, dna_conc=5 *
+    #                    10**-3, s_i=250, save_path=None)
