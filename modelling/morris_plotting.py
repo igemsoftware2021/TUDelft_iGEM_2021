@@ -226,55 +226,73 @@ def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_163329311
 
     mu = data_dict["mu"].reshape(-1)
     mu_star = data_dict["mu_star"].reshape(-1)
-    sigma = data_dict["sigma"].reshape(-1)
 
     custom_colors = custom_aptavita_colors()
     factor_names = senstivity_analysis_factor_names()
 
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
     fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
-    fig3, ax3 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig3, (ax3, ax4) = plt.subplots(
+        nrows=2, ncols=1, figsize=(12, 10), dpi=150)
 
     mu_fc = (standard_area + mu)/standard_area
     mu_star_fc = (standard_area + mu_star)/standard_area
-    sigma_fc = (standard_area + sigma)/standard_area
 
-    ax1.bar(np.arange(0, mu_fc.shape[0]), mu_fc, color=custom_colors)
+    # The mu fold change will be offset by 1, since that is the standard
+    # Hence all the values need to be lowered by 1 to get the correct
+    # bars
+    mu_fc_bar_value = mu_fc - 1
+
+    ax1.bar(np.arange(0, mu_fc.shape[0]),
+            mu_fc_bar_value, bottom=1, color=custom_colors)
     ax2.bar(np.arange(0, mu_star_fc.shape[0]), mu_star_fc, color=custom_colors)
-    ax3.bar(np.arange(0, sigma_fc.shape[0]), sigma_fc, color=custom_colors)
+
+    ax3.bar(np.arange(0, mu_fc.shape[0]),
+            mu_fc_bar_value, bottom=1, color=custom_colors)
+    ax4.bar(np.arange(0, mu_star_fc.shape[0]), mu_star_fc, color=custom_colors)
 
     # Set all proporties for ax1
-    # ax1.set_xlabel(r"Time $[s]$")
     ax1.set_xticks(np.arange(0, len(parameters)))
     ax1.set_xticklabels(factor_names[:len(parameters)])
     ax1.set_ylabel(r"Fold change")
-    # ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
-    # ax1.yaxis.set_major_locator(MultipleLocator(5000))
+    ax1.yaxis.set_minor_locator(MultipleLocator(0.1))
 
     # Set all proporties for ax2
     ax2_ylim = ax2.get_ylim()
     ax2.set_ylim(1, ax2_ylim[1])
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(factor_names[:len(parameters)])
-    # ax2.set_ylabel(r"Fold change")
     ax2.set_ylabel(
         r"Fold change")
-    # ax2.yaxis.set_major_locator(MultipleLocator(5000))
+    ax2.yaxis.set_minor_locator(MultipleLocator(0.1))
 
-    # Set all proporites for ax3
-    ax3_ylim = ax3.get_ylim()
-    ax3.set_ylim(1, ax3_ylim[1])
+    # Set all proporties for ax3
     ax3.set_xticks(np.arange(0, len(parameters)))
     ax3.set_xticklabels(factor_names[:len(parameters)])
-    # ax2.set_ylabel(r"Fold change")
-    ax3.set_ylabel(
-        r"$\mathrm{{\sigma}}$ fold change $[\mathrm{\mu M \cdot s}]$")
-    # ax3.yaxis.set_major_locator(MultipleLocator(5000))
+    ax3.set_ylabel(r"Fold change")
+    ax3.yaxis.set_minor_locator(MultipleLocator(0.1))
+
+    # Set all proporties for ax4
+    ax4_ylim = ax2.get_ylim()
+    ax4.set_ylim(1, ax2_ylim[1])
+    ax4.set_xticks(np.arange(0, len(parameters)))
+    ax4.set_xticklabels(factor_names[:len(parameters)])
+    ax4.set_ylabel(
+        r"Fold change")
+    ax4.yaxis.set_minor_locator(MultipleLocator(0.1))
+
+    # Set the character labels
+    ax3.text(-0.05, 1.05, "a", transform=ax3.transAxes,
+             size=16, weight="bold")
+    ax4.text(-0.05, 1.05, "b", transform=ax4.transAxes,
+             size=16, weight="bold")
 
     if save_path is not None:
-        fig1.savefig(f"{save_path}_mu_fc.svg", format="svg", dpi=1200)
-        fig2.savefig(f"{save_path}_mu_star_fc.svg", format="svg", dpi=1200)
-        fig3.savefig(f"{save_path}_sigma_fc.svg", format="svg", dpi=1200)
+        fig1.savefig(f"{save_path}_Mu_FC{tag}.svg", format="svg", dpi=1200)
+        fig2.savefig(f"{save_path}_Mu_Star_FC{tag}.svg",
+                     format="svg", dpi=1200)
+        fig3.savefig(f"{save_path}_Mu_FC_Mu_Star_FC_Subplot{tag}.svg",
+                     format="svg", dpi=1200)
     else:
         plt.show()
 
@@ -688,17 +706,17 @@ def morris_method_visualization():
 
 
 if __name__ == "__main__":
-    # morris_method_visualization()
+    morris_method_visualization()
     # plot_morris_analysis_mu_star_subplots(
     #     path="modelling/data", tag="_1633520689", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1633520689.svg")
     # plot_morris_analysis_area(
     #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
 
-    parameters = standard_parameters_prokaryotic()
-    standard_area = model_prokaryotic_area(
-        parameters, 3*10**-3, 250, 0.05, 0.09)
-    plot_morris_analysis_area_fold_change(
-        path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400", standard_area=standard_area)
+    # parameters = standard_parameters_prokaryotic()
+    # standard_area = model_prokaryotic_area(
+    #     parameters, 3*10**-3, 250, 0.05, 0.09)
+    # plot_morris_analysis_area_fold_change(
+    #     path="modelling/data", tag="_1633591400", standard_area=standard_area, save_path="modelling/data/plots/T--TUDelft--Morris_Area")
     # plot_morris_analysis_area_fold_change(
     #     path="modelling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
     # plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None)
