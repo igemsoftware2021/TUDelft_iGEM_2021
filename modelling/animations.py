@@ -68,10 +68,10 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=1000, low
         14, 10), gridspec_kw={"height_ratios": [2, 1]}, dpi=125)
 
     # Store the label str expressions
-    label_line1 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ fixed at {int(standard_dna_conc*1000)} $\mathrm{{nM}}$"
-    label_line2 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ fixed at {int(standard_dna_conc*1000)} $\mathrm{{nM}}$"
-    label_line3 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ variable"
-    label_line4 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $\mathrm{{DNA}}$ variable"
+    label_line1 = f"${int(vit_conc1*1000)}\;\mathrm{{nM}}$ - $\mathrm{{DNA}}$ fixed at {int(standard_dna_conc*1000)} $\mathrm{{nM}}$"
+    label_line2 = f"${int(vit_conc2*1000)}\;\mathrm{{nM}}$ - $\mathrm{{DNA}}$ fixed at {int(standard_dna_conc*1000)} $\mathrm{{nM}}$"
+    label_line3 = f"${int(vit_conc1*1000)}\;\mathrm{{nM}}$ - $\mathrm{{DNA}}$ variable"
+    label_line4 = f"${int(vit_conc2*1000)}\;\mathrm{{nM}}$ - $\mathrm{{DNA}}$ variable"
 
     # First normal product lines
     line1, = ax1.plot(time1[::plot_di], p1_standard[::plot_di],
@@ -110,7 +110,7 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=1000, low
         ax1.set_xlim(0, t_tot)
 
         # ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"DNA concentration $[\mathrm{{n M}}$]")
+        ax2.set_xlabel(r"DNA concentration $[\mathrm{{n M}}]$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
@@ -229,13 +229,13 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=1000, dna_conc
 
     # Create the figure
     fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(
-        14, 10), gridspec_kw={"height_ratios": [2, 1]}, dpi=125)
+        12, 8), gridspec_kw={"height_ratios": [2, 1]}, dpi=150)
 
     # Store the label str expressions
-    label_line1 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $0.017$ $\mathrm{{s}}^{{-1}}$"
-    label_line2 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $0.017$ $\mathrm{{s}}^{{-1}}$"
-    label_line3 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
-    label_line4 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
+    label_line1 = f"${int(vit_conc1*1000)}\;\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $0.017\;\mathrm{{s}}^{{-1}}$"
+    label_line2 = f"${int(vit_conc2*1000)}\;\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $0.017\;\mathrm{{s}}^{{-1}}$"
+    label_line3 = f"${int(vit_conc1*1000)}\;\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
+    label_line4 = f"${int(vit_conc2*1000)}\;\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
 
     # First normal product lines
     line1, = ax1.plot(time1[::plot_di], p1_standard[::plot_di],
@@ -258,20 +258,20 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=1000, dna_conc
     # Plot the position of the k_c that is the standard area
     ax2.scatter(standard_k_c, 1.0, color="#057D54")
 
-    k_c_math_exp = f"Cleaving rate: {k_c_all[0]:.2e} $\mathrm{{s}}^{{-1}}$"
-    k_c_text = ax1.text(0.01, 0.6, k_c_math_exp, transform=ax1.transAxes,
+    k_c_math_exp = f"$k_{{\mathrm{{c}}}} = {k_c_all[0]:.4f}\;\mathrm{{s}}^{{-1}}$"
+    k_c_text = ax1.text(0.01, 0.65, k_c_math_exp, transform=ax1.transAxes,
                         fontsize=10, bbox=dict(facecolor="#FFCE3A", alpha=0.5, boxstyle="round"))
 
     def init():
         # ax1.set_title("Product concentration over time")
         # ax1.legend(title="Vitamin concentration")
         ax1.legend()
-        ax1.set_xlabel(r"Time $[\mathrm{{s}}}$")
+        ax1.set_xlabel(r"Time $[\mathrm{{s}}]$")
         ax1.set_ylabel(r"Product concentration $[\mathrm{{\mu M}}]$")
         ax1.set_xlim(0, t_tot)
 
         # ax2.set_title("Relative area between two graphs over time")
-        ax2.set_xlabel(r"$k_\mathrm{c}$ $[\mathrm{{s}}^{{-1}}]$")
+        ax2.set_xlabel(r"$k_\mathrm{c}\;[\mathrm{{s}}^{{-1}}]$")
         ax2.set_ylabel("Relative area")
 
         # Determine how to set the x-axis for ax2
@@ -309,7 +309,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=1000, dna_conc
 
     def update(index):
 
-        k_c_math_exp = f"Cleaving rate: {k_c_all[index]:.2e} $\mathrm{{s}}^{{-1}}$"
+        k_c_math_exp = f"$k_{{\mathrm{{c}}}} = {k_c_all[index]:.4f}\;\mathrm{{s}}^{{-1}}$"
         k_c_text.set_text(k_c_math_exp)
 
         line3.set_data(time1[::plot_di], p1[index, ::plot_di])
@@ -610,8 +610,8 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 
 if __name__ == "__main__":
-    anim_two_vitamin_conc_differing_dna_conc(
-        0.05, 0.09, s_i=1000, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=20, dt=0.01, t_tot=14400)
+    # anim_two_vitamin_conc_differing_dna_conc(
+    #     0.05, 0.09, s_i=1000, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=20, dt=0.01, t_tot=14400)
     anim_two_vitamin_conc_differing_k_c(
         0.05, 0.09, s_i=1000, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=20, dt=0.01, t_tot=7200)
 
@@ -619,4 +619,4 @@ if __name__ == "__main__":
     #     0.05, 0.09, s_i=1000, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=361, dt=0.01, t_tot=10800, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_DNA_Conc.mp4")
 
     # anim_two_vitamin_conc_differing_k_c(
-    #     0.05, 0.09, s_i=1000, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=361, dt=0.01, t_tot=7200, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_k_c.mp4")
+    #     0.05, 0.09, s_i=1000, dna_conc=3*10**-3, low_k_c=(0.017)/10, standard_k_c=0.017, high_k_c=(0.017)*5, num_steps=361, dt=0.01, t_tot=7200, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_k_c.mp4")
