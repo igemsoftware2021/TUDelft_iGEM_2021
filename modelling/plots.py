@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
+from models_area import model_prokaryotic_area
 from models import model_prokaryotic, model_prokaryotic_all
 from standard_values import standard_parameters_prokaryotic, standard_constants, standard_initial_conditions
 from plot_helpers import custom_aptavita_colors, custom_aptavita_color_cycler, micromolar_conc_to_math_exp
@@ -51,7 +52,7 @@ def yfp_plot(save_path: str = None):
         plt.show()
 
 
-def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
+def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float = 3*10**-3, s_i: float = 1000, dt=0.01, t_tot=4800, save_path: str = None):
     """Function plots the product over time for different vitamin concentrations.
 
     Parameters
@@ -69,7 +70,7 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
     custom_cycler = custom_aptavita_color_cycler()
 
     # Create the figure
-    fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
+    fig1, ax1 = plt.subplots(figsize=(10, 6), dpi=150)
 
     ax1.set_prop_cycle(custom_cycler)
 
@@ -86,7 +87,7 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
 
         # Run the simulation
         time, p = model_prokaryotic(
-            parameters, initial_conditions, dt=0.01, t_tot=4800)
+            parameters, initial_conditions, dt=dt, t_tot=t_tot)
 
         ax1.plot(time, p,
                  label=f"{int(vit_conc * 1000)} $\mathrm{{nM}}$")
@@ -106,7 +107,7 @@ def plot_prokaryotic_different_vitamin_conc(vit_conc_list: list, dna_conc: float
         plt.show()
 
 
-def plot_TlR_over_time(vit_conc: float = 0.07, dna_conc: float = 5*10**-3, s_i: float = 250, save_path: str = None):
+def plot_TlR_over_time(vit_conc: float = 0.07, dna_conc: float = 5*10**-3, s_i: float = 1000, save_path: str = None):
 
     custom_cycler = custom_aptavita_color_cycler()
 
@@ -139,7 +140,7 @@ def plot_TlR_over_time(vit_conc: float = 0.07, dna_conc: float = 5*10**-3, s_i: 
         plt.show()
 
 
-def plot_enzyme_mon_and_enzyme_conc(dna_conc: float = 5*10**-3, s_i: float = 250, save_path: str = None):
+def plot_enzyme_mon_and_enzyme_conc(dna_conc: float = 5*10**-3, s_i: float = 1000, save_path: str = None):
 
     custom_cycler = custom_aptavita_color_cycler()
 
@@ -180,7 +181,7 @@ def plot_enzyme_mon_and_enzyme_conc(dna_conc: float = 5*10**-3, s_i: float = 250
         plt.show()
 
 
-def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 3*10**-3, s_i: float = 250, dt=0.01, t_tot=4800, save_path: str = None):
+def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 3*10**-3, s_i: float = 1000, dt=0.01, t_tot=4800, save_path: str = None):
     """Function plots the absorbance over time for different vitamin concentrations.
 
     Parameters
@@ -203,7 +204,7 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
     custom_cycler = custom_aptavita_color_cycler()
 
     # Create the figure
-    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(14, 10), dpi=125)
+    fig, (ax1, ax2) = plt.subplots(nrows=2, ncols=1, figsize=(12, 8), dpi=150)
 
     ax1.set_prop_cycle(custom_cycler)
     ax2.set_prop_cycle(custom_cycler)
@@ -212,9 +213,11 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
     # for every simulation
     parameters = standard_parameters_prokaryotic()
 
+    area_reference = model_prokaryotic_area(
+        parameters, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
+
     initial_conditions1 = np.array([dna_conc, s_i, vit_conc1])
     initial_conditions2 = np.array([dna_conc, s_i, vit_conc2])
-
     time1, p1 = model_prokaryotic(
         parameters, initial_conditions1, dt=dt, t_tot=t_tot)
     time2, p2 = model_prokaryotic(
@@ -228,6 +231,12 @@ def plot_area_prokaryotic_different_k_c(vit_conc1, vit_conc2, dna_conc: float = 
 
     parameters_adjusted = parameters.copy()
     parameters_adjusted[13] = 1/600
+
+    area_adjusted = model_prokaryotic_area(
+        parameters_adjusted, dna_conc=dna_conc, s_i=s_i, vit_conc1=vit_conc1, vit_conc2=vit_conc2, dt=dt, t_tot=t_tot)
+
+    fold_change = (area_reference + area_adjusted) / area_reference
+    print(f"Fold change: {fold_change}")
 
     time_adjusted1, p_adjusted1 = model_prokaryotic(
         parameters_adjusted, initial_conditions1, dt=dt, t_tot=t_tot)
@@ -415,7 +424,7 @@ def plot_absolute_mrna_prokaryotic(vit_conc: list, dna_conc: float = 5*10**-3, s
         plt.show()
 
 
-def plot_total_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
+def plot_total_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 1000, save_path: str = None):
 
     custom_cycler = custom_aptavita_color_cycler()
 
@@ -456,7 +465,7 @@ def plot_total_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list
         plt.show()
 
 
-def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
+def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 1000, save_path: str = None):
 
     custom_colors = custom_aptavita_colors()
 
@@ -507,7 +516,7 @@ def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list
         plt.show()
 
 
-def plot_dumrna_dt_different_dna_conc(dna_conc_list: list, dna_conc_list_names: list, vit_conc_list: float, s_i: float = 250, save_path: str = None):
+def plot_dumrna_dt_different_dna_conc(dna_conc_list: list, dna_conc_list_names: list, vit_conc_list: float, s_i: float = 1000, save_path: str = None):
 
     custom_cycler = custom_aptavita_color_cycler()
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
@@ -544,7 +553,7 @@ def plot_dumrna_dt_different_dna_conc(dna_conc_list: list, dna_conc_list_names: 
         plt.show()
 
 
-def plot_dumrna_dt_different_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 250, save_path: str = None):
+def plot_dumrna_dt_different_k_c(k_c_list: list, k_c_list_names: list, vit_conc: float, dna_conc: float = 3*10**-3, s_i: float = 1000, save_path: str = None):
 
     custom_cycler = custom_aptavita_color_cycler()
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
@@ -614,19 +623,25 @@ def k_D_plot():
 if __name__ == "__main__":
 
     # plot_prokaryotic_different_vitamin_conc(
-    # [0.05, 0.09], dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
+    #     [0.07], dna_conc=3*10**-3, s_i=1000, dt=0.01, t_tot=5400)
 
-    # plot_area_prokaryotic_different_k_c(
-    #     0.05, 0.09, dna_conc=3*10**-3, s_i=250, dt=0.01, t_tot=4800, save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
+    # plot_prokaryotic_different_vitamin_conc(
+    #     [0.05, 0.09], dna_conc=3*10**-3, s_i=1000, dt=0.01, t_tot=5400)
+
+    # plot_prokaryotic_different_vitamin_conc(
+    #     [0.05, 0.09], dna_conc=3*10**-3, s_i=1000, save_path="modelling/data/plots/T--TUDelft--Model_Example_Plot.svg")
+
+    plot_area_prokaryotic_different_k_c(
+        0.05, 0.09, dna_conc=3*10**-3, s_i=1000, dt=0.01, t_tot=7200)  # , save_path="modelling/data/plots/T--TUDelft--Area_Example_Plot.svg")
 
     # plot_dumrna_dt_different_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
-    #                              "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--dumRNA_dt_Different_k_c_Plot.svg")
+    #                              "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=1000, save_path="modelling/data/plots/T--TUDelft--dumRNA_dt_Different_k_c_Plot.svg")
 
     # plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[1/60, 1/300, 1/600], k_c_list_names=[
-    #     "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=250, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
+    #     "1/60", "1/300", "1/600"], vit_conc=0.07, dna_conc=3*10**-3, s_i=1000, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
 
     # yfp_plot(save_path="modelling/data/plots/T--TUDelft--YFP_Plot_Three_Regimes.svg")
-    plot_enzyme_mon_and_enzyme_conc(
-        dna_conc=3*10**-3, s_i=250)  # , save_path="modelling/data/plots/T--TUDelft--Plot_Enzyme_Concentration.svg")
+    # plot_enzyme_mon_and_enzyme_conc(
+    #     dna_conc=3*10**-3, s_i=1000)  # , save_path="modelling/data/plots/T--TUDelft--Plot_Enzyme_Concentration.svg")
     # plot_TlR_over_time(vit_conc=0.07, dna_conc=5 *
-    #                    10**-3, s_i=250, save_path=None)
+    #                    10**-3, s_i=1000, save_path=None)
