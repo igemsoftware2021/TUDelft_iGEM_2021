@@ -164,7 +164,7 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
     return time[::10], mu, mu_star, sigma, mu_star_conf
 
 
-def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 7200, num_levels: int = 4, optimal_trajectories: int = 10, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
+def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_conc1, vit_conc2, dt: int = 0.01, t_tot: int = 10800, num_levels: int = 4, optimal_trajectories: int = 10, local_optimization: bool = True, num_resamples: int = 1000, conf_level: float = 0.95, print_to_console: bool = False, seed: int = None):
     # TODO finish this function, I only copied it and changed the input arguments
     """Function does Morris analysis on a function/model.
 
@@ -255,8 +255,9 @@ def morris_analysis_area_prokaryotic(problem, trajectories, dna_conc, s_i, vit_c
     model_input = morris_sample.sample(
         problem, trajectories, num_levels=num_levels, optimal_trajectories=optimal_trajectories, local_optimization=local_optimization, seed=seed)
 
-    # np.savetxt("modelling/trajectories_nice_area_no_dna.txt", model_input)
-    # model_input = np.loadtxt("modelling/trajectories_nice_area_no_dna.txt")
+    # Used to allow for easy rerunning by storing the optimal trajectories
+    # np.savetxt("modelling/trajectories_nice_area.txt", model_input)
+    # model_input = np.loadtxt("modelling/trajectories_nice_area.txt")
 
     # Check if you need to override the dna_conc variable then do np.delete()
     # https://stackoverflow.com/questions/24027040/how-to-extract-all-columns-but-one-from-an-array-or-matrix-in-python
