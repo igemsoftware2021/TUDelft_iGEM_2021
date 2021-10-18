@@ -82,7 +82,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
     factor_names = senstivity_analysis_factor_names()
 
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
-        nrows=2, ncols=2, figsize=(14, 10), dpi=125)
+        nrows=2, ncols=2, figsize=(12, 9), dpi=150)
 
     # Set the color cycler
     # ax1.set_prop_cycle(custom_cycler)
@@ -142,6 +142,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
     ax1.set_xlabel(r"Time $[\mathrm{s}]$")
     ax1.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
     ax1_ylim = ax1.get_ylim()
+    ax1.yaxis.set_major_locator(MultipleLocator(50))
 
     # Set all proporties for ax2
     ax2.legend()
@@ -233,7 +234,7 @@ def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_163329311
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
     fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
     fig3, (ax3, ax4) = plt.subplots(
-        nrows=2, ncols=1, figsize=(12, 10), dpi=150)
+        nrows=2, ncols=1, figsize=(12, 10), gridspec_kw={"height_ratios": [3, 2]}, dpi=150)
 
     mu_fc = (standard_area + mu)/standard_area
     mu_star_fc = (standard_area + mu_star)/standard_area
@@ -706,17 +707,17 @@ def morris_method_visualization():
 
 
 if __name__ == "__main__":
-    morris_method_visualization()
+    # morris_method_visualization()
     # plot_morris_analysis_mu_star_subplots(
-    #     path="modelling/data", tag="_1633520689", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1633520689.svg")
+    #     path="modelling/data", tag="_1634552273", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1634552273.svg")
     # plot_morris_analysis_area(
     #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
 
-    # parameters = standard_parameters_prokaryotic()
-    # standard_area = model_prokaryotic_area(
-    #     parameters, 3*10**-3, 250, 0.05, 0.09)
-    # plot_morris_analysis_area_fold_change(
-    #     path="modelling/data", tag="_1633591400", standard_area=standard_area, save_path="modelling/data/plots/T--TUDelft--Morris_Area")
+    parameters = standard_parameters_prokaryotic()
+    standard_area = model_prokaryotic_area(
+        parameters, 3*10**-3, 1000, 0.05, 0.09, dt=0.01, t_tot=10800)
+    plot_morris_analysis_area_fold_change(
+        path="modelling/data", tag="_1634558479", standard_area=standard_area)  # , save_path="modelling/data/plots/T--TUDelft--Morris_Area")
     # plot_morris_analysis_area_fold_change(
     #     path="modelling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
     # plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None)
