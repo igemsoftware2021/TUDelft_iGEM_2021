@@ -13,7 +13,7 @@ def run_morris_analysis_prokaryotic(path="modelling/data", tag=f"_{int(time.time
     num_optimal_trajectories = 70
 
     # Set the time of the simulation and timesteps
-    t_tot = 10800
+    t_tot = 7200
     dt = 0.01
 
     var_names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
@@ -25,8 +25,8 @@ def run_morris_analysis_prokaryotic(path="modelling/data", tag=f"_{int(time.time
     # Set the parameters and the parameter ranges
     parameters = standard_parameters_prokaryotic()
 
-    dna_conc = 0.3*10**-3
-    s_i = 250
+    dna_conc = 3*10**-3
+    s_i = 1000
     vit_conc = 0.07
 
     initial_conditions = np.array([dna_conc, s_i, vit_conc])
@@ -65,8 +65,7 @@ def run_morris_analysis_prokaryotic(path="modelling/data", tag=f"_{int(time.time
                     parameters[12]],  # (12) k_off
                    [lower_range * parameters[13], upper_range * \
                     parameters[13]],  # ,  # (13) k_c
-                   [lower_range * dna_conc, upper_range * \
-                    dna_conc],  # (14) dna_conc
+                   [0.3*10**-3, 6*10**-3],  # (14) dna_conc
                    [lower_range * vit_conc, upper_range * vit_conc]]  # (15) vit_conc
     }
 
@@ -93,7 +92,7 @@ def run_morris_analysis_area_prokaryotic(path="modelling/data", tag=f"_{int(time
     num_optimal_trajectories = 70
 
     # Set the time of the simulation and timesteps
-    t_tot = 7200
+    t_tot = 10800
     dt = 0.01
 
     var_names = ["k_ts", "k_tl", "k_mat", "k_cat", "k_s", "kc_s", "k_l",
@@ -106,7 +105,7 @@ def run_morris_analysis_area_prokaryotic(path="modelling/data", tag=f"_{int(time
     parameters = standard_parameters_prokaryotic()
 
     dna_conc = 3*10**-3
-    s_i = 250
+    s_i = 1000
     vit_conc1 = 0.05
     vit_conc2 = 0.09
 
@@ -144,8 +143,7 @@ def run_morris_analysis_area_prokaryotic(path="modelling/data", tag=f"_{int(time
                     parameters[12]],  # (12) k_off
                    [lower_range * parameters[13], upper_range * \
                     parameters[13]],  # ,  # (13) k_c
-                   [lower_range * dna_conc, upper_range * \
-                    dna_conc]],  # (14) dna_conc
+                   [0.3*10**-3, 6*10**-3]],  # (14) dna_conc
     }
 
     # Check if the number of variable names givens is equal to the number of bounds given
