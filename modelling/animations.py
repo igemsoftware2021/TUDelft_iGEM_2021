@@ -7,7 +7,7 @@ from plot_helpers import micromolar_conc_to_math_exp
 from matplotlib.ticker import MultipleLocator
 
 
-def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_dna_conc=1*10**-6, standard_dna_conc=3*10**-3, high_dna_conc=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
+def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=1000, low_dna_conc=1*10**-6, standard_dna_conc=3*10**-3, high_dna_conc=5*10**-3, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
     """All inputs are in micromolar"""
 
     # The difference in dt between every plotted point, this is done to speed up the animation
@@ -172,7 +172,7 @@ def anim_two_vitamin_conc_differing_dna_conc(vit_conc1, vit_conc2, s_i=250, low_
         plt.show()
 
 
-def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*10, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
+def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=1000, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*10, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
     """All inputs are in micromolar"""
 
     # The difference in dt between every plotted point, this is done to speed up the animation
@@ -232,8 +232,8 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
         14, 10), gridspec_kw={"height_ratios": [2, 1]}, dpi=125)
 
     # Store the label str expressions
-    label_line1 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $1/60$ $\mathrm{{s}}^{{-1}}$"
-    label_line2 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $1/60$ $\mathrm{{s}}^{{-1}}$"
+    label_line1 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $0.017$ $\mathrm{{s}}^{{-1}}$"
+    label_line2 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ fixed at $0.017$ $\mathrm{{s}}^{{-1}}$"
     label_line3 = f"${int(vit_conc1*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
     label_line4 = f"${int(vit_conc2*1000)}$ $\mathrm{{nM}}$ - $k_\mathrm{{c}}$ variable"
 
@@ -335,7 +335,7 @@ def anim_two_vitamin_conc_differing_k_c(vit_conc1, vit_conc2, s_i=250, dna_conc=
         plt.show()
 
 
-def anim_two_vitamin_conc_differing_k_D(vit_conc1, vit_conc2, s_i=250, dna_conc=3*10**-3, low_k_D=0.005, standard_k_D=0.05, high_k_D=5, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
+def anim_two_vitamin_conc_differing_k_D(vit_conc1, vit_conc2, s_i=1000, dna_conc=3*10**-3, low_k_D=0.005, standard_k_D=0.05, high_k_D=5, num_steps=10, dt=0.01, t_tot=7200, save_path=None):
     """All inputs are in micromolar"""
 
     # The difference in dt between every plotted point, this is done to speed up the animation
@@ -611,7 +611,12 @@ def anim_frac_mrna_conc_differing_dna_conc(vit_conc1, low_dna_conc=1*10**-6, hig
 
 if __name__ == "__main__":
     anim_two_vitamin_conc_differing_dna_conc(
-        0.05, 0.09, s_i=250, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=361, dt=0.01, t_tot=10800, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_DNA_Conc.mp4")
-
+        0.05, 0.09, s_i=1000, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=20, dt=0.01, t_tot=14400)
     anim_two_vitamin_conc_differing_k_c(
-        0.05, 0.09, s_i=250, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=361, dt=0.01, t_tot=7200, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_k_c.mp4")
+        0.05, 0.09, s_i=1000, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=20, dt=0.01, t_tot=7200)
+
+    # anim_two_vitamin_conc_differing_dna_conc(
+    #     0.05, 0.09, s_i=1000, low_dna_conc=0.3*10**-4, standard_dna_conc=3*10**-3, high_dna_conc=6*10**-3, num_steps=361, dt=0.01, t_tot=10800, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_DNA_Conc.mp4")
+
+    # anim_two_vitamin_conc_differing_k_c(
+    #     0.05, 0.09, s_i=1000, dna_conc=3*10**-3, low_k_c=(1/60)/10, standard_k_c=1/60, high_k_c=(1/60)*5, num_steps=361, dt=0.01, t_tot=7200, save_path="modelling/data/plots/T--TUDelft--Animation_Differing_k_c.mp4")
