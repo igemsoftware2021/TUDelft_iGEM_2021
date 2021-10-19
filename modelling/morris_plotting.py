@@ -41,12 +41,12 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     # Set all proporties for ax1
     ax1.legend()
     ax1.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M}]$")
+    ax1.set_ylabel(r"$\mu\;[\mathrm{\mu M}]$")
 
     # Set all proporties for ax2
     ax2.legend()
     ax2.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
+    ax2.set_ylabel(r"$\mu^{\ast}\;[\mathrm{\mu M}]$")
 
     # Set all proporites for ax3
     ax3.legend()
@@ -56,7 +56,7 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     ax4.legend()
     ax4.set_xlabel(r"Time $\mathrm{(s)}$")
     ax4.set_ylabel(
-        r"$\mathrm{{\mu}}^{\ast}$ $95\%$-confidence interval $[\mathrm{\mu M}]$")
+        r"$\mu^{\ast}\;95\%$-confidence interval $[\mathrm{\mu M}]$")
 
     if save_path is not None:
         fig1.savefig(f"{save_path}/plot_mu{tag}", format="svg", dpi=1200)
@@ -140,25 +140,25 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
     # Set all proporties for ax1
     ax1.legend(loc="upper left")
     ax1.set_xlabel(r"Time $[\mathrm{s}]$")
-    ax1.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
+    ax1.set_ylabel(r"$\mu^{\ast}\;[\mathrm{\mu M}]$")
     ax1_ylim = ax1.get_ylim()
     ax1.yaxis.set_major_locator(MultipleLocator(50))
 
     # Set all proporties for ax2
     ax2.legend()
     ax2.set_xlabel(r"Time $[\mathrm{s}]$")
-    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
+    ax2.set_ylabel(r"$\mu^{\ast}\;[\mathrm{\mu M}]$")
     # ax2.set_ylim(ax1_ylim)
 
     # Set all proporites for ax3
     ax3.legend()
     ax3.set_xlabel(r"Time $[\mathrm{s}]$")
-    ax3.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
+    ax3.set_ylabel(r"$\mu^{\ast}\;[\mathrm{\mu M}]$")
     # ax3.set_ylim(ax1_ylim)
 
     ax4.legend()
     ax4.set_xlabel(r"Time $[\mathrm{s}]$")
-    ax4.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M}]$")
+    ax4.set_ylabel(r"$\mu^{\ast}\;[\mathrm{\mu M}]$")
     # ax4.set_ylim(ax1_ylim)
 
     # Set the character labels
@@ -199,13 +199,13 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_pat
     # ax1.set_xlabel(r"Time $[s]$")
     ax1.set_xticks(np.arange(0, len(parameters)))
     ax1.set_xticklabels(factor_names[:len(parameters)])
-    ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
+    ax1.set_ylabel(r"$\mu\;[\mathrm{\mu M \cdot s}]$")
     ax1.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporties for ax2
     ax2.set_xticks(np.arange(0, len(parameters)))
     ax2.set_xticklabels(factor_names[:len(parameters)])
-    ax2.set_ylabel(r"$\mathrm{{\mu}}^{\ast}$ $[\mathrm{\mu M \cdot s}]$")
+    ax2.set_ylabel(r"$\mu^{\ast}\;[\mathrm{\mu M \cdot s}]$")
     ax2.yaxis.set_major_locator(MultipleLocator(5000))
 
     # Set all proporites for ax3
@@ -374,7 +374,7 @@ def plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None):
     ax1.set_xticks(np.arange(0, len(parameters1)))
     ax1.set_xticklabels(factor_names[:len(parameters1)])
     ax1.set_ylabel(r"Fold change")
-    # ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax1.set_ylabel(r"$\mu\;[\mathrm{\mu M \cdot s}]$")
     ax1.yaxis.set_major_locator(MultipleLocator(0.5))
 
     if save_path is not None:
@@ -459,7 +459,7 @@ def plot_morris_analysis_area_mu_star_fold_change_multiple_DNA_conc(save_path=No
     ax1.set_xticks(np.arange(0, len(parameters1)))
     ax1.set_xticklabels(factor_names[:len(parameters1)])
     ax1.set_ylabel(r"Fold change")
-    # ax1.set_ylabel(r"$\mathrm{{\mu}}$ $[\mathrm{\mu M \cdot s}]$")
+    # ax1.set_ylabel(r"$\mu\;[\mathrm{\mu M \cdot s}]$")
     ax1.yaxis.set_major_locator(MultipleLocator(0.5))
     ax1.axhline(1, color="#4D94EF", linestyle="dashed")
 
@@ -708,8 +708,8 @@ def morris_method_visualization():
 
 if __name__ == "__main__":
     # morris_method_visualization()
-    # plot_morris_analysis_mu_star_subplots(
-    #     path="modelling/data", tag="_1634552273", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1634552273.svg")
+    plot_morris_analysis_mu_star_subplots(
+        path="modelling/data", tag="_1634552273", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1634552273.svg")
     # plot_morris_analysis_area(
     #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
 
@@ -717,7 +717,7 @@ if __name__ == "__main__":
     standard_area = model_prokaryotic_area(
         parameters, 3*10**-3, 1000, 0.05, 0.09, dt=0.01, t_tot=10800)
     plot_morris_analysis_area_fold_change(
-        path="modelling/data", tag="_1634558479", standard_area=standard_area)  # , save_path="modelling/data/plots/T--TUDelft--Morris_Area")
+        path="modelling/data", tag="_1634558479", standard_area=standard_area, save_path="modelling/data/plots/T--TUDelft--Morris_Area")
     # plot_morris_analysis_area_fold_change(
     #     path="modelling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
     # plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None)
