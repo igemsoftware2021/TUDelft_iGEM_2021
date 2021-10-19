@@ -15,9 +15,9 @@ def i2c_multiplexer_select_channel(pi, i2c_multiplexer_handle, channel_number):
     channel_number: int
         Number of the channel that should be selected on the multiplexer.
     """
-    channel_base_2_number = int(2 ** channel_number)
+    channel_number_base_2 = 2 ** channel_number
     pi.i2c_write_device(i2c_multiplexer_handle,
-                        [0x80 | channel_base_2_number])
+                        [(channel_number_base_2)])
     print(channel_number)
 
 
@@ -56,7 +56,7 @@ def determine_intensity_single_channel(pi, pin_light, i2c_multiplexer_handle, i2
                                    i2c_multiplexer_handle, channel_number)
     intensity = i2c_sensor_handle.ch0_light
     timepoint = time.time()
-    time.sleep(0.5)
+    time.sleep(0.25)
     pi.write(pin_light, 0)
     return timepoint, intensity
 
