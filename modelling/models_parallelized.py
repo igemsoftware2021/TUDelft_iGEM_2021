@@ -36,7 +36,6 @@ def model_no_aptamer_parallel(parameters, constants, initial_conditions, dt: int
     # The number of simulations
     num_simulations = parameters.shape[0]
     model_output = np.zeros((n, num_simulations))
-    # Every column is a unique simulation
     for ii in prange(num_simulations):
         _, model_output[:, ii] = model_no_aptamer(
             parameters[ii, :], constants, initial_conditions[ii, :], dt=dt, t_tot=t_tot)
@@ -46,7 +45,7 @@ def model_no_aptamer_parallel(parameters, constants, initial_conditions, dt: int
 @njit(parallel=True)
 def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
     """"Function runs a simulations of the kinetics of the prokaryotic
-    AptaVita system parallel using the Numba library.
+    AptaVita system in parallel using the Numba library.
 
     Parameters
     ----------
