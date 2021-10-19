@@ -51,9 +51,7 @@ def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t
     ----------
     parameters: numpy.array
         The Numpy array containing all the parameters for the model of dtype=float
-    constants: numpy.array
-        The Numpy array containing all the constants for the model of dtype=float
-    initial_condition: numpy.array (2D)
+    initial_condition: numpy.array
         The Numpy array containing all the initial conditions for the model of dtype=float
     dt: int
         The time each timestep takes in seconds. (default 0.01)
