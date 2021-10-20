@@ -135,16 +135,16 @@ def plot_absorbance_spectrum_cpr(save_path: str = None):
         plt.show()
 
 
-def plot_absorbance_curves_hardware_spectr(save_path: str = None):
+def plot_absorbance_curves_hardware_plate(save_path: str = None):
 
     cpr_conc_hardware = np.array([0.25, 0.25, 0.25, 0.5, 0.5, 0.5,
                                   0.75, 0.75, 0.75, 1, 1, 1, 1.25, 1.25, 1.25])
     cpr_absorbance_hardware = np.array([0.29901, 0.24646, 0.27459, 0.62725, 0.577777, 0.67268067, 0.8091459787, 0.7160924046,
                                         0.6714569699, 0.9095247866, 0.9010765457, 0.9437113038, 1.0697792, 1.115627537, 1.18410570])
 
-    cpr_conc_spectr = np.array(
+    cpr_conc_plate = np.array(
         [0.25, 0.25, 0.5, 0.5, 0.75, 0.75, 1, 1, 1.25, 1.25])
-    cpr_absorbance_spectr = np.array(
+    cpr_absorbance_plate = np.array(
         [0.3045, 0.2613, 0.53305, 0.50545, 0.60035, 0.62765, 0.78615, 0.70985, 0.95405, 0.90065])
 
     # First all calculations
@@ -191,47 +191,48 @@ def plot_absorbance_curves_hardware_spectr(save_path: str = None):
     #
     #
     #
-    # Spectrophotometer
-    popt_func_spectr, pcov_func_spectr = curve_fit(
-        func, cpr_conc_spectr, cpr_absorbance_spectr)
-    popt_func_wh_offset_spectr, pcov_func_wh_offset_spectr = curve_fit(
-        func_wh_offset, cpr_conc_spectr, cpr_absorbance_spectr)
+    # Plate reader
+    popt_func_plate, pcov_func_plate = curve_fit(
+        func, cpr_conc_plate, cpr_absorbance_plate)
+    popt_func_wh_offset_plate, pcov_func_wh_offset_plate = curve_fit(
+        func_wh_offset, cpr_conc_plate, cpr_absorbance_plate)
     print(f"popt hardware: ", popt_func_hardware)
-    print(f"popt spectr: ", popt_func_spectr)
+    print(f"popt spectr: ", popt_func_plate)
 
-    cpr_conc_spectr_line = np.arange(
-        0.05, np.amax(cpr_conc_spectr)+0.1, step=0.05)
+    cpr_conc_plate_line = np.arange(
+        0.05, np.amax(cpr_conc_plate)+0.1, step=0.05)
 
-    cpr_absorbance_func_spectr = func(
-        cpr_conc_spectr_line, popt_func_spectr[0], popt_func_spectr[1])
+    cpr_absorbance_func_plate = func(
+        cpr_conc_plate_line, popt_func_plate[0], popt_func_plate[1])
 
-    cpr_absorbance_func_wh_offset_spectr = func_wh_offset(
-        cpr_conc_spectr_line, popt_func_wh_offset_spectr[0])
+    cpr_absorbance_func_wh_offset_plate = func_wh_offset(
+        cpr_conc_plate_line, popt_func_wh_offset_plate[0])
 
     # Calculate R^2 func spectrophotometer
-    residuals_func_spectr = cpr_absorbance_spectr - \
-        func(cpr_conc_spectr, popt_func_spectr[0], popt_func_spectr[1])
-    ss_res_func_spectr = np.sum(residuals_func_spectr**2)
-    ss_tot_func_spectr = np.sum(
-        (cpr_absorbance_spectr-np.mean(cpr_absorbance_spectr))**2)
-    r_squared_func_spectr = 1 - (ss_res_func_spectr/ss_tot_func_spectr)
+    residuals_func_plate = cpr_absorbance_plate - \
+        func(cpr_conc_plate, popt_func_plate[0], popt_func_plate[1])
+    ss_res_func_plate = np.sum(residuals_func_plate**2)
+    ss_tot_func_plate = np.sum(
+        (cpr_absorbance_plate-np.mean(cpr_absorbance_plate))**2)
+    r_squared_func_plate = 1 - (ss_res_func_plate/ss_tot_func_plate)
 
     # Calculate R^2 func_wh_offset spectrophotometer
-    residuals_func_wh_offset_spectr = cpr_absorbance_spectr - \
-        func_wh_offset(cpr_conc_spectr, popt_func_spectr[0])
-    ss_res_func_wh_offset_spectr = np.sum(
-        residuals_func_wh_offset_spectr**2)
-    ss_tot_func_wh_offset_spectr = np.sum(
-        (cpr_absorbance_spectr-np.mean(cpr_absorbance_spectr))**2)
-    r_squared_func_wh_offset_spectr = 1 - \
-        (ss_res_func_wh_offset_spectr/ss_tot_func_wh_offset_spectr)
+    residuals_func_wh_offset_plate = cpr_absorbance_plate - \
+        func_wh_offset(cpr_conc_plate, popt_func_plate[0])
+    ss_res_func_wh_offset_plate = np.sum(
+        residuals_func_wh_offset_plate**2)
+    ss_tot_func_wh_offset_plate = np.sum(
+        (cpr_absorbance_plate-np.mean(cpr_absorbance_plate))**2)
+    r_squared_func_wh_offset_plate = 1 - \
+        (ss_res_func_wh_offset_plate/ss_tot_func_wh_offset_plate)
 
     print(
         f"R^2 func hardware: {r_squared_func_hardware}, R^2 func_wh_offset hardware: {r_squared_func_wh_offset_hardware}")
     print(
-        f"R^2 func spectr: {r_squared_func_spectr}, R^2 func_wh_offset spectr: {r_squared_func_wh_offset_spectr}")
+        f"R^2 func spectr: {r_squared_func_plate}, R^2 func_wh_offset spectr: {r_squared_func_wh_offset_plate}")
 
-    fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12, 5), dpi=150)
+    fig1, (ax2, ax1) = plt.subplots(nrows=1, ncols=2, figsize=(12, 5), dpi=150)
+
     # Hardware plotting
     ax1.scatter(cpr_conc_hardware, cpr_absorbance_hardware,
                 color="#057D54", alpha=1.0, s=15)
@@ -240,13 +241,13 @@ def plot_absorbance_curves_hardware_spectr(save_path: str = None):
     # ax1.plot(cpr_conc_hardware_line,
     #          cpr_absorbance_func_wh_offset_hardware, color="#FFCE3A", label="0 constrain")
 
-    # Spectrophotometer plotting
-    ax2.scatter(cpr_conc_spectr, cpr_absorbance_spectr,
+    # Plate reader plotting
+    ax2.scatter(cpr_conc_plate, cpr_absorbance_plate,
                 color="#057D54", alpha=1.0, s=15)
-    ax2.plot(cpr_conc_spectr_line, cpr_absorbance_func_spectr,
+    ax2.plot(cpr_conc_plate_line, cpr_absorbance_func_plate,
              color="#9B0138", label="best fit")  # "#000000"
-    # ax2.plot(cpr_conc_spectr_line,
-    #          cpr_absorbance_func_wh_offset_spectr, color="#FFCE3A", label="0 constrain")
+    # ax2.plot(cpr_conc_plate_line,
+    #          cpr_absorbance_func_wh_offset_plate, color="#FFCE3A", label="0 constrain")
 
     # Proporties ax1
     ax1.set_xlabel("CPR concentration [mM]")
@@ -296,5 +297,5 @@ if __name__ == "__main__":
         "T--TUDelft--Hardware_Different_Light_Conditions.svg")
     # absorbance_spectrum_food_colorant()
     plot_absorbance_spectrum_cpr("T--TUDelft--CPR_Absorbance_Spectrum.svg")
-    plot_absorbance_curves_hardware_spectr(
-        "T--TUDelft--CPR_Absorbance_Curves_Hardware_Spectr.svg")
+    plot_absorbance_curves_hardware_plate(
+        "T--TUDelft--CPR_Absorbance_Curves_Hardware_Plate.svg")
