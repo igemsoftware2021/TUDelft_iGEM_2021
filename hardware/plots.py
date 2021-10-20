@@ -11,8 +11,64 @@ def custom_aptavita_colors():
             "#667817", "#6FC0A8", "#D6682A", "#F3758A", "#755F26", "#A74D36", "#C88E99", "#A79536"]
 
 
-def ambient_light(save_path: str = None):
-    pass
+def plot_ambient_light_different_conditions(save_path: str = None):
+
+    # Data (structure [value sensor 1, value sensor 2, value sensor 3, value sensor 4])
+    # Pure sensor values
+    # mean_condition1 = np.array([393.4, 404.4, 398.9, 434.4])
+    # mean_condition2 = np.array([82, 80.7, 91, 82.0])
+    # mean_condition3 = np.array([6, 3, 4, 5])
+    # mean_condition4 = np.array([0, 0, 0, 0])
+
+    # sem_condition1 = np.array([0.0971, 0.163, 0.131, 0.223])
+    # sem_condition2 = np.array([0, 0.0586, 0, 0.0277])
+    # sem_condition3 = np.array([0, 0, 0, 0])
+    # sem_condition4 = np.array([0, 0, 0, 0])
+
+    # Transmitted light normalization
+    mean_condition1 = np.array([100, 100, 100, 100])
+    mean_condition2 = np.array([20.84, 19.96, 22.82, 18.87])
+    mean_condition3 = np.array([7.317, 3.717, 4.396, 6.101])
+    mean_condition4 = np.array([0, 0, 0, 0])
+
+    conf_sem_condition1 = np.array([0.0967, 0.119, 0.0970, 0.152])
+    conf_sem_condition2 = np.array([0.01, 0.0442, 0.0147, 0.0315])
+    conf_sem_condition3 = np.array([0.00354, 0.00293, 0.00283, 0.00614])
+    conf_sem_condition4 = np.array([0, 0, 0, 0])
+
+    custom_colors = custom_aptavita_colors()
+
+    fig1, ax1 = plt.subplots(figsize=(12, 6), dpi=150)
+
+    # Position of bars on x-axis
+    ind = np.arange(mean_condition1.shape[0])
+
+    # Width of a bar
+    width = 0.20
+
+    ax1.bar(ind-1.5*width, mean_condition1, width,
+            color=custom_colors[0], label="Condition 1")
+    ax1.bar(ind-0.5*width, mean_condition2, width,
+            color=custom_colors[1], label="Condition 2")
+    ax1.bar(ind+0.5*width, mean_condition3, width,
+            color=custom_colors[2], label="Condition 3")
+    ax1.bar(ind+1.5*width, mean_condition4, width,
+            color=custom_colors[3], label="Condition 4")
+
+    # Set all proporties for ax1
+    ax1.legend()
+    ax1.set_xticks(np.arange(0, 4))
+    ax1.set_xticklabels(["Sensor 1", "Sensor 2", "Sensor 3", "Sensor 4"])
+    # ax1.set_yscale("log")
+    ax1.set_ylabel("Transmitted light (%)")
+
+    ax1.yaxis.set_major_locator(MultipleLocator(10))
+    ax1.yaxis.set_minor_locator(MultipleLocator(5))
+
+    if save_path is not None:
+        fig1.savefig(f"{save_path}", format="svg", dpi=1200)
+    else:
+        plt.show()
 
 
 def absorbance_spectrum_food_colorant(save_path: str = None):
@@ -43,7 +99,7 @@ def absorbance_spectrum_food_colorant(save_path: str = None):
         plt.show()
 
 
-def absorbance_spectrum_cpr(save_path: str = None):
+def plot_absorbance_spectrum_cpr(save_path: str = None):
 
     wavelength = np.array([300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630,
                           640, 650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930, 940, 950, 960, 970, 980, 990, 1000])
@@ -56,10 +112,13 @@ def absorbance_spectrum_cpr(save_path: str = None):
 
     absorbance_norm = absorbance / np.amax(absorbance)
 
-    fig1, ax1 = plt.subplots(figsize=(10, 5), dpi=150)
+    fig1, ax1 = plt.subplots(figsize=(12, 6), dpi=150)
     ax1.plot(wavelength, absorbance_norm, color="#9B0138")
     ax1.set_xlabel("Wavelength [nM]")
     ax1.set_ylabel("Absorbance")
+
+    print(
+        f"Wavelength maximum absorbance: {wavelength[np.argmax(absorbance_norm)]}")
 
     # ax1_ylim = ax1.get_ylim()
     # ax1.set_ylim((0, ax1_ylim[1]))
@@ -76,7 +135,7 @@ def absorbance_spectrum_cpr(save_path: str = None):
         plt.show()
 
 
-def absorbance_curves(save_path: str = None):
+def plot_absorbance_curves_hardware_spectr(save_path: str = None):
 
     cpr_conc_hardware = np.array([0.25, 0.25, 0.25, 0.5, 0.5, 0.5,
                                   0.75, 0.75, 0.75, 1, 1, 1, 1.25, 1.25, 1.25])
@@ -233,6 +292,9 @@ def absorbance_curves(save_path: str = None):
 
 if __name__ == "__main__":
     pass
+    plot_ambient_light_different_conditions(
+        "T--TUDelft--Hardware_Different_Light_Conditions.svg")
     # absorbance_spectrum_food_colorant()
-    # absorbance_spectrum_cpr()
-    absorbance_curves()
+    plot_absorbance_spectrum_cpr("T--TUDelft--CPR_Absorbance_Spectrum.svg")
+    plot_absorbance_curves_hardware_spectr(
+        "T--TUDelft--CPR_Absorbance_Curves_Hardware_Spectr.svg")
