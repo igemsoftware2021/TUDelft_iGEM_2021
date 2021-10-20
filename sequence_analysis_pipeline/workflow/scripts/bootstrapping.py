@@ -1,107 +1,110 @@
 import numpy as np
-import calc_helpers
+from tqdm import tqdm
+import traceback
+from calc_helpers import calc_cs_and_fc_metrics, calc_sample_standard_deviation
+np.seterr(divide="raise")
 
 
-# def bootstrap_cleavage_fraction_with_replacement(data, r_clvd_ref, r_unclvd_ref, num_samples=1000):
+def bootstrap_cs_fc_with_replacement(info_rows, num_samples=1000, sample_size=None):
+    # info rows looks as follows [(rowid, read_count, sequence_id, reference_name, cleaved_prefix, ligand_present), ..., ()]
 
-#     n = data.shape[0]
-#     # Create a mask which indexes to bootstrap with replacement
-#     random_mask = np.random.randint(0, high=n, size=(
-#         num_samples, n), dtype=np.int32)    # high value is exclusive
+    # First create rowid array, where at every index is a rowid integer
+    rc_total = sum(info_row[1] for info_row in info_rows)
 
-#     bootstrap_samples = data[random_mask]
-#     # Get number of prefixes
-#     r_clvd_s = np.count_nonzero(bootstrap_samples == 1, axis=1)
-#     r_unclvd_s = np.count_nonzero(bootstrap_samples == 0, axis=1)
+    rowid_array = np.zeros(rc_total, dtype=np.int32)
 
-#     print(r_clvd_s)
+    start_idx = 0
+    for info_row in info_rows:
+        rc = info_row[1]
+        rowid_array[start_idx:start_idx+rc] = info_row[0]
+        start_idx += rc
 
-#     cs = calc_helpers.calc_cleavage_fraction(
-#         r_clvd_s, r_clvd_ref, r_unclvd_s, r_unclvd_ref)
+    # The dictionaries to store all the information in
+    rowid_to_neg_cs_array = dict()
+    rowid_to_pos_cs_array = dict()
+    rowid_to_fc_array = dict()  # fc = fold change
 
-#     # Calculate estimated mean
-#     cs_mean = np.mean(cs)
+    for _ in tqdm(range(num_samples)):
 
-#     # Calculate standard deviation of the bootstrapped cleavage fractions
-#     cs_sd = calc_helpers.calc_sample_standard_deviation(cs)
+        flag = True
+        while flag:
+            try:
+                if sample_size is None:
+                    random_idx = np.random.randint(
+                        1, high=rowid_array.shape[0], size=rc_total)
+                else:
+                    random_idx = np.random.randint(
+                        1, high=rowid_array.shape[0], size=sample_size)
 
-#     return cs, cs_mean, cs_sd
+                random_rowid = rowid_array[random_idx]
 
+                unique, counts = np.unique(random_rowid, return_counts=True)
+                rowid_to_rc = dict(zip(unique, counts))
 
-def bootstrap_fold_change_with_replacement(r_clvd_s_neg, r_unclvd_s_neg, r_clvd_s_pos, r_unclvd_s_pos, r_clvd_ref_neg, r_unclvd_ref_neg, r_clvd_ref_pos, r_unclvd_ref_pos, k=1, num_samples=1000) -> tuple:
-    # TODO update doc string
-    """
-    Function does bootstrapping for cleavage fraction and fold change on the data.
-    args:\n
-    samples_pos: (array) cleaved prefix array yes/no of reads with condition ligand present.\n
-    \texample: let's say we have a sequence where three prefixes were cleaved and two uncleaved
-    then the array will look as follows: [0, 0, 1, 1, 1].\n
-    samples_neg: (array) cleaved prefix array yes/no of reads with condition ligand not present.\n
-    num_samples: (int) number of bootstrap samples to take.\n
-    \n
-    returns:\n
-    A tuple containing the following values in the same order:\n
-    cs_pos_sd: (float) sample standard deviaton of the cleavage fraction for the condition ligand present.\n
-    cs_pos_5_perc: (float) lower 95% limit for the cleavage fraction for the condition ligand present.\n
-    cs_pos_95_perc: (float) upper 95% limit for the cleavage fraction for the condition ligand present.\n
-    cs_neg_sd: (float) sample standard deviation of the cleavage fraction for the condition ligand not present.\n
-    cs_neg_5_perc: (float) lower 95% limit for the cleavage fraction for the condition ligand not present.\n
-    cs_neg_95_perc: (float) upper 95% limit for the cleavage fraction for the condition ligand not present.\n
-    fold_change_sd: (float) sample standard deviation of the fold change.\n
-    fold_change_se: (float) standard error of the fold change.\n
-    fold_change_5_perc: (float) lower 95% limit for the fold change.\n
-    fold_change_95_perc: (float) upper 95% limit for the fold change.\n
-    """
+                updated_info_rows = []
+                for info_row in info_rows:
+                    rowid = info_row[0]
+                    rc_new = rowid_to_rc.get(rowid, 0)
+                    updated_info_row = (
+                        info_row[0], rc_new, info_row[2], info_row[3], info_row[4], info_row[5])
+                    updated_info_rows.append(updated_info_row)
 
-    # Create an array with all the read counts
-    # A number is linked to the following read:
-    # 0: r_clvd_s_neg
-    # 1: r_unclvd_s_neg
-    # 2: r_clvd_s_pos
-    # 3: r_unclvd_s_pos
-    sample_data = np.zeros(
-        r_clvd_s_neg + r_unclvd_s_neg + r_clvd_s_pos + r_unclvd_s_pos, dtype=np.int8)
-    # Fill the array with an amount of r_seq_clvd_neg ones.
-    sample_data[r_clvd_s_neg:(r_clvd_s_neg + r_unclvd_s_neg)] = 1
-    sample_data[(r_clvd_s_neg + r_unclvd_s_neg):(r_clvd_s_neg + r_unclvd_s_neg + r_clvd_s_pos)] = 2
-    sample_data[-r_unclvd_s_pos:] = 3
+                # Calculate the cleavage fractions and fold change
+                rowid_to_neg_cs, rowid_to_pos_cs, rowid_to_fc = calc_cs_and_fc_metrics(
+                    updated_info_rows)
+                flag = False
+            except (RuntimeWarning, FloatingPointError) as e:
+                # traceback.print_exc()
+                # print(e)
+                flag = True
+                print("again")
 
-    n = sample_data.shape[0]
-    # Create a mask that has random idx to bootstrap with replacement
-    random_idx = np.random.randint(0, high=n, size=(
-        num_samples, n), dtype=np.int32)    # high value is exclusive
+        # Append the calculated value to the array in the dictionary
+        for rowid in rowid_to_neg_cs.keys():
+            value = rowid_to_neg_cs_array.get(rowid, [])
+            value.append(rowid_to_neg_cs[rowid])
+            rowid_to_neg_cs_array[rowid] = value
 
-    bootstrap_samples = sample_data[random_idx]
+        # Append the calculated value to the array in the dictionary
+        for rowid in rowid_to_pos_cs.keys():
+            value = rowid_to_pos_cs_array.get(rowid, [])
+            value.append(rowid_to_pos_cs[rowid])
+            rowid_to_pos_cs_array[rowid] = value
 
-    # Get read_counts for every prefix and condition
-    sample_r_clvd_s_neg = np.count_nonzero(bootstrap_samples == 0, axis=1)
-    sample_r_unclvd_s_neg = np.count_nonzero(bootstrap_samples == 1, axis=1)
-    sample_r_clvd_s_pos = np.count_nonzero(bootstrap_samples == 2, axis=1)
-    sample_r_unclvd_s_pos = np.count_nonzero(bootstrap_samples == 3, axis=1)
+        # Append the calculated value to the array in the dictionary
+        for rowid in rowid_to_fc.keys():
+            value = rowid_to_fc_array.get(rowid, [])
+            value.append(rowid_to_fc[rowid])
+            rowid_to_fc_array[rowid] = value
 
-    cs_neg = calc_helpers.calc_cleavage_fraction(
-        sample_r_clvd_s_neg, r_clvd_ref_neg, sample_r_unclvd_s_neg, r_unclvd_ref_neg)
+    # The dictionaries to store all the information in which will be returned
+    rowid_to_neg_cs_mean = dict()
+    rowid_to_neg_cs_se = dict()
 
-    # Calculate estimated mean
-    cs_neg_mean = np.mean(cs_neg)
+    for rowid in rowid_to_neg_cs_array.keys():
+        neg_cs_array = np.array(rowid_to_neg_cs_array[rowid], dtype=np.float64)
+        rowid_to_neg_cs_mean[rowid] = np.mean(neg_cs_array)
+        rowid_to_neg_cs_se[rowid] = calc_sample_standard_deviation(
+            neg_cs_array)
 
-    # Calculate standard deviation of the bootstrapped cleavage fractions
-    cs_neg_se = calc_helpers.calc_sample_standard_deviation(cs_neg)
+    # The dictionaries to store all the information in which will be returned
+    rowid_to_pos_cs_mean = dict()
+    rowid_to_pos_cs_se = dict()
 
-    cs_pos = calc_helpers.calc_cleavage_fraction(
-        sample_r_clvd_s_pos, r_clvd_ref_pos, sample_r_unclvd_s_pos, r_unclvd_ref_pos)
+    for rowid in rowid_to_pos_cs_array.keys():
+        pos_cs_array = np.array(rowid_to_pos_cs_array[rowid], dtype=np.float64)
+        rowid_to_pos_cs_mean[rowid] = np.mean(pos_cs_array)
+        rowid_to_pos_cs_se[rowid] = calc_sample_standard_deviation(
+            pos_cs_array)
 
-    # Calculate estimated mean
-    cs_pos_mean = np.mean(cs_pos)
+    # The dictionaries to store all the information in which will be returned
+    rowid_to_fc_mean = dict()
+    rowid_to_fc_se = dict()
 
-    # Calculate standard deviation of the bootstrapped cleavage fractions
-    cs_pos_se = calc_helpers.calc_sample_standard_deviation(cs_pos)
+    for rowid in rowid_to_fc_array.keys():
+        fc_array = np.array(rowid_to_fc_array[rowid], dtype=np.float64)
+        rowid_to_fc_mean[rowid] = np.mean(fc_array)
+        rowid_to_fc_se[rowid] = calc_sample_standard_deviation(
+            fc_array)
 
-    fold_changes = calc_helpers.calc_fold_change(cs_pos, cs_neg, k=k)
-
-    fold_change_mean = np.mean(fold_changes)
-
-    fold_change_se = calc_helpers.calc_sample_standard_deviation(
-        fold_changes)
-
-    return cs_neg_mean, cs_neg_se, cs_pos_mean, cs_pos_se, fold_changes, fold_change_mean, fold_change_se
+    return rowid_to_neg_cs_mean, rowid_to_neg_cs_se, rowid_to_pos_cs_mean, rowid_to_pos_cs_se, rowid_to_fc_mean, rowid_to_fc_se
