@@ -1,18 +1,9 @@
-configfile: "config/config_folate.yaml"
-
-# Example
-# inputfiles:
-# "S1_D80_l0_read_counts.txt"
-# "S1_D80_l1_read_counts.txt"
-# Then dataset = S1_D80 and sample = L0/L1
+configfile: "config/config.yaml"
 
 dataset = config["dataset"]
 
 rule all:
     input:
-        # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset=config["dataset"], read=["R1", "R2"])
-        # expand("results/fastqc_reports/{dataset}_{read}_001_fastqc.html", dataset="N41-I14_S14", read=["R1", "R2"]),
-        # "results/pear/N41-I14_S14.assembled.fastq"
         expand("results/plots/{dataset}_fold_change_vs_fold_change_se.pdf", dataset=config["dataset"]),
         expand("results/databases/{dataset}_database.db", dataset=config["dataset"])
 
@@ -126,7 +117,7 @@ rule database_bootstrapping:
     conda:
         "envs/database.yaml"
     script:
-        "scripts/database_bootstrapping_v3.py"
+        "scripts/database_bootstrapping.py"
 
 rule database_biosensor_assay:
     input:
