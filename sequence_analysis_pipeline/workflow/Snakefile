@@ -106,7 +106,7 @@ rule database_calculate_metrics:
     conda:
         "envs/database.yaml"
     script:
-        "scripts/calculate_metrics.py"
+        "scripts/database_calculate_metrics.py"
 
 rule database_bootstrapping:
     input:
@@ -139,4 +139,4 @@ rule plotting:
     conda:
         "envs/plotting.yaml"
     script:
-        "scripts/plotting.py"
+        "scripts/database_plot.py"

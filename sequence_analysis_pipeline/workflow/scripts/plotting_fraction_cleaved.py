@@ -3,8 +3,8 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/S1_D63_5_database.db"
-# database_path = snakemake.input[0]
+# database_path = "./results/databases/S1_D63_database.db"
+database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
 TABLE_ID_SEQ = "id_sequence"
