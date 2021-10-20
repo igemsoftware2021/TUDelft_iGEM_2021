@@ -556,7 +556,7 @@ def plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list: list
 
     # Tight layout should be set after plotting and setting the
     # correct title and labels
-    # fig.tight_layout()
+    fig.tight_layout()
 
     if save_path is not None:
         fig.savefig(f"{save_path}", format="svg", dpi=1200)
@@ -690,10 +690,10 @@ if __name__ == "__main__":
     # plot_dumrna_dt_different_k_c(k_c_list=[0.017, 0.0033, 0.0017], k_c_list_names=[
     #                              "0.017", "0.0033", "0.0017"], vit_conc=0.07, dna_conc=3*10**-3, s_i=1000, save_path="modelling/data/plots/T--TUDelft--dumRNA_dt_Different_k_c_Plot.svg")
 
-    # plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[0.017, 0.0033, 0.0017], k_c_list_names=[
-    #                                                               "0.017", "0.0033", "0.0017"], vit_conc=0.07, dna_conc=3*10**-3, s_i=1000, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
+    plot_total_and_bound_absolute_umrna_prokaryotic_differing_k_c(k_c_list=[0.017, 0.0033, 0.0017], k_c_list_names=[
+                                                                  "0.017", "0.0033", "0.0017"], vit_conc=0.07, dna_conc=3*10**-3, s_i=1000, save_path="modelling/data/plots/T--TUDelft--umRNA_Bound_Unbound_Different_k_c_Plot.svg")
 
-    yfp_plot(save_path="modelling/data/plots/T--TUDelft--YFP_Plot_Three_Regimes.svg")
+    # yfp_plot(save_path="modelling/data/plots/T--TUDelft--YFP_Plot_Three_Regimes.svg")
     # plot_enzyme_mon_and_enzyme_conc(
     #     dna_conc=3*10**-3, s_i=1000)  # , save_path="modelling/data/plots/T--TUDelft--Plot_Enzyme_Concentration.svg")
     # plot_TlR_over_time(vit_conc=0.07, dna_conc=5 *
