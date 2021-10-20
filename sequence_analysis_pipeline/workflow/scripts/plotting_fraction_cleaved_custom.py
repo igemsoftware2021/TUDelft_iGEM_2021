@@ -13,7 +13,7 @@ TABLE_ID_SEQ = "id_sequence"
 # The table with the added read counts of sequences
 TABLE_CLEAN_SEQ = "clean_sequences"
 
-fig2, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(14, 6), dpi=125)
+fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(14, 6), dpi=150)
 
 count = 0
 
@@ -109,6 +109,8 @@ ax2.text(-0.1, 1.05, "b", transform=ax2.transAxes, size=16, weight="bold")
 
 plt.show()
 
+fig1.savefig("T--TUDelft--Sequence_Analysis_Cleavage_Fractions.svg",
+             format="svg", dpi=1200)
 
 # ax2.set_yscale("log")
 # ax2.set_ylim((0, 10))

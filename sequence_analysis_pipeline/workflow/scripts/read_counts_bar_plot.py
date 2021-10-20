@@ -80,7 +80,7 @@ r_seqs = [[301, 52, 185, 1349], [2007, 35, 377, 1182], [
 seq_names = ["Sequence A", "Sequence B",
              "Sequence C", "Sequence D", "Sequence E"]
 
-fig = plt.figure(figsize=(12, 8), dpi=125)
+fig1 = plt.figure(figsize=(12, 8), dpi=150)
 ax1 = plt.subplot2grid(shape=(2, 14), loc=(0, 0), colspan=4)
 ax6 = plt.subplot2grid(shape=(2, 14), loc=(0, 4), colspan=1)
 ax2 = plt.subplot2grid(shape=(2, 14), loc=(0, 5), colspan=4)
@@ -154,3 +154,6 @@ for i in range(5):
 # fig.legend(legend_handles, labels, loc="upper center")
 
 plt.show()
+
+fig1.savefig(f"T--TUDelft--Sequencing_Normalized_Read_Counts.svg",
+             format="svg", dpi=1200)
