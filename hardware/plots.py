@@ -231,46 +231,31 @@ def plot_absorbance_curves_hardware_plate(save_path: str = None):
     print(
         f"R^2 func spectr: {r_squared_func_plate}, R^2 func_wh_offset spectr: {r_squared_func_wh_offset_plate}")
 
-    fig1, (ax2, ax1) = plt.subplots(nrows=1, ncols=2, figsize=(12, 5), dpi=150)
-
-    # Hardware plotting
-    ax1.scatter(cpr_conc_hardware, cpr_absorbance_hardware,
-                color="#057D54", alpha=1.0, s=15)
-    ax1.plot(cpr_conc_hardware_line, cpr_absorbance_func_hardware,
-             color="#9B0138", label="best fit")
-    # ax1.plot(cpr_conc_hardware_line,
-    #          cpr_absorbance_func_wh_offset_hardware, color="#FFCE3A", label="0 constrain")
+    fig1, (ax1, ax2) = plt.subplots(nrows=1, ncols=2, figsize=(12, 5), dpi=150)
 
     # Plate reader plotting
-    ax2.scatter(cpr_conc_plate, cpr_absorbance_plate,
+    ax1.scatter(cpr_conc_plate, cpr_absorbance_plate,
                 color="#057D54", alpha=1.0, s=15)
-    ax2.plot(cpr_conc_plate_line, cpr_absorbance_func_plate,
+    ax1.plot(cpr_conc_plate_line, cpr_absorbance_func_plate,
              color="#9B0138", label="best fit")  # "#000000"
     # ax2.plot(cpr_conc_plate_line,
     #          cpr_absorbance_func_wh_offset_plate, color="#FFCE3A", label="0 constrain")
 
-    # Proporties ax1
-    ax1.set_xlabel("CPR concentration [mM]")
-    ax1.set_ylabel("Absorbance")
+    # Hardware plotting
+    ax2.scatter(cpr_conc_hardware, cpr_absorbance_hardware,
+                color="#057D54", alpha=1.0, s=15)
+    ax2.plot(cpr_conc_hardware_line, cpr_absorbance_func_hardware,
+             color="#9B0138", label="best fit")
+    # ax1.plot(cpr_conc_hardware_line,
+    #          cpr_absorbance_func_wh_offset_hardware, color="#FFCE3A", label="0 constrain")
 
-    ax1_xlim = ax1.get_xlim()
-    ax1.set_xlim((0, ax1_xlim[1]))
-    ax1_ylim = ax1.get_ylim()
-    ax1.set_ylim((0, ax1_ylim[1]))
-
-    ax1.xaxis.set_major_locator(MultipleLocator(0.2))
-    ax1.xaxis.set_minor_locator(MultipleLocator(0.1))
-
-    ax1.yaxis.set_major_locator(MultipleLocator(0.1))
-    ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
-
-    # Proporties ax2
+    # First do proporties for hardware subplot since this has the highest y-limit
     ax2.set_xlabel("CPR concentration $[\mathrm{mM}]$")
     ax2.set_ylabel("Absorbance")
 
     ax2_xlim = ax2.get_xlim()
     ax2.set_xlim((0, ax2_xlim[1]))
-    ax2_ylim = ax1.get_ylim()
+    ax2_ylim = ax2.get_ylim()
     ax2.set_ylim((0, ax2_ylim[1]))
 
     ax2.xaxis.set_major_locator(MultipleLocator(0.2))
@@ -278,6 +263,19 @@ def plot_absorbance_curves_hardware_plate(save_path: str = None):
 
     ax2.yaxis.set_major_locator(MultipleLocator(0.1))
     ax2.yaxis.set_minor_locator(MultipleLocator(0.05))
+
+    # Proporties ax1
+    ax1.set_xlabel("CPR concentration [mM]")
+    ax1.set_ylabel("Absorbance")
+
+    ax1.set_xlim((0, ax2_xlim[1]))
+    ax1.set_ylim((0, ax2_ylim[1]))
+
+    ax1.xaxis.set_major_locator(MultipleLocator(0.2))
+    ax1.xaxis.set_minor_locator(MultipleLocator(0.1))
+
+    ax1.yaxis.set_major_locator(MultipleLocator(0.1))
+    ax1.yaxis.set_minor_locator(MultipleLocator(0.05))
 
     # Set the character labels
     ax1.text(-0.1, 1.05, "a", transform=ax1.transAxes,
@@ -292,7 +290,6 @@ def plot_absorbance_curves_hardware_plate(save_path: str = None):
 
 
 if __name__ == "__main__":
-    pass
     plot_ambient_light_different_conditions(
         "T--TUDelft--Hardware_Different_Light_Conditions.svg")
     # absorbance_spectrum_food_colorant()
