@@ -1,10 +1,10 @@
 # Hardware module
 
-This module contains all the files that are needed to operate the dedicated read-out device. Additionaly, some files are included that can be used to test if the hardware is working properly. For a full building guide of the device, visit the contribution page of our wiki ([click here](/[modeling/env_requirements](https://2021.igem.org/Team:TUDelft/Contribution))).
+This module contains all the files that are needed to operate the dedicated read-out device. Additionaly, some files are included that can be used to test if the hardware is working properly. For a full building guide of the device, visit the contribution page of our wiki ([click here](https://2021.igem.org/Team:TUDelft/Contribution)).
 
 ## Usage
 
-To run the source code you should install Python and install the required libraries. The required libraries can be found in the folder `hardware/env_requirements` ([click here](/modeling/env_requirements)) and can be installed with Python pip: use `requirements.txt` and install the libraries with the help of *pip*. For help, see [here](https://pip.pypa.io/en/stable/user_guide/#requirements-files).
+To run the source code you should install Python and install the required libraries. The required libraries can be found in the file `requirements.txt` ([click here](/hardware/requirements.txt)). The required libraries can be installed with Python *pip*. For help, see [here](https://pip.pypa.io/en/stable/user_guide/#requirements-files).
 
 The library required for the APDS9930 sensor can be installed as follows:
 ```
