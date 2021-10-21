@@ -69,21 +69,7 @@ def model_prokaryotic_absorbance_area_parallel(parameters, constants, dna_conc, 
 
 if __name__ == "__main__":
     parameters = standard_parameters_prokaryotic()
-    # parameters2 = standard_parameters_prokaryotic()
-    # parameters2[13] = parameters2[13]/10
-    # parameters = np.vstack((parameters, parameters2))
-    # print(parameters, parameters.shape)
-    constants = standard_constants()
-    # result = model_prokaryotic_absorbance_area(
-    #     parameters, constants, 2*10**-3, 250, 0.05, 0.09)
+    dna_conc, s_i, vit_conc = standard_initial_conditions()
     result = model_prokaryotic_area(
-        parameters, 3*10**-3, 250, 0.05, 0.09)
+        parameters, dna_conc, s_i, 0.05, 0.09)
     print(result)
-    vit_conc = np.linspace(1, 20, 21)
-    results = np.zeros(vit_conc.shape)
-    # for i in range(vit_conc.shape[0]):
-    #     results[i] = model_prokaryotic_readout_area(
-    #         parameters, constants, 2*10**-3, 150, vit_conc[0], vit_conc[i], dt=0.01)
-
-    # plt.plot(vit_conc, results)
-    # plt.show()
