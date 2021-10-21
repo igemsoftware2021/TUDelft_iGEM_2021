@@ -4,7 +4,7 @@ dataset = config["dataset"]
 
 rule all:
     input:
-        expand("results/plots/{dataset}_fold_change_vs_fold_change_se.pdf", dataset=config["dataset"]),
+        expand("results/plots/{dataset}_fold_change_vs_fold_change_se.svg", dataset=config["dataset"]),
         expand("results/databases/{dataset}_database.db", dataset=config["dataset"])
 
     
@@ -135,7 +135,7 @@ rule plotting:
         "results/databases/{dataset}_database.db",
         "results/checkpoints/{dataset}/{dataset}_database_biosensor_assay.done"
     output:
-        "results/plots/{dataset}_fold_change_vs_fold_change_se.pdf"
+        "results/plots/{dataset}_fold_change_vs_fold_change_se.svg"
     conda:
         "envs/plotting.yaml"
     script:
