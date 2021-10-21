@@ -1,8 +1,8 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegFileWriter
-from models import model_prokaryotic, model_prokaryotic_absorbance, model_prokaryotic_all
-from standard_values import standard_constants, standard_initial_conditions, standard_parameters_prokaryotic
+from models import model_prokaryotic, model_prokaryotic_all
+from standard_values import standard_parameters_prokaryotic
 from plot_helpers import micromolar_conc_to_math_exp
 from matplotlib.ticker import MultipleLocator
 
