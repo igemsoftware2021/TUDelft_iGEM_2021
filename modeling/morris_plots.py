@@ -7,7 +7,7 @@ from standard_values import standard_parameters_prokaryotic
 from models_area import model_prokaryotic_area
 
 
-def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=None):
+def plot_morris_analysis(path="modeling/data", tag="_1633190385", save_path=None):
     parameters, data_dict = morris_datareader(path=path, tag=tag)
 
     custom_cycler = custom_aptavita_color_cycler()
@@ -67,7 +67,7 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     plt.show()
 
 
-def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_1633190385", save_path=None):
+def plot_morris_analysis_mu_star_subplots(path="modeling/data", tag="_1633190385", save_path=None):
 
     parameters, data_dict = morris_datareader(
         path=path, tag=tag, data_names=["mu_star", "mu_star_conf"])
@@ -79,7 +79,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
     fill_plot_step = 10
     plot_step = 10
     plot_time = 72001
-    plot_time = min(plot_time, parameters["mu_star"].shape[0])
+    plot_time = min(plot_time, data_dict["mu_star"].shape[0])
 
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
         nrows=2, ncols=2, figsize=(12, 9), dpi=150)
@@ -177,7 +177,7 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
         plt.show()
 
 
-def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_path=None):
+def plot_morris_analysis_area(path="modeling/data", tag="_1633293118", save_path=None):
     parameters, data_dict = morris_datareader(path=path, tag=tag)
 
     mu = data_dict["mu"].reshape(-1)
@@ -222,7 +222,7 @@ def plot_morris_analysis_area(path="modelling/data", tag="_1633293118", save_pat
         plt.show()
 
 
-def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_1633293118", save_path=None, standard_area=8758.052481272032):
+def plot_morris_analysis_area_fold_change(path="modeling/data", tag="_1633293118", save_path=None, standard_area=8758.052481272032):
     parameters, data_dict = morris_datareader(path=path, tag=tag)
 
     mu = data_dict["mu"].reshape(-1)
@@ -238,6 +238,9 @@ def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_163329311
 
     mu_fc = (standard_area + mu)/standard_area
     mu_star_fc = (standard_area + mu_star)/standard_area
+
+    # For retrieving fold changes in the text
+    # print(mu_star_fc)
 
     # The mu fold change will be offset by 1, since that is the standard
     # Hence all the values need to be lowered by 1 to get the correct
@@ -301,26 +304,26 @@ def plot_morris_analysis_area_fold_change(path="modelling/data", tag="_163329311
 def plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None):
     # Ran for 3 hours
     # parameters1, data_dict1 = morris_datareader(
-    #     path="modelling/data", tag="_1634025739")
+    #     path="modeling/data", tag="_1634025739")
     # parameters2, data_dict2 = morris_datareader(
-    #     path="modelling/data", tag="_1634030488")
+    #     path="modeling/data", tag="_1634030488")
     # parameters3, data_dict3 = morris_datareader(
-    #     path="modelling/data", tag="_1634030607")
+    #     path="modeling/data", tag="_1634030607")
     # parameters4, data_dict4 = morris_datareader(
-    #     path="modelling/data", tag="_1634030685")
+    #     path="modeling/data", tag="_1634030685")
 
     dt = 0.01
     t_tot = 18000
 
     # Ran for 5 hours
     parameters1, data_dict1 = morris_datareader(
-        path="modelling/data", tag="_1634031996")  # 3 nM
+        path="modeling/data", tag="_1634031996")  # 3 nM
     parameters2, data_dict2 = morris_datareader(
-        path="modelling/data", tag="_1634032760")  # 1 nM
+        path="modeling/data", tag="_1634032760")  # 1 nM
     parameters3, data_dict3 = morris_datareader(
-        path="modelling/data", tag="_1634032582")  # 0.3 nM
+        path="modeling/data", tag="_1634032582")  # 0.3 nM
     parameters4, data_dict4 = morris_datareader(
-        path="modelling/data", tag="_1634033312")  # 0.1 nM
+        path="modeling/data", tag="_1634033312")  # 0.1 nM
 
     mu1 = data_dict1["mu"].reshape(-1)
     mu2 = data_dict2["mu"].reshape(-1)
@@ -386,26 +389,26 @@ def plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None):
 def plot_morris_analysis_area_mu_star_fold_change_multiple_DNA_conc(save_path=None):
     # Ran for 3 hours
     # parameters1, data_dict1 = morris_datareader(
-    #     path="modelling/data", tag="_1634025739")
+    #     path="modeling/data", tag="_1634025739")
     # parameters2, data_dict2 = morris_datareader(
-    #     path="modelling/data", tag="_1634030488")
+    #     path="modeling/data", tag="_1634030488")
     # parameters3, data_dict3 = morris_datareader(
-    #     path="modelling/data", tag="_1634030607")
+    #     path="modeling/data", tag="_1634030607")
     # parameters4, data_dict4 = morris_datareader(
-    #     path="modelling/data", tag="_1634030685")
+    #     path="modeling/data", tag="_1634030685")
 
     dt = 0.01
     t_tot = 18000
 
     # Ran for 5 hours
     parameters1, data_dict1 = morris_datareader(
-        path="modelling/data", tag="_1634031996")  # 3 nM
+        path="modeling/data", tag="_1634031996")  # 3 nM
     parameters2, data_dict2 = morris_datareader(
-        path="modelling/data", tag="_1634032760")  # 1 nM
+        path="modeling/data", tag="_1634032760")  # 1 nM
     parameters3, data_dict3 = morris_datareader(
-        path="modelling/data", tag="_1634032582")  # 0.3 nM
+        path="modeling/data", tag="_1634032582")  # 0.3 nM
     parameters4, data_dict4 = morris_datareader(
-        path="modelling/data", tag="_1634033312")  # 0.1 nM
+        path="modeling/data", tag="_1634033312")  # 0.1 nM
 
     mu_star1 = data_dict1["mu_star"].reshape(-1)
     mu_star2 = data_dict2["mu_star"].reshape(-1)
@@ -709,18 +712,18 @@ def morris_method_visualization():
 if __name__ == "__main__":
     morris_method_visualization()
     plot_morris_analysis_mu_star_subplots(
-        path="modelling/data", tag="_1634552273", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1634552273.svg")
+        path="modeling/data", tag="_1634552273", save_path="modeling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1634552273.svg")
 
     parameters = standard_parameters_prokaryotic()
     standard_area = model_prokaryotic_area(
         parameters, 3*10**-3, 1000, 0.05, 0.09, dt=0.01, t_tot=10800)
     plot_morris_analysis_area_fold_change(
-        path="modelling/data", tag="_1634558479", standard_area=standard_area, save_path="modelling/data/plots/T--TUDelft--Morris_Area")
+        path="modeling/data", tag="_1634558479", standard_area=standard_area, save_path="modeling/data/plots/T--TUDelft--Morris_Area")
 
     # plot_morris_analysis_area(
-    #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
+    #     path="modeling/data", tag="_1633591400", save_path="modeling/data/plots/T--TUDelft--Morris_Area_1633591400")
     # plot_morris_analysis_area_fold_change(
-    #     path="modelling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
+    #     path="modeling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
     # plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None)
     # plot_morris_analysis_area_mu_star_fold_change_multiple_DNA_conc(
     #     save_path=None)

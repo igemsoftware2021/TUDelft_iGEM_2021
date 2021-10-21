@@ -159,7 +159,11 @@ testing
 # snakemake
 .snakemake
 
-# data
+# Modeling data
+modeling/data/
+
+
+# Sequencing data
 sequence_analysis_pipeline/data/NGS/
 sequence_analysis_pipeline/results/
 sequence_analysis_pipeline/results/
