@@ -1,6 +1,6 @@
 # Modeling
 
-This folder contains all the files used for our model implementation, sensitivity analyses and figure creation. The data is not shown, since the total file size is too large.
+This folder contains all the files used for our model implementation, sensitivity analyses and figure creation. The data is not shown, since the total size of all the files combined is too large to store on GitHub.
 ## Usage
 To run the source code you should install Python and install the required libraries. The required libraries can be found in the folder `modeling/env_requirements` ([click here](/modeling/env_requirements)) and can be installed in two different ways:
 
