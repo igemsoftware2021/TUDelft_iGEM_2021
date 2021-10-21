@@ -152,12 +152,7 @@ dmypy.json
 # Loulotte's stuff
 .DS_Store
 
-# Boyd's stuff
-/sponsor_scraping/
-
 # data
 sequence_analysis_pipeline/data/NGS/
 sequence_analysis_pipeline/results/
-
-# minke's stuff
-\test_microfluidic_minke
+sequence_analysis_pipeline/results/
