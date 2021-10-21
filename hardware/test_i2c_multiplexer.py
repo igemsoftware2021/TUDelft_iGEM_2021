@@ -19,7 +19,6 @@ time.sleep(0.12)
 
 i2c_sensor_handle = APDS9930(1)
 i2c_sensor_handle.enable_ambient_light_sensor()
-#i2c_sensor_handle.ambient_light_gain = 1
 i2c_sensor_handle.write_byte_data(
     APDS9930_ATIME, 0xc0)  # Integration time 175 ms
 
@@ -39,11 +38,8 @@ while time.time() < stop:
     print("CH0", result_0)
     #print("CH1", result_1)
     time.sleep(0.3)
-    #print(time.time() - stop + 60)
     if time.time() > stop - 55:
         pi.i2c_write_device(i2c_multiplexer_handle, [0x80 | 0x02])
-
-# TODO van te voren testen zit je te cappen op CH0 met een blanco, overweeg anders andere channel
 
 i2c_sensor_handle.close()
 pi.close()

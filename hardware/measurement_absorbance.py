@@ -5,7 +5,7 @@ from helpers import initialize_light_pins, initialize_heating_pin
 from helpers import i2c_multiplexer_select_channel, i2c_activate_als_all_sensors
 from helpers import i2c_write_to_all_sensors, pre_heater, temperature_controller
 from helpers import determine_intensity_single_channel, calculate_absorbance
-from helpers import save_as_csv, read_from_csv
+from helpers import save_as_csv, read_from_csv, i2c_change_gain_all_sensors
 from apds9930 import APDS9930
 from apds9930.values import APDS9930_ATIME
 import matplotlib.pyplot as plt
@@ -18,12 +18,11 @@ from file_helpers import read_absorbance_csv, read_temperature_csv
 total_time = 4
 
 # Control pins
-pin_heating = 18
 pin_light_1 = 17
-# pin_light_2 = "TBD"
-# pin_light_3 = "TBD"
-# pin_light_4 = "TBD"
-pins_light = [pin_light_1]  # , pin_light_2, pin_light_3, pin_light_4]
+pin_light_2 = 27
+pin_light_3 = 22
+pin_light_4 = 23
+pins_light = [pin_light_1,  pin_light_2, pin_light_3, pin_light_4]
 
 # Constants for heating
 k_u = 1  # Ultimate gain, used for Ziegler-Nichols tuning of the PID controller
@@ -48,14 +47,14 @@ spi_flags = 0
 i2c_bus = 1  # I2C bus of the Raspberry Pi that is connected to the multiplexer
 i2c_multiplexer_adress = 0x70  # TCA9548
 i2c_sensor_adress = 0x39  # APDS9930
-i2c_sensor_int_time = 0xc0  # Integration time APDS9930. 0x0c <-> 175 ms
-i2c_sensor_gain = "TBD"  # Gain of the APDS9930.
-i2c_sensor_1_channel = 7  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_2_channel = 6  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_3_channel = 5  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_4_channel = 4  # Channel of the multiplexer to which the sensor is connected
-i2c_sensor_channels = [i2c_sensor_1_channel, i2c_sensor_2_channel,
-                       i2c_sensor_3_channel, i2c_sensor_4_channel]
+i2c_sensor_int_time = 0xdb  # Integration time APDS9930. 0x0c <-> 175 ms
+i2c_sensor_gain = 3  # Gain of the APDS9930.
+i2c_sensor_1_channel = 4  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_2_channel = 5  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_3_channel = 6  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_4_channel = 7  # Channel of the multiplexer to which the sensor is connected
+i2c_sensor_channels = [i2c_sensor_4_channel, i2c_sensor_4_channel,
+                       i2c_sensor_4_channel, i2c_sensor_4_channel]
 num_sensors = len(i2c_sensor_channels)
 ###############################################################################
 
@@ -67,7 +66,6 @@ pi = pigpio.pi()
 
 if not pi.connected:
     exit()
-    # TODO display error
 
 # Initialize pins
 initialize_light_pins(pi, pins_light)
@@ -88,9 +86,9 @@ i2c_activate_als_all_sensors(
     pi, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels)
 i2c_write_to_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels,
                          APDS9930_ATIME, i2c_sensor_int_time)
-# helpers.i2c_change_gain_all_sensors(pi, i2c_multiplexer_handle, i2c_sensor_handle, channel_numbers, gain)
 
-# TODO test gain
+i2c_change_gain_all_sensors(
+    pi, i2c_multiplexer_handle, i2c_sensor_handle, i2c_sensor_channels, gain)
 
 ###############################################################################
 

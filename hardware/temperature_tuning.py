@@ -6,15 +6,15 @@ import matplotlib.pyplot as plt
 from file_helpers import write_temperature_csv
 
 # Heating pin
-pin_heating = 13
+pin_heating = 13  # Pin used to switch heating elements on and off.
 
 # Constants for heating
 k_u = 1000000  # Ultimate gain, used for Ziegler-Nichols tuning of the PID controller
 temperature_desired = 37  # Desired temperature in degrees Celsius
-pwm_freq = 10
+pwm_freq = 10  # Frequency of the Pulse-Width-Modulated pin
 controller_parameters = [k_u, temperature_desired, pwm_freq]
-v_ref = 3.3
-gain = 2.96
+v_ref = 3.3  # Reference voltage of the ADC-converter.
+gain = 2.96  # Gain of the amplifier connected to the temperature sensor
 
 # SPI
 spi_channel = 0  # SPI channel of the Raspberry Pi that is connected to the ADC
@@ -32,7 +32,6 @@ helpers.initialize_heating_pin(pi, pin_heating)
 
 pi.set_mode(pin_heating, pigpio.OUTPUT)
 pi.write(pin_heating, 1)
-print("licht")
 time.sleep(10)
 
 temperature_error = []
@@ -44,14 +43,9 @@ duty_cycle_upper_bound = (1 - T_c * pwm_freq) * 10**6
 duration = 0.10
 interval = 0.005
 pi.hardware_PWM(pin_heating, pwm_freq, 10**6)
-print("nu")
 time.sleep(10)
 start = time.time()
-print("hoi")
-print(start)
-print(start+120)
 while time.time() < start + 120:
-    print("test")
     # Measure temperature error
     temperature_median = helpers.read_mcp3008_median(pi, adc_handle, spi_channel, v_ref, gain,
                                                      duration=duration, interval=interval)

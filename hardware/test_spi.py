@@ -15,13 +15,13 @@ pi = pigpio.pi()
 if not pi.connected:
     exit()
 
+
+v_ref = 3.3  # Reference voltage of the ADC-converter.
+gain = 2.96  # Gain of the amplifier connected to the temperature sensor
+
 adc = pi.spi_open(0, 50000, 0)  # CE0 (indicates to which slave it's talking)
 
 stop = time.time() + 5
-
-v_ref = 3.3
-gain = 2.96
-
 while time.time() < stop:
     adc_value = read_mcp3008(adc, 0)
     print(adc_value)
