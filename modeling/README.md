@@ -18,4 +18,3 @@ A description for files that were used for analysis and text on our wiki page. T
 - `animations.py` - functions to make the animations for the wiki.
 - `plot_helpers.py` - functions that are needed for the plotting.
 - `model_timing.py` - file to benchmark model implementations of pure Python + NumPy and Numba.
-

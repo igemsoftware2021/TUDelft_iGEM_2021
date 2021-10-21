@@ -7,12 +7,13 @@ from scipy.optimize import curve_fit
 
 
 def custom_aptavita_colors():
+    """Returns custom AptaVita color scheme"""
     return ["#9B0138", "#057D54", "#FFCE3A", "#EDB4D7", "#4FD590", "#4D94EF", "#EFA54D", "#313175",
             "#667817", "#6FC0A8", "#D6682A", "#F3758A", "#755F26", "#A74D36", "#C88E99", "#A79536"]
 
 
 def plot_ambient_light_different_conditions(save_path: str = None):
-
+    """The plot with the normalized transmitted length for different light conditions"""
     # Data (structure [value sensor 1, value sensor 2, value sensor 3, value sensor 4])
     # Pure sensor values
     # mean_condition1 = np.array([393.4, 404.4, 398.9, 434.4])
@@ -72,7 +73,7 @@ def plot_ambient_light_different_conditions(save_path: str = None):
 
 
 def absorbance_spectrum_food_colorant(save_path: str = None):
-
+    """Plots absorbance spectrum of the food colorant."""
     wavelength = np.array([300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630,
                           640, 650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930, 940, 950, 960, 970, 980, 990, 1000])
     absorbance = np.array([1.237300038, 1.203600049, 1.036299944, 0.6395999789, 0.3312999904, 0.244599998, 0.2535000145, 0.3095000088, 0.4287, 0.5939000249, 0.7129999995, 0.9079999924, 0.8080000281, 0.4555000067, 0.181400001, 0.0903000012, 0.07079999894, 0.07079999894, 0.07859999686, 0.09089999646, 0.1116999984, 0.1460999995, 0.1965000033, 0.2802999914, 0.4092999995, 0.5819000006, 0.8377000093, 1.20630002, 1.74000001, 2.361299992, 2.769500017, 3.173199892, 3.296099901, 3.650399923, 3.471400023, 3.382100105,
@@ -100,7 +101,7 @@ def absorbance_spectrum_food_colorant(save_path: str = None):
 
 
 def plot_absorbance_spectrum_cpr(save_path: str = None):
-
+    """Plots the absorbance spectrum of the CPR at a pH of 7.4"""
     wavelength = np.array([300, 310, 320, 330, 340, 350, 360, 370, 380, 390, 400, 410, 420, 430, 440, 450, 460, 470, 480, 490, 500, 510, 520, 530, 540, 550, 560, 570, 580, 590, 600, 610, 620, 630,
                           640, 650, 660, 670, 680, 690, 700, 710, 720, 730, 740, 750, 760, 770, 780, 790, 800, 810, 820, 830, 840, 850, 860, 870, 880, 890, 900, 910, 920, 930, 940, 950, 960, 970, 980, 990, 1000])
     absorbance = np.array([2.1627, 1.9501, 1.8003, 1.716, 1.6937, 1.6973, 1.715, 1.7267, 1.7012, 1.6293, 1.5652, 1.5446, 1.5455, 1.5574, 1.5718, 1.5872, 1.6043, 1.6281, 1.66, 1.6962, 1.7507, 1.8194, 1.9025, 2.0061, 2.0973, 2.194, 2.3261, 2.4813, 2.4542, 2.2637, 1.9338, 1.6342, 1.5003, 1.4298,
@@ -136,7 +137,7 @@ def plot_absorbance_spectrum_cpr(save_path: str = None):
 
 
 def plot_absorbance_curves_hardware_plate(save_path: str = None):
-
+    """Plots the absorbance against concentrations and makes a linear fit with the data points."""
     cpr_conc_hardware = np.array([0.25, 0.25, 0.25, 0.5, 0.5, 0.5,
                                   0.75, 0.75, 0.75, 1, 1, 1, 1.25, 1.25, 1.25])
     cpr_absorbance_hardware = np.array([0.29901, 0.24646, 0.27459, 0.62725, 0.577777, 0.67268067, 0.8091459787, 0.7160924046,
