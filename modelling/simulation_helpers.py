@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.interpolate import UnivariateSpline
-from models import model_prokaryotic_readout
+from models import model_prokaryotic_absorbance
 from alignment_helpers import weighted_running_average
 from standard_values import standard_parameters_prokaryotic, standard_constants
 
@@ -162,7 +162,7 @@ if __name__ == "__main__":
     initial_conditions = np.array([dna_i, s_i, 500*10**-3])
 
     # Running the model
-    time, absorbance = model_prokaryotic_readout(
+    time, absorbance = model_prokaryotic_absorbance(
         parameters, constants, initial_conditions, dt=dt, t_tot=t_tot)
 
     absorbance_values, sd_values = create_absorbance_sd(30)
