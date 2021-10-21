@@ -5,7 +5,7 @@ This folder contains all the files used for our model implementation, sensitivit
 To run the source code you should install Python and install the required libraries. The required libraries can be found in the folder `modeling/env_requirements` ([click here](/modeling/env_requirements)) and can be installed in two different ways:
 
 1. Python pip: use `requirements.txt` and install the libraries with the help of *pip*. For help, see [here](https://pip.pypa.io/en/stable/user_guide/#requirements-files).
-2. Conda package manager: use `environment.yaml` and use the *conda* package manager to create a new environment with the required packages. For help, see [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
+2. Conda package manager: use `environment.yaml` and use the *conda* package manager to create a new environment with the required libraries. For help, see [here](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-from-an-environment-yml-file).
 
 ## File description
 A description for files that were used for analysis and text on our wiki page. The filename is shown and what the code in the file does is briefly explained.
