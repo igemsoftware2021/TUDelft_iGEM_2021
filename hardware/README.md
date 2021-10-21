@@ -6,6 +6,11 @@ This module contains all the files that are needed to operate the dedicated read
 
 To run the source code you should install Python and install the required libraries. The required libraries can be found in the folder `hardware/env_requirements` ([click here](/modeling/env_requirements)) and can be installed with Python pip: use `requirements.txt` and install the libraries with the help of *pip*. For help, see [here](https://pip.pypa.io/en/stable/user_guide/#requirements-files).
 
+The library required for the APDS9930 sensor can be installed as follows:
+```
+python -m pip install https://github.com/Hofei90/python-apds9930.git
+```
+
 ## File description
 
 A description for files that were used for analysis and text on our wiki page. The filename is shown and it is briefly explained what each file does.
@@ -15,7 +20,7 @@ A description for files that were used for analysis and text on our wiki page. T
 - `helpers.py` - helper functions to enable measurements by the read-out device.
 - `measurement_main.py` - file to run a temperature-controlled absorbance measurement over time, including an option to pre-heat the test box.
 - `measurement_absorbance.py` - file to run an absorbance measurement over time.
-- `plots.py` - .
+- `plots.py` - functions to create all the plots for the wiki.
 - `temperature_tuning.py` - file to tune the PID-controller.
 - `test_i2c_multiplexer.py` - file to try out if the connection and communication with the sensors via the multiplexer functions correctly.
 - `test_spi.py` - file to try out the temperature measurement.
