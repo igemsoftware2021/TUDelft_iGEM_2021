@@ -4,7 +4,7 @@ from SALib.sample import morris as morris_sample
 from SALib.analyze import morris as morris_analyze
 from tqdm import tqdm
 import numpy as np
-from models_parallelized import model_prokaryotic_parallel
+from models import model_prokaryotic_parallel
 from models_area import model_prokaryotic_area_parallel
 
 
@@ -94,6 +94,7 @@ def morris_analysis_prokaryotic(problem, trajectories, initial_conditions, dt: i
     n = int(np.ceil(t_tot/dt) + 1)  # Number of timesteps of the simulation [-]
     time = np.linspace(0, t_tot, n)  # Array with all timepoints.
 
+    # See model_prokaryotic_parallel (this was done to have less datapoints due to memory constrains)
     n = int(np.ceil(n/10))
 
     # Retrieve number of parameters

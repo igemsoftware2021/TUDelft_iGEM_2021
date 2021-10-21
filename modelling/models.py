@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit
+from numba import njit, prange
 
 
 @njit(cache=True, nogil=True)
@@ -501,3 +501,46 @@ def model_prokaryotic_all(parameters, initial_conditions, dt=0.01, t_tot=7200):
         p[step + 1] = p[step] + p_dt * dt
 
     return time, dna, umrna, cmrna, dmrna, vit, umrna_vit, tsr, tlr, e_mon, e, s, p, production
+
+
+@njit(parallel=True)
+def model_prokaryotic_parallel(parameters, initial_conditions, dt: int = 0.01, t_tot: int = 7200):
+    """"Function runs a simulations of the kinetics of the prokaryotic
+    AptaVita system in parallel using the Numba library.
+
+    Parameters
+    ----------
+    parameters: numpy.array
+        The Numpy array containing all the parameters for the model of dtype=float
+    initial_condition: numpy.array
+        The Numpy array containing all the initial conditions for the model of dtype=float
+    dt: int
+        The time each timestep takes in seconds. (default 0.01)
+    t_tot: int
+        The total time the model should run in seconds. (default 7200)
+
+    Returns
+    -------
+    model_output: numpy.ndarray
+        The Numpy array contains all the model output values. Every row is a time point and
+        every column contains the results of each unique simulation over all the timepoints.
+        The resulting array has ceil(t_tot/dt) + 1 rows and parameters.shape[0] columns.
+    """
+    # Not all data can be stored when a lot of simualtions are run in parallel
+    # due to memory constraint, hence every 10 data point is stored
+    store_step = 10
+
+    # The amount of time steps
+    n = int(np.ceil(t_tot/dt) + 1)
+    # The number of simulations
+    num_simulations = parameters.shape[0]
+    # model_output = np.zeros((n, num_simulations))
+    # The division by 10 was done, because 70 trajectories with timesteps of 0.01 for 10800 seconds
+    # does not fit in memory
+    model_output = np.zeros((int(np.ceil(n/10)), num_simulations))
+    # Every column is a unique simulation
+    for ii in prange(num_simulations):
+        _, product = model_prokaryotic(
+            parameters=parameters[ii, :], initial_conditions=initial_conditions[ii, :], dt=dt, t_tot=t_tot)
+        model_output[:, ii] = product[::store_step]
+    return model_output
