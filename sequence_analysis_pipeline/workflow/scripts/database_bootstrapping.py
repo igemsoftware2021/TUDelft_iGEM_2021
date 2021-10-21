@@ -1,7 +1,7 @@
 import numpy as np
 from tqdm import tqdm
 from database_interface import DatabaseInterfaceSequences
-from bootstrapping_v2 import bootstrap_cs_fc_with_replacement
+from bootstrapping import bootstrap_cs_fc_with_replacement
 
 
 database_path = snakemake.input[0]
@@ -16,10 +16,6 @@ TABLE_CLEAN_SEQ = "clean_sequences"
 with DatabaseInterfaceSequences(path=database_path) as db:
     info_rows = db.get(table=TABLE_CLEAN_SEQ, columns=[
                        "id", "read_count", "sequence_id", "reference_name", "cleaved_prefix", "ligand_present"])
-
-    # for info_row in info_rows:
-    #     if info_row[3] is not None:
-    #         print(info_row)
 
     rowid_to_neg_cs_mean, rowid_to_neg_cs_se, rowid_to_pos_cs_mean, rowid_to_pos_cs_se, rowid_to_fc_mean, rowid_to_fc_se = bootstrap_cs_fc_with_replacement(
         info_rows)

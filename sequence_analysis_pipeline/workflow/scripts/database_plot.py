@@ -2,8 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from database_interface import DatabaseInterfaceSequences
 
-database_path = "./results/databases/S2_D63_database.db"
-# database_path = snakemake.input[0]
+# database_path = "./results/databases/S2_D63_database.db"
+database_path = snakemake.input[0]
 
 # The table that links an integer to a sequence
 TABLE_ID_SEQ = "id_sequence"
@@ -103,12 +103,10 @@ ax2.scatter(fc_array[non_biosensor_array],
 ax2.scatter(fc_array[biosensor_array],
             fc_se_array[biosensor_array], s=2, alpha=1, color="red")
 
+fig2.savefig(f"{snakemake.output[0]}", format="svg", dpi=1200)
+
 # ax2.set_xticks([10, 20, 30, 40, 50, 60, 70, 80, 90,
 #                91, 92, 93, 94, 95, 96, 97, 98, 99, 99.5])
 # ax2.set_xscale("log")
 # ax2.set_yscale("log")
-ax2.grid(True)
-
-plt.show()
-# fig1.show()
-fig2.show()
+# ax2.grid(True)
