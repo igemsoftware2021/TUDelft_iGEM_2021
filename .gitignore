@@ -11,7 +11,7 @@
 [Ll]ib
 [Ll]ib64
 [Ll]ocal
-[Ss]cripts
+# [Ss]cripts
 pyvenv.cfg
 .venv
 pip-selfcheck.json
@@ -150,11 +150,17 @@ dmypy.json
 .DS_Store
 test_LoulotteW
 
-# Boyd's stuff
-sponsor_scraping
-
 # Minke's stuff
 test_microfluidic_minke
 
 # Koen's stuff
 testing
+
+# snakemake
+.snakemake
+
+# data
+sequence_analysis_pipeline/data/NGS/
+sequence_analysis_pipeline/results/
+sequence_analysis_pipeline/results/
+sequence_analysis_pipeline/logs/

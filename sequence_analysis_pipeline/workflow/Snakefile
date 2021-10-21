@@ -1,0 +1,144 @@
+configfile: "config/config.yaml"
+
+dataset = config["dataset"]
+
+rule all:
+    input:
+        expand("results/plots/{dataset}_fold_change_vs_fold_change_se.svg", dataset=config["dataset"]),
+        expand("results/plots/{dataset}_fraction_cleaved.svg", dataset=config["dataset"]),
+        expand("results/databases/{dataset}_database.db", dataset=config["dataset"])
+
+    
+rule fastqc:
+    input:
+        "data/NGS/{sample}.fastq.gz"
+    output:
+        "results/fastqc_reports/{sample}_fastqc.html",
+        "results/fastqc_reports/{sample}_fastqc.zip"
+    conda:
+        "envs/fastqc.yaml"
+    log:
+        "logs/fastqc/{sample}_fastqc.log"
+    shell:
+        """
+        #!/bin/bash
+        fastqc {input} -o results/fastqc_reports/ 2> {log}
+        """
+
+rule pear:
+    input:
+        forward_read="data/NGS/{sample}_R1_001.fastq.gz",
+        reverse_read="data/NGS/{sample}_R2_001.fastq.gz"
+    output:
+        "results/pear/{sample}.assembled.fastq",
+        "results/pear/{sample}.discarded.fastq",
+        "results/pear/{sample}.unassembled.forward.fastq",
+        "results/pear/{sample}.unassembled.reverse.fastq"
+    conda:
+        "envs/pear.yaml"
+    log:
+        "logs/pear/{sample}_pear.log"
+    shell:
+        """
+        #!/bin/bash
+        pear -f {input.forward_read} -r {input.reverse_read} -o results/pear/{dataset} > {log}
+        """
+
+rule fastq_to_fasta:
+    input:
+        "results/pear/{dataset}.assembled.fastq"
+    output:
+        "results/fasta/{dataset}.assembled.seq"
+    shell:
+        """
+        #!/bin/bash
+        awk '{{if(NR%4==2) print $0}}' {input} > {output}
+        """
+
+rule sort_and_combine_fasta:
+    input:
+        "results/fasta/{dataset}.assembled.seq"
+    output:
+        "results/read_counts/{dataset}_read_count.txt"
+    shell:
+        """
+        sort {input} | uniq -dc  | sort -nr > {output}
+        """
+
+rule split_file:
+    input:
+        "results/read_counts/{dataset}_read_count.txt"
+    output:
+        "results/read_counts/{dataset}_L0_read_count.txt",
+        "results/read_counts/{dataset}_L1_read_count.txt",
+        "results/read_counts/{dataset}_other_read_count.txt"
+    conda:
+        "envs/tqdm.yaml"
+    script:
+        "scripts/file_splitting.py"
+
+rule database_insert_read_counts:
+    input:
+        "results/read_counts/{dataset}_L0_read_count.txt",
+        "results/read_counts/{dataset}_L1_read_count.txt"
+    output:
+        "results/databases/{dataset}_database.db"
+    conda:
+        "envs/database.yaml"
+    script:
+        "scripts/database_insertion.py"
+
+rule database_movement:
+    input:
+        "results/databases/{dataset}_database.db"
+    output:
+        touch("results/checkpoints/{dataset}/{dataset}_database_movement.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "scripts/database_movement.py"
+
+rule database_calculate_metrics:
+    input:
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}/{dataset}_database_movement.done"
+    output:
+        touch("results/checkpoints/{dataset}/{dataset}_database_calculate_metrics.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "scripts/database_calculate_metrics.py"
+
+rule database_bootstrapping:
+    input:
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}/{dataset}_database_calculate_metrics.done"
+    output:
+        touch("results/checkpoints/{dataset}/{dataset}_database_bootstrapping.done")
+    conda:
+        "envs/database.yaml"
+    script:
+        "scripts/database_bootstrapping.py"
+
+rule database_biosensor_assay:
+    input:
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}/{dataset}_database_bootstrapping.done"
+    output:
+        touch("results/checkpoints/{dataset}/{dataset}_database_biosensor_assay.done")
+    conda:
+        "envs/biosensor_assay.yaml"
+    script:
+        "scripts/database_biosensor_assay.py"
+
+rule plotting:
+    input:
+        "results/databases/{dataset}_database.db",
+        "results/checkpoints/{dataset}/{dataset}_database_biosensor_assay.done"
+    output:
+        "results/plots/{dataset}_fold_change_vs_fold_change_se.svg",
+        "results/plots/{dataset}_fraction_cleaved.svg"
+    conda:
+        "envs/plotting.yaml"
+    script:
+        "scripts/database_plot.py"

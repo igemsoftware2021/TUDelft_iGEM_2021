@@ -1,0 +1,7 @@
+name: tqdm
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - tqdm=4.61.*
+  - pyyaml=5.4.*

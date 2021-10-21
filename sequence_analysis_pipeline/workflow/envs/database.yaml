@@ -1,0 +1,11 @@
+name: database
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  - python=3.9.*
+  - pyyaml=5.4.*
+  - tqdm=4.61.*
+  - regex=2021.4.*
+  - pathlib
