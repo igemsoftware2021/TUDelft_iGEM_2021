@@ -32,8 +32,8 @@ def standard_constants():
     h = 0.020  # (0) Height of the paper [cm]
     # (1) Exctinction coefficient of CPRG at a wavelength of 410 in 25% serum [1/(µM*cm)]
     eps_cprg = 0.294
-    # (2) Exctinction coefficient of CPR at a wavelength of 580 in 25% serum [1/(µM*cm)]
-    eps_cpr = 0.539  # TODO change to 0.077228 (Sigma-Aldrich)
+    # (2) Exctinction coefficient of CPR at a wavelength of 574 nm [1/(µM*cm)] (Sigma-Aldrich)
+    eps_cpr = 0.07228
 
     # Array containing above constants
     constants = np.array([h, eps_cprg, eps_cpr])
@@ -42,6 +42,6 @@ def standard_constants():
 
 def standard_initial_conditions():
     dna_conc = 3*10**-3     # DNA concentration [µM]
-    s_i = 250               # Substrate concentration [µM]
+    s_i = 1000              # Substrate concentration [µM]
     vit_conc = 0.07         # Vitamin concentration [µM]
     return np.array([dna_conc, s_i, vit_conc])
