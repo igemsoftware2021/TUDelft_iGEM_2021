@@ -13,6 +13,9 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     custom_cycler = custom_aptavita_color_cycler()
     factor_names = senstivity_analysis_factor_names()
 
+    # Set plot steps to increase plotting speed and lower figure memory
+    plot_step = 10
+
     fig1, ax1 = plt.subplots(figsize=(14, 8), dpi=125)
     fig2, ax2 = plt.subplots(figsize=(14, 8), dpi=125)
     fig3, ax3 = plt.subplots(figsize=(14, 8), dpi=125)
@@ -25,18 +28,14 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     ax4.set_prop_cycle(custom_cycler)
 
     for i in range(len(parameters)):
-        ax1.plot(data_dict["time"][::10], data_dict["mu"]
-                 [::10, i], label=factor_names[i])
-        # ax2.plot(data_dict["time"][::10], data_dict["mu"]
-        #          [::10, i], label=parameters[i])
-        # ax3.plot(data_dict["time"][::10], data_dict["mu"]
-        #          [::10, i], label=parameters[i])
-        ax2.plot(data_dict["time"][::10], data_dict["mu_star"]
-                 [::10, i], label=factor_names[i])
-        ax3.plot(data_dict["time"][::10], data_dict["sigma"]
-                 [::10, i], label=factor_names[i])
-        ax4.plot(data_dict["time"][::10], data_dict["mu_star_conf_level"]
-                 [::10, i], label=factor_names[i], alpha=0.5)
+        ax1.plot(data_dict["time"][::plot_step], data_dict["mu"]
+                 [::plot_step, i], label=factor_names[i])
+        ax2.plot(data_dict["time"][::plot_step], data_dict["mu_star"]
+                 [::plot_step, i], label=factor_names[i])
+        ax3.plot(data_dict["time"][::plot_step], data_dict["sigma"]
+                 [::plot_step, i], label=factor_names[i])
+        ax4.plot(data_dict["time"][::plot_step], data_dict["mu_star_conf_level"]
+                 [::plot_step, i], label=factor_names[i], alpha=0.5)
 
     # Set all proporties for ax1
     ax1.legend()
@@ -51,7 +50,7 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
     # Set all proporites for ax3
     ax3.legend()
     ax3.set_xlabel(r"Time $\mathrm{(s)}$")
-    ax3.set_ylabel(r"$\mathrm{{\sigma}}$ $[\mathrm{\mu M}]$")
+    ax3.set_ylabel(r"$\mathrm{{\sigma}}\;[\mathrm{\mu M}]$")
 
     ax4.legend()
     ax4.set_xlabel(r"Time $\mathrm{(s)}$")
@@ -70,16 +69,17 @@ def plot_morris_analysis(path="modelling/data", tag="_1633190385", save_path=Non
 
 def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_1633190385", save_path=None):
 
-    fill_plot_step = 10
-    plot_steps = 10
-    plot_time = 72001
-
     parameters, data_dict = morris_datareader(
         path=path, tag=tag, data_names=["mu_star", "mu_star_conf"])
 
     custom_cycler = custom_aptavita_color_cycler()
     custom_colors = custom_aptavita_colors()
     factor_names = senstivity_analysis_factor_names()
+
+    fill_plot_step = 10
+    plot_step = 10
+    plot_time = 72001
+    plot_time = min(plot_time, parameters["mu_star"].shape[0])
 
     fig1, ((ax1, ax2), (ax3, ax4)) = plt.subplots(
         nrows=2, ncols=2, figsize=(12, 9), dpi=150)
@@ -91,9 +91,9 @@ def plot_morris_analysis_mu_star_subplots(path="modelling/data", tag="_163319038
     ax4.set_prop_cycle(custom_cycler)
 
     for i in range(len(parameters)):
-        x = data_dict["time"][:plot_time:plot_steps]
-        y = data_dict["mu_star"][:plot_time:plot_steps, i]
-        ci = data_dict["mu_star_conf"][:plot_time:plot_steps, i]
+        x = data_dict["time"][:plot_time:plot_step]
+        y = data_dict["mu_star"][:plot_time:plot_step, i]
+        ci = data_dict["mu_star_conf"][:plot_time:plot_step, i]
 
         if parameters[i] in {"deg_mrna", "kc_s", "k_tlr"}:
             ax1.plot(
@@ -337,10 +337,10 @@ def plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None):
     standard_area4 = model_prokaryotic_area(
         standard_parameter_values, 0.1*10**-3, 250, 0.05, 0.09, dt=dt, t_tot=t_tot)
 
-    mu_fc1 = mu1 / standard_area1
-    mu_fc2 = mu2 / standard_area2
-    mu_fc3 = mu3 / standard_area3
-    mu_fc4 = mu4 / standard_area4
+    mu_fc1 = (standard_area1 + mu1) / standard_area1
+    mu_fc2 = (standard_area2 + mu2) / standard_area2
+    mu_fc3 = (standard_area3 + mu3) / standard_area3
+    mu_fc4 = (standard_area4 + mu4) / standard_area4
 
     # Not used
     # mu_star = data_dict["mu_star"].reshape(-1)
@@ -707,17 +707,18 @@ def morris_method_visualization():
 
 
 if __name__ == "__main__":
-    # morris_method_visualization()
+    morris_method_visualization()
     plot_morris_analysis_mu_star_subplots(
         path="modelling/data", tag="_1634552273", save_path="modelling/data/plots/T--TUDelft--Morris_Mu_Star_Subplots_1634552273.svg")
-    # plot_morris_analysis_area(
-    #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
 
     parameters = standard_parameters_prokaryotic()
     standard_area = model_prokaryotic_area(
         parameters, 3*10**-3, 1000, 0.05, 0.09, dt=0.01, t_tot=10800)
     plot_morris_analysis_area_fold_change(
         path="modelling/data", tag="_1634558479", standard_area=standard_area, save_path="modelling/data/plots/T--TUDelft--Morris_Area")
+
+    # plot_morris_analysis_area(
+    #     path="modelling/data", tag="_1633591400", save_path="modelling/data/plots/T--TUDelft--Morris_Area_1633591400")
     # plot_morris_analysis_area_fold_change(
     #     path="modelling/data", tag="_1633591400", save_path=None, standard_area=standard_area)
     # plot_morris_analysis_area_fold_change_multiple_DNA_conc(save_path=None)
