@@ -1,5 +1,4 @@
 import time
-import multiprocessing
 import numpy as np
 import pigpio
 from helpers import initialize_light_pins, initialize_heating_pin
