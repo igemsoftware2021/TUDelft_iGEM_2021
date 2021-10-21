@@ -1,8 +1,5 @@
 import numpy as np
 from numba import njit
-import csv
-from standard_values import standard_parameters_prokaryotic, standard_constants, standard_initial_conditions
-import matplotlib.pyplot as plt
 
 
 @njit(cache=True, nogil=True)
