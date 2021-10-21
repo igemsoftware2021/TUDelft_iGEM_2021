@@ -1,4 +1,0 @@
-sqlite3
-pyyaml
-tqdm
-regex
