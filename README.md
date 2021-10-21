@@ -1,4 +1,4 @@
-# TUDelft_iGEM_2021
+# Repository of the TU Delft iGEM 2021 team
 
 
 This repository contains all the source code for software created by the iGEM TU Delft 2021 team. We worked on three modules. Click on the following links to read more about each individual module and study the source code:
