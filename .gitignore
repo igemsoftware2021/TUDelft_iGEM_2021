@@ -156,3 +156,4 @@ dmypy.json
 sequence_analysis_pipeline/data/NGS/
 sequence_analysis_pipeline/results/
 sequence_analysis_pipeline/results/
+sequence_analysis_pipeline/logs/
